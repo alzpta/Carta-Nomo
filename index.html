@@ -3,60 +3,171 @@
 <head>
   <meta charset="UTF-8" />
   <title>Números interactivos 1–100</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- PWA (ajustado para GitHub Pages en /Carta-Nomo/) -->
   <link rel="manifest" href="/Carta-Nomo/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
   <link rel="apple-touch-icon" href="/Carta-Nomo/iconos/icon-192.png" />
   <link rel="icon" href="/Carta-Nomo/favicon.ico" />
 
   <style>
-    :root { --bg:#fff; --card:#f6f7f8; --accent:#0b5fff; --hover:#e8f1ff; }
-    body { font-family: system-ui, sans-serif; margin:20px; background:var(--bg); color:#111; }
-    h1 { text-align:center; }
-    .hint { text-align:center; color:#555; margin:10px 0 20px; }
+    :root {
+      --bg: #fff;
+      --card: #f6f7f8;
+      --accent: #0b5fff;
+      --hover: #e8f1ff;
+      --radius: 12px;
+      --cell-min: 60px;      /* tamaño mínimo del botón número */
+      --gap: 10px;
+      --content-w: 1000px;   /* ancho máximo del contenido */
+    }
 
-    .toolbar { max-width:900px; margin:0 auto 12px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    .btn { padding:10px 14px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:600; }
-    .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
-    .btn.danger { border-color:#e00; color:#e00; }
-    .muted { color:#666; font-size:.9rem; align-self:center; }
+    * { box-sizing: border-box; }
 
-    .grid { display:grid; grid-template-columns:repeat(10,1fr); gap:10px; max-width:900px; margin:auto; }
-    .number { padding:12px; background:#f0f0f0; border-radius:10px; cursor:pointer; font-weight:700; text-align:center; }
-    .number:hover { background:var(--hover); }
-    .selected { outline:2px solid var(--accent); background:#eef3ff; }
+    body {
+      margin: 0;
+      padding: clamp(12px, 2vw, 24px);
+      background: var(--bg);
+      color: #111;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height: 1.3;
+    }
 
-    #output { margin:20px auto 0; font-size:1.2rem; max-width:900px; }
-    .image-preview { max-width:120px; margin-top:8px; border-radius:8px; }
+    .page {
+      max-width: var(--content-w);
+      margin: 0 auto;
+    }
 
-    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; padding:16px; }
-    .modal { background:#fff; border-radius:14px; padding:16px; width:100%; max-width:500px; }
-    .modal h2 { margin:0 0 10px; }
-    .row { margin:10px 0; }
-    .row label { display:block; margin-bottom:4px; font-size:.9rem; }
-    .row input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; }
-    .actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+    h1 {
+      text-align: center;
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      margin: 0 0 .4rem;
+    }
+
+    .hint {
+      text-align: center;
+      color: #555;
+      font-size: clamp(.9rem, 2.5vw, 1rem);
+      margin: 0 0 clamp(12px, 2.5vw, 20px);
+    }
+
+    /* Toolbar responsive */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto clamp(12px, 3vw, 16px);
+    }
+    .btn {
+      padding: clamp(8px, 2vw, 10px) clamp(10px, 3vw, 14px);
+      border-radius: var(--radius);
+      border: 1px solid #d0d7de;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: clamp(.9rem, 2.5vw, 1rem);
+    }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn.danger  { border-color: #e00; color: #e00; }
+    .muted { color: #666; font-size: clamp(.85rem, 2.2vw, .95rem); }
+
+    /* Grid totalmente fluido: columnas se adaptan al ancho disponible */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
+      gap: var(--gap);
+      max-width: var(--content-w);
+      margin: 0 auto;
+    }
+    .number {
+      padding: clamp(10px, 2.2vw, 14px);
+      background: #f0f0f0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 700;
+      text-align: center;
+      user-select: none;
+      transition: background .15s ease;
+      font-size: clamp(.95rem, 2.8vw, 1.05rem);
+    }
+    .number:hover { background: var(--hover); }
+    .selected { outline: 2px solid var(--accent); background: #eef3ff; }
+
+    #output {
+      margin: clamp(14px, 3vw, 20px) auto 0;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      max-width: var(--content-w);
+      padding: 0 clamp(2px, 1vw, 6px);
+    }
+    .image-preview {
+      max-width: min(160px, 40vw);
+      width: 100%;
+      height: auto;
+      margin-top: 8px;
+      border-radius: 10px;
+    }
+
+    /* Modales responsive */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.4);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: clamp(10px, 3vw, 16px);
+      z-index: 1000;
+    }
+    .modal {
+      width: 100%;
+      max-width: min(520px, 95vw);
+      background: #fff;
+      border-radius: 14px;
+      padding: clamp(12px, 3vw, 16px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.2);
+    }
+    .modal h2 { margin: 0 0 8px; font-size: clamp(1.1rem, 3vw, 1.3rem); }
+    .row { margin: 10px 0; }
+    .row label { display:block; margin-bottom:4px; font-size: clamp(.9rem, 2.5vw, 1rem); }
+    .row input {
+      width: 100%;
+      padding: clamp(8px, 2vw, 10px);
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: clamp(.95rem, 2.6vw, 1rem);
+    }
+    .actions { display:flex; gap:10px; justify-content:flex-end; margin-top: 12px; }
+
+    /* Ajustes finos para pantallas muy pequeñas */
+    @media (max-width: 420px) {
+      :root { --cell-min: 54px; --gap: 8px; }
+      .toolbar { gap: 8px; }
+      .btn { padding: 8px 10px; }
+    }
   </style>
 </head>
 <body>
-  <h1>Carta Nomo Sarria</h1>
-  <p class="hint">Clic en un número = ver y oír. Para editar, primero inicia sesión.</p>
+  <div class="page">
+    <h1>Carta Nomo Sarria</h1>
+    <p class="hint">Clic en un número = ver y oír. Para editar, primero inicia sesión.</p>
 
-  <div class="toolbar">
-    <span id="userInfo" class="muted"></span>
-    <button id="loginBtn" class="btn">Iniciar sesión</button>
-    <button id="logoutBtn" class="btn" style="display:none">Salir</button>
-    <button id="editarBtn" class="btn primary" style="display:none">Editar número</button>
-    <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
-    <button id="exportBtn" class="btn" style="display:none">Exportar</button>
-    <button id="importBtn" class="btn" style="display:none">Importar</button>
+    <div class="toolbar">
+      <span id="userInfo" class="muted"></span>
+      <button id="loginBtn" class="btn">Iniciar sesión</button>
+      <button id="logoutBtn" class="btn" style="display:none">Salir</button>
+      <button id="editarBtn" class="btn primary" style="display:none">Editar número</button>
+      <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
+      <button id="exportBtn" class="btn" style="display:none">Exportar</button>
+      <button id="importBtn" class="btn" style="display:none">Importar</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div id="output"></div>
   </div>
 
-  <div class="grid" id="grid"></div>
-  <div id="output"></div>
-
   <!-- Modal edición -->
-  <div id="editBackdrop" class="modal-backdrop">
+  <div id="editBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal">
       <h2>Editar número</h2>
       <div class="row">
@@ -65,7 +176,7 @@
       </div>
       <div class="row">
         <label for="palabra">Palabra</label>
-        <input type="text" id="palabra" />
+        <input type="text" id="palabra" placeholder="Escribe la palabra…" />
       </div>
       <div class="row">
         <label for="imagen">Imagen (opcional)</label>
@@ -79,16 +190,16 @@
   </div>
 
   <!-- Modal login -->
-  <div id="loginBackdrop" class="modal-backdrop">
+  <div id="loginBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal">
       <h2>Acceso administrador</h2>
       <div class="row">
         <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" />
+        <input type="email" id="loginEmail" placeholder="admin@tu-dominio.com" />
       </div>
       <div class="row">
         <label for="loginPass">Contraseña</label>
-        <input type="password" id="loginPass" />
+        <input type="password" id="loginPass" placeholder="••••••••" />
       </div>
       <div class="actions">
         <button id="loginCancel" class="btn">Cancelar</button>
@@ -99,9 +210,9 @@
   </div>
 
 <script>
-/* === Configura tus credenciales === */
+/* === Credenciales (Opción A) === */
 const ADMIN_EMAIL = "admin@tu-dominio.com";
-const ADMIN_PASS_HASH = "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270"; // SHA-256
+const ADMIN_PASS_HASH = "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270";
 
 async function sha256(txt){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
@@ -111,7 +222,7 @@ async function sha256(txt){
 /* === Estado === */
 let seleccionado = 1;
 let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
-function guardarDatos(){ localStorage.setItem("palabrasNumeros", JSON.stringify(datos)); }
+const guardarDatos = () => localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
 
 /* === UI refs === */
 const grid=document.getElementById("grid"),output=document.getElementById("output");
@@ -152,7 +263,7 @@ loginSubmit.onclick=async()=>{
 };
 logoutBtn.onclick=()=>setLogged(false);
 
-/* === Modal edición === */
+/* === Edición === */
 editarBtn.onclick=()=>{
   if(!isLogged()){alert("Debes iniciar sesión");return;}
   const info=datos[seleccionado]||{};
@@ -164,11 +275,13 @@ cancelarBtn.onclick=()=>{editBackdrop.style.display="none";}
 guardarBtn.onclick=()=>{
   const n=parseInt(numSel.value,10)||1;
   const palabra=(palabraInput.value||"").trim();
-  const aplicar=(img)=>{ datos[n]={palabra,imagen:img||datos[n]?.imagen||null};
-    guardarDatos(); mostrar(n); editBackdrop.style.display="none"; };
-  if(imagenInput.files[0]){
-    const r=new FileReader(); r.onload=()=>aplicar(r.result); r.readAsDataURL(imagenInput.files[0]);
-  } else aplicar();
+  const aplicar=(img)=>{
+    datos[n]={palabra, imagen: img ?? datos[n]?.imagen ?? null};
+    guardarDatos(); mostrar(n); editBackdrop.style.display="none";
+  };
+  const f=imagenInput.files[0];
+  if(f){ const r=new FileReader(); r.onload=()=>aplicar(r.result); r.readAsDataURL(f); }
+  else aplicar();
 };
 
 borrarBtn.onclick=()=>{
@@ -176,20 +289,17 @@ borrarBtn.onclick=()=>{
   delete datos[seleccionado]; guardarDatos(); mostrar(seleccionado);
 };
 
-/* === Importar / Exportar (solo con sesión) === */
+/* === Importar / Exportar === */
 exportBtn.onclick=()=>{
   if(!isLogged()){alert("Debes iniciar sesión");return;}
   const blob=new Blob([JSON.stringify(datos,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url; a.download="palabrasNumeros.json"; a.click();
+  const a=document.createElement("a"); a.href=url; a.download="palabrasNumeros.json"; a.click();
   URL.revokeObjectURL(url);
 };
-
 importBtn.onclick=()=>{
   if(!isLogged()){alert("Debes iniciar sesión");return;}
-  const inp=document.createElement("input");
-  inp.type="file"; inp.accept="application/json";
+  const inp=document.createElement("input"); inp.type="file"; inp.accept="application/json";
   inp.onchange=()=>{
     const f=inp.files?.[0]; if(!f) return;
     const r=new FileReader();
@@ -197,35 +307,50 @@ importBtn.onclick=()=>{
       try{
         const obj=JSON.parse(r.result);
         if(obj && typeof obj==="object"){
-          // mezcla (merge) — mantiene lo existente y sobreescribe lo importado
-          datos={...datos, ...obj};
-          guardarDatos();
-          mostrar(seleccionado);
-          alert("Importación completada.");
+          // valida claves 1..100 y estructura básica
+          const limpio={};
+          Object.keys(obj).forEach(k=>{
+            const n=Number(k);
+            if(n>=1 && n<=100 && typeof obj[k]==="object"){
+              const p = typeof obj[k].palabra==="string" ? obj[k].palabra : "";
+              const im = typeof obj[k].imagen==="string" ? obj[k].imagen : null;
+              limpio[n]={palabra:p, imagen:im};
+            }
+          });
+          datos={...datos, ...limpio};
+          guardarDatos(); mostrar(seleccionado); alert("Importación completada.");
         } else { alert("JSON no válido"); }
       }catch{ alert("JSON no válido"); }
     };
     r.readAsText(f);
   };
-  document.body.appendChild(inp);
-  inp.click();
-  inp.remove();
+  document.body.appendChild(inp); inp.click(); inp.remove();
 };
 
-/* === Mostrar === */
+/* === Hablar/mostrar === */
+function hablar(texto){
+  try { speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(texto); u.lang="es-ES"; speechSynthesis.speak(u); } catch {}
+}
 function mostrar(i){
-  const info=datos[i]; output.innerHTML=`<strong>Número ${i}:</strong> ${info?info.palabra:"(sin datos)"}`;
-  if(info?.imagen){output.innerHTML+=`<div><img src="${info.imagen}" class="image-preview"></div>`;}
-  if(info?.palabra){speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(info.palabra); u.lang="es-ES"; speechSynthesis.speak(u);}
+  const info=datos[i];
+  output.innerHTML=`<strong>Número ${i}:</strong> ${info?info.palabra:"(sin datos)"}`;
+  if(info?.imagen){output.innerHTML+=`<div><img src="${info.imagen}" class="image-preview" alt="Imagen del número ${i}"></div>`;}
+  if(info?.palabra){hablar(info.palabra);}
 }
 
-/* === Construir grid === */
+/* === Construir grid fluido === */
 for(let i=1;i<=100;i++){
   const d=document.createElement("div"); d.className="number"; d.textContent=i;
-  d.onclick=()=>{seleccionado=i;document.querySelectorAll(".number").forEach((n,ix)=>n.classList.toggle("selected",ix+1===i)); mostrar(i);}
+  d.onclick=()=>{seleccionado=i;[...grid.children].forEach((n,ix)=>n.classList.toggle("selected",ix+1===i)); mostrar(i);}
   grid.appendChild(d);
 }
+[...grid.children].forEach((n,ix)=>n.classList.toggle("selected",ix===0));
 mostrar(seleccionado);
+
+/* === PWA SW === */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>navigator.serviceWorker.register("/Carta-Nomo/service-worker.js"));
+}
 </script>
 </body>
 </html>

@@ -85,6 +85,14 @@
     .number:hover{background:var(--hover)}
     .selected{outline:2px solid var(--accent);background:#eef3ff}
 
+    /* NUEVO: celdas sin datos en azul pastel */
+    .number.empty{
+      background:#eaf4ff;             /* azul pastel */
+    }
+    .number.empty:hover{
+      background:#ddecff;             /* un poco más intenso al hover */
+    }
+
     #output{
       margin:clamp(14px,3vw,20px) auto 0;
       font-size:clamp(1rem,3vw,1.2rem);
@@ -213,6 +221,18 @@ const loginBackdrop=document.getElementById("loginBackdrop"),loginEmail=document
 const loginPass=document.getElementById("loginPass"),loginSubmit=document.getElementById("loginSubmit");
 const loginCancel=document.getElementById("loginCancel");
 
+/* === Helpers de UI === */
+function tieneDatos(n){
+  const d = datos[n];
+  return !!(d && ( (d.palabra && d.palabra.trim()) || d.imagen ));
+}
+function refrescarCeldasVacias(){
+  [...grid.children].forEach((el,ix)=>{
+    const n = ix+1;
+    el.classList.toggle("empty", !tieneDatos(n));
+  });
+}
+
 /* === Sesión === */
 function isLogged(){ return localStorage.getItem("adminLogged")==="1"; }
 function setLogged(v){ localStorage.setItem("adminLogged", v?"1":"0"); renderAuthUI(); }
@@ -253,7 +273,9 @@ guardarBtn.onclick=()=>{
   const palabra=(palabraInput.value||"").trim();
   const aplicar=(img)=>{
     datos[n]={palabra, imagen: img ?? datos[n]?.imagen ?? null};
-    guardarDatos(); seleccionar(n); mostrar(n); editBackdrop.style.display="none";
+    guardarDatos(); seleccionar(n); mostrar(n);
+    editBackdrop.style.display="none";
+    refrescarCeldasVacias(); // <- actualizar colores
   };
   const f=imagenInput.files[0];
   if(f){ const r=new FileReader(); r.onload=()=>aplicar(r.result); r.readAsDataURL(f); }
@@ -263,6 +285,7 @@ guardarBtn.onclick=()=>{
 borrarBtn.onclick=()=>{
   if(!isLogged()){alert("Debes iniciar sesión");return;}
   delete datos[seleccionado]; guardarDatos(); mostrar(seleccionado);
+  refrescarCeldasVacias(); // <- actualizar colores
 };
 
 /* === Importar / Exportar === */
@@ -283,7 +306,6 @@ importBtn.onclick=()=>{
       try{
         const obj=JSON.parse(r.result);
         if(obj && typeof obj==="object"){
-          // validar claves 1..100 y estructura {palabra, imagen}
           const limpio={};
           Object.keys(obj).forEach(k=>{
             const n=Number(k);
@@ -294,7 +316,9 @@ importBtn.onclick=()=>{
             }
           });
           datos={...datos, ...limpio};
-          guardarDatos(); mostrar(seleccionado); alert("Importación completada.");
+          guardarDatos(); mostrar(seleccionado);
+          refrescarCeldasVacias(); // <- actualizar colores
+          alert("Importación completada.");
         } else { alert("JSON no válido"); }
       }catch{ alert("JSON no válido"); }
     };
@@ -325,6 +349,8 @@ for(let i=1;i<=100;i++){
   grid.appendChild(d);
 }
 seleccionar(1); mostrar(1);
+/* pinta azul pastel las que no tienen datos */
+refrescarCeldasVacias();
 
 /* === PWA SW === */
 if("serviceWorker" in navigator){

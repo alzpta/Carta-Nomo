@@ -22,6 +22,7 @@
     .btn.primary { background: var(--accent); color:#fff; border-color: var(--accent); }
     .btn.danger { border-color:#e00; color:#e00; }
     .btn:active { transform: translateY(1px); }
+    .muted { color:#666; font-size:.9rem; }
 
     .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; max-width: 900px; margin: auto; }
     .number { padding: 12px; background: #f0f0f0; border-radius: 10px; cursor: pointer; font-weight: 700; text-align:center; user-select:none; transition: background .15s ease; }
@@ -31,34 +32,39 @@
     #output { margin: 18px auto 0; font-size: 1.2rem; max-width: 900px; }
     .image-preview { max-width: 120px; margin-top: 8px; border-radius: 8px; }
 
-    /* Modal */
+    /* Modal genérico */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; padding: 16px; }
     .modal { width: 100%; max-width: 560px; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
     .modal h2 { margin: 0 0 8px; }
     .modal .row { display: grid; gap: 10px; grid-template-columns: 1fr 2fr; margin: 10px 0; }
     .modal label { font-size: .9rem; color:#333; }
     .modal input[type="number"],
-    .modal input[type="text"] { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; }
+    .modal input[type="text"],
+    .modal input[type="email"],
+    .modal input[type="password"] { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; }
     .modal input[type="file"] { width:100%; }
     .modal .actions { display:flex; gap:10px; justify-content:flex-end; margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>Carta Nomo Sarria</h1>
-  <p class="hint">Clic en un número = oír y mostrar. Usa el botón “Editar” para asignar/editar palabra e imagen.</p>
+  <p class="hint">Clic en un número = oír y mostrar. Solo con sesión puedes editar.</p>
 
   <div class="toolbar">
-    <button id="editarBtn" class="btn primary">Editar número</button>
-    <button id="borrarBtn" class="btn danger" title="Borra palabra e imagen del número seleccionado">Borrar</button>
+    <span id="userInfo" class="muted"></span>
+    <button id="loginBtn" class="btn">Entrar</button>
+    <button id="logoutBtn" class="btn" style="display:none">Salir</button>
+    <button id="editarBtn" class="btn primary" style="display:none">Editar número</button>
+    <button id="borrarBtn" class="btn danger" style="display:none" title="Borra palabra e imagen del número seleccionado">Borrar</button>
     <button id="exportBtn" class="btn" title="Exporta todos tus datos como JSON">Exportar</button>
-    <button id="importBtn" class="btn" title="Importa un JSON previamente exportado">Importar</button>
+    <button id="importBtn" class="btn" title="Importa un JSON previamente exportado (solo admin)">Importar</button>
   </div>
 
   <div class="grid" id="grid"></div>
   <div id="output"></div>
 
   <!-- Modal de edición -->
-  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="editBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal">
       <h2>Editar número</h2>
       <div class="row">
@@ -80,27 +86,69 @@
     </div>
   </div>
 
+  <!-- Modal de login -->
+  <div id="loginBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <h2>Acceso administrador</h2>
+      <div class="row">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="admin@tu-dominio.com" />
+      </div>
+      <div class="row">
+        <label for="loginPass">Contraseña</label>
+        <input type="password" id="loginPass" placeholder="••••••••" />
+      </div>
+      <div class="actions">
+        <button id="loginCancel" class="btn">Cancelar</button>
+        <button id="loginSubmit" class="btn primary">Entrar</button>
+      </div>
+      <p class="muted">Este login solo oculta la edición (no es seguridad real).</p>
+    </div>
+  </div>
+
   <script>
-    // ---- Estado y utilidades ----
+    // ============= CONFIG LOGIN (solo cliente) =============
+    const ADMIN_EMAIL = "admin@tu-dominio.com";
+    // SHA-256 de tu contraseña (ver abajo cómo obtenerla)
+    const ADMIN_PASS_HASH = "REEMPLAZA_CON_TU_HASH";
+
+    async function sha256(text) {
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    // ============= Estado app =============
     const grid = document.getElementById("grid");
     const output = document.getElementById("output");
 
+    const userInfo = document.getElementById("userInfo");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
     const editarBtn = document.getElementById("editarBtn");
     const borrarBtn = document.getElementById("borrarBtn");
     const exportBtn = document.getElementById("exportBtn");
     const importBtn = document.getElementById("importBtn");
 
-    const modalBackdrop = document.getElementById("modalBackdrop");
+    const editBackdrop = document.getElementById("editBackdrop");
     const numSel = document.getElementById("numSel");
     const palabraInput = document.getElementById("palabra");
     const imagenInput = document.getElementById("imagen");
     const guardarBtn = document.getElementById("guardarBtn");
     const cancelarBtn = document.getElementById("cancelarBtn");
 
-    let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
-    let seleccionado = 1;
+    const loginBackdrop = document.getElementById("loginBackdrop");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPass = document.getElementById("loginPass");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginCancel = document.getElementById("loginCancel");
 
-    const guardarDatos = () => localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+    let seleccionado = 1;
+    let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {}; // { n: {palabra, imagenDataURL} }
+
+    function guardarDatos() {
+      localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+    }
 
     function hablar(texto) {
       try {
@@ -108,13 +156,12 @@
         const u = new SpeechSynthesisUtterance(texto);
         u.lang = "es-ES";
         speechSynthesis.speak(u);
-      } catch (_) {}
+      } catch {}
     }
 
     function pintarSeleccion() {
       [...grid.children].forEach((el, idx) => {
-        const n = idx + 1;
-        el.classList.toggle("selected", n === seleccionado);
+        el.classList.toggle("selected", idx + 1 === seleccionado);
       });
     }
 
@@ -131,58 +178,78 @@
       if (hablarAhora && info.palabra) hablar(info.palabra);
     }
 
-    // ---- Construir cuadrícula 1–100 ----
-    for (let i = 1; i <= 100; i++) {
-      const div = document.createElement("div");
-      div.className = "number";
-      div.textContent = i;
-
-      div.onclick = () => {
-        seleccionado = i;
-        pintarSeleccion();
-        mostrar(i, true); // solo muestra y habla
-      };
-
-      grid.appendChild(div);
+    // ============= Auth “light” en localStorage =============
+    function isLogged() { return localStorage.getItem("adminLogged") === "1"; }
+    function setLogged(v) { localStorage.setItem("adminLogged", v ? "1" : "0"); renderAuthUI(); }
+    function renderAuthUI() {
+      const on = isLogged();
+      editarBtn.style.display = on ? "" : "none";
+      borrarBtn.style.display = on ? "" : "none";
+      logoutBtn.style.display = on ? "" : "none";
+      loginBtn.style.display = on ? "none" : "";
+      userInfo.textContent = on ? `Sesión: ${ADMIN_EMAIL}` : "Sesión: invitado (solo lectura)";
     }
-    pintarSeleccion();
-    mostrar(seleccionado, false);
+    renderAuthUI();
 
-    // ---- Modal ----
-    function abrirModal(i) {
-      numSel.value = i;
+    function openLogin() {
+      loginEmail.value = "";
+      loginPass.value = "";
+      loginBackdrop.style.display = "flex";
+      loginBackdrop.setAttribute("aria-hidden", "false");
+    }
+    function closeLogin() {
+      loginBackdrop.style.display = "none";
+      loginBackdrop.setAttribute("aria-hidden", "true");
+    }
+    loginBtn.onclick = openLogin;
+    loginCancel.onclick = closeLogin;
+    loginBackdrop.addEventListener("click", e => { if (e.target === loginBackdrop) closeLogin(); });
+
+    loginSubmit.onclick = async () => {
+      const email = (loginEmail.value || "").trim().toLowerCase();
+      const pass = loginPass.value || "";
+      if (email !== ADMIN_EMAIL) { alert("Credenciales inválidas"); return; }
+      const h = await sha256(pass);
+      if (h !== ADMIN_PASS_HASH) { alert("Credenciales inválidas"); return; }
+      setLogged(true);
+      closeLogin();
+    };
+
+    logoutBtn.onclick = () => setLogged(false);
+
+    // ============= Modal edición =============
+    function openEdit(i) {
+      if (!isLogged()) { alert("Debes iniciar sesión para editar."); return; }
       const info = datos[i] || {};
+      numSel.value = i;
       palabraInput.value = info.palabra || "";
-      imagenInput.value = ""; // por seguridad no se pre-carga
-
-      modalBackdrop.style.display = "flex";
-      modalBackdrop.setAttribute("aria-hidden", "false");
+      imagenInput.value = "";
+      editBackdrop.style.display = "flex";
+      editBackdrop.setAttribute("aria-hidden", "false");
     }
-
-    function cerrarModal() {
-      modalBackdrop.style.display = "none";
-      modalBackdrop.setAttribute("aria-hidden", "true");
+    function closeEdit() {
+      editBackdrop.style.display = "none";
+      editBackdrop.setAttribute("aria-hidden", "true");
       imagenInput.value = "";
     }
-
-    editarBtn.addEventListener("click", () => abrirModal(seleccionado));
-    cancelarBtn.addEventListener("click", cerrarModal);
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) cerrarModal();
-    });
+    editarBtn.onclick = () => openEdit(seleccionado);
+    cancelarBtn.onclick = closeEdit;
+    editBackdrop.addEventListener("click", (e) => { if (e.target === editBackdrop) closeEdit(); });
 
     numSel.addEventListener("change", () => {
-      const v = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
+      let v = parseInt(numSel.value || "1", 10);
+      v = Math.min(100, Math.max(1, v));
       numSel.value = v;
+      seleccionado = v;
+      pintarSeleccion();
       const info = datos[v] || {};
       palabraInput.value = info.palabra || "";
       imagenInput.value = "";
-      seleccionado = v;
-      pintarSeleccion();
     });
 
-    guardarBtn.addEventListener("click", () => {
-      const n = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
+    guardarBtn.onclick = () => {
+      if (!isLogged()) { alert("Debes iniciar sesión para guardar."); return; }
+      const n = Math.min(100, Math.max(1, parseInt(numSel.value || "1", 10)));
       const palabra = (palabraInput.value || "").trim();
 
       const aplicar = (imgData = null) => {
@@ -192,10 +259,10 @@
         seleccionado = n;
         pintarSeleccion();
         mostrar(n, true);
-        cerrarModal();
+        closeEdit();
       };
 
-      const file = imagenInput.files && imagenInput.files[0];
+      const file = imagenInput.files?.[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = () => aplicar(reader.result);
@@ -203,30 +270,32 @@
       } else {
         aplicar(null);
       }
-    });
+    };
 
-    // ---- Borrar / Exportar / Importar ----
-    borrarBtn.addEventListener("click", () => {
+    // ============= Borrar / Exportar / Importar =============
+    borrarBtn.onclick = () => {
+      if (!isLogged()) { alert("Debes iniciar sesión para borrar."); return; }
       if (datos[seleccionado]) {
         delete datos[seleccionado];
         guardarDatos();
         mostrar(seleccionado, false);
       }
-    });
+    };
 
-    exportBtn.addEventListener("click", () => {
+    exportBtn.onclick = () => {
       const blob = new Blob([JSON.stringify(datos)], { type: "application/json" });
       const url  = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = "palabrasNumeros.json"; a.click();
       URL.revokeObjectURL(url);
-    });
+    };
 
-    importBtn.addEventListener("click", () => {
+    importBtn.onclick = () => {
+      if (!isLogged()) { alert("Debes iniciar sesión para importar."); return; }
       const inp = document.createElement("input");
       inp.type = "file"; inp.accept = "application/json";
       inp.onchange = () => {
-        const f = inp.files[0];
+        const f = inp.files?.[0];
         if (!f) return;
         const r = new FileReader();
         r.onload = () => {
@@ -235,7 +304,6 @@
             if (typeof obj === "object" && obj) {
               datos = obj;
               guardarDatos();
-              pintarSeleccion();
               mostrar(seleccionado, false);
             }
           } catch { alert("Archivo JSON no válido"); }
@@ -245,11 +313,24 @@
       document.body.appendChild(inp);
       inp.click();
       inp.remove();
-    });
-  </script>
+    };
 
-  <!-- Service Worker en /Carta-Nomo/ -->
-  <script>
+    // ============= Cuadrícula y comportamiento =============
+    for (let i = 1; i <= 100; i++) {
+      const div = document.createElement("div");
+      div.className = "number";
+      div.textContent = i;
+      div.onclick = () => {
+        seleccionado = i;
+        pintarSeleccion();
+        mostrar(i, true); // solo muestra y habla
+      };
+      grid.appendChild(div);
+    }
+    pintarSeleccion();
+    mostrar(seleccionado, false);
+
+    // ============= Service Worker (PWA) =============
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("/Carta-Nomo/service-worker.js");

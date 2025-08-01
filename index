@@ -35,7 +35,7 @@
   </style>
 </head>
 <body>
-  <h1>Tabla 1–100 con palabras e imágenes personalizadas</h1>
+  <h1>Carta Nomo Sarria</h1>
   <div class="grid" id="grid"></div>
   <div id="output"></div>
 

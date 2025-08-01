@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Números interactivos 1–100</title>
 
-  <!-- PWA -->
+  <!-- PWA (ajustado para GitHub Pages en /Carta-Nomo/) -->
   <link rel="manifest" href="/Carta-Nomo/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
   <link rel="apple-touch-icon" href="/Carta-Nomo/icons/icon-192.png" />
@@ -17,10 +17,13 @@
     .number:hover { background: #d0eaff; }
     #output { margin-top: 20px; font-size: 1.5em; }
     .image-preview { max-width: 100px; margin-top: 10px; }
+    .hint { margin: 8px 0 18px; color: #555; font-size: .95rem; }
   </style>
 </head>
 <body>
   <h1>Carta Nomo Sarria</h1>
+  <p class="hint">Clic para oír/mostrar. Ctrl/Cmd‑clic o doble clic para editar.</p>
+
   <div class="grid" id="grid"></div>
   <div id="output"></div>
 
@@ -32,56 +35,84 @@
     const guardarDatos = () =>
       localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
 
-    for (let i = 1; i <= 100; i++) {
-      const div = document.createElement("div");
-      div.className = "number";
-      div.textContent = i;
-      div.onclick = async () => {
-        const anterior = datos[i]?.palabra || "";
-        const palabra = prompt(`Escribe o modifica la palabra para el número ${i}`, anterior);
-        if (!palabra) return;
-
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*";
-
-        fileInput.onchange = () => {
-          const file = fileInput.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-              datos[i] = { palabra, imagen: reader.result };
-              guardarDatos();
-              mostrar(i);
-            };
-            reader.readAsDataURL(file);
-          } else {
-            datos[i] = { palabra, imagen: datos[i]?.imagen || null };
-            guardarDatos();
-            mostrar(i);
-          }
-          fileInput.remove();
-        };
-
-        document.body.appendChild(fileInput);
-        fileInput.click();
-      };
-      grid.appendChild(div);
+    function hablar(texto) {
+      try {
+        speechSynthesis.cancel();    // evita colas de voz
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = "es-ES";
+        speechSynthesis.speak(u);
+      } catch (_) {}
     }
 
-    function mostrar(i) {
+    async function editar(i) {
+      const anterior = datos[i]?.palabra || "";
+      const palabra = prompt(`Escribe o modifica la palabra para el número ${i}`, anterior);
+      if (!palabra) return;
+
+      // Selector de imagen (opcional)
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*";
+
+      fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            datos[i] = { palabra, imagen: reader.result };
+            guardarDatos();
+            mostrar(i, true);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          datos[i] = { palabra, imagen: datos[i]?.imagen || null };
+          guardarDatos();
+          mostrar(i, true);
+        }
+        fileInput.remove();
+      };
+
+      document.body.appendChild(fileInput);
+      fileInput.click();
+    }
+
+    function mostrar(i, hablarAhora = false) {
       const info = datos[i];
       if (!info) return;
       output.innerHTML = `<strong>Número ${i}:</strong> ${info.palabra}`;
       if (info.imagen) {
         output.innerHTML += `<div><img src="${info.imagen}" class="image-preview" /></div>`;
       }
-      const u = new SpeechSynthesisUtterance(info.palabra);
-      u.lang = "es-ES";
-      speechSynthesis.speak(u);
+      if (hablarAhora) hablar(info.palabra);
+    }
+
+    // Construir la cuadrícula 1–100
+    for (let i = 1; i <= 100; i++) {
+      const div = document.createElement("div");
+      div.className = "number";
+      div.textContent = i;
+
+      // Clic normal: si hay datos → mostrar/decir; si no → editar
+      div.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) { // Ctrl o Cmd para editar
+          editar(i);
+          return;
+        }
+        if (datos[i]) {
+          mostrar(i, true);
+        } else {
+          editar(i);
+        }
+      };
+
+      // Doble clic: editar
+      div.ondblclick = () => editar(i);
+
+      grid.appendChild(div);
     }
   </script>
 
+  <!-- Registro del Service Worker (ruta para /Carta-Nomo/) -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

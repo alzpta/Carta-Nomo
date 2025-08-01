@@ -11,108 +11,215 @@
   <link rel="icon" href="/Carta-Nomo/favicon.ico" />
 
   <style>
-    body { font-family: sans-serif; text-align: center; margin: 20px; }
+    :root { --bg:#fff; --card:#f6f7f8; --accent:#0b5fff; --hover:#e8f1ff; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color:#111; margin: 20px; }
+    h1 { text-align:center; margin-bottom:10px; }
+    .hint { text-align:center; color:#555; margin: 4px 0 16px; font-size: .95rem; }
+    .editor {
+      max-width: 900px; margin: 0 auto 18px; padding: 12px;
+      background: var(--card); border-radius: 12px;
+      display: grid; gap: 10px; grid-template-columns: 1fr 2fr 2fr auto;
+      align-items: end;
+    }
+    .editor label { font-size: .85rem; color:#333; display:block; margin-bottom:4px; }
+    .editor input[type="number"],
+    .editor input[type="text"] { width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; }
+    .editor input[type="file"] { width:100%; }
+    .editor button {
+      padding: 10px 14px; border: none; border-radius: 10px; cursor: pointer;
+      background: var(--accent); color: white; font-weight: 600;
+    }
     .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; max-width: 900px; margin: auto; }
-    .number { padding: 10px; background: #f0f0f0; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .number:hover { background: #d0eaff; }
-    #output { margin-top: 20px; font-size: 1.5em; }
-    .image-preview { max-width: 100px; margin-top: 10px; }
-    .hint { margin: 8px 0 18px; color: #555; font-size: .95rem; }
+    .number {
+      padding: 12px; background: #f0f0f0; border-radius: 10px; cursor: pointer;
+      font-weight: 700; text-align:center; user-select:none;
+      transition: background .15s ease;
+    }
+    .number:hover { background: var(--hover); }
+    .selected { outline: 2px solid var(--accent); background: #eef3ff; }
+    #output { margin: 18px auto 0; font-size: 1.2rem; max-width: 900px; }
+    .image-preview { max-width: 120px; margin-top: 8px; border-radius: 8px; }
+    .toolbar { max-width:900px; margin: 0 auto 8px; display:flex; gap:12px; align-items:center; }
+    .toolbar button { padding:6px 10px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
   </style>
 </head>
 <body>
   <h1>Carta Nomo Sarria</h1>
-  <p class="hint">Clic para oír/mostrar. Ctrl/Cmd‑clic o doble clic para editar.</p>
+  <p class="hint">Clic en un número = oír y mostrar. Usa el panel de abajo para asignar/editar palabra e imagen.</p>
+
+  <!-- Panel de edición -->
+  <div class="editor" id="editor">
+    <div>
+      <label for="numSel">Número</label>
+      <input type="number" id="numSel" min="1" max="100" value="1" />
+    </div>
+    <div>
+      <label for="palabra">Palabra</label>
+      <input type="text" id="palabra" placeholder="Escribe la palabra…" />
+    </div>
+    <div>
+      <label for="imagen">Imagen (opcional)</label>
+      <input type="file" id="imagen" accept="image/*" />
+    </div>
+    <div>
+      <button id="guardarBtn">Guardar</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button id="borrarBtn" title="Borra palabra e imagen del número seleccionado">Borrar número</button>
+    <button id="exportBtn" title="Exporta todos tus datos como JSON">Exportar</button>
+    <button id="importBtn" title="Importa un JSON previamente exportado">Importar</button>
+  </div>
 
   <div class="grid" id="grid"></div>
   <div id="output"></div>
 
   <script>
-    const grid = document.getElementById("grid");
-    const output = document.getElementById("output");
+    const grid     = document.getElementById("grid");
+    const output   = document.getElementById("output");
+    const numSel   = document.getElementById("numSel");
+    const palabraI = document.getElementById("palabra");
+    const imgI     = document.getElementById("imagen");
+    const guardar  = document.getElementById("guardarBtn");
+    const borrar   = document.getElementById("borrarBtn");
+    const exportB  = document.getElementById("exportBtn");
+    const importB  = document.getElementById("importBtn");
+
     let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
+    let seleccionado = 1;
 
     const guardarDatos = () =>
       localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
 
     function hablar(texto) {
       try {
-        speechSynthesis.cancel();    // evita colas de voz
+        speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(texto);
         u.lang = "es-ES";
         speechSynthesis.speak(u);
       } catch (_) {}
     }
 
-    async function editar(i) {
-      const anterior = datos[i]?.palabra || "";
-      const palabra = prompt(`Escribe o modifica la palabra para el número ${i}`, anterior);
-      if (!palabra) return;
-
-      // Selector de imagen (opcional)
-      const fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.accept = "image/*";
-
-      fileInput.onchange = () => {
-        const file = fileInput.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            datos[i] = { palabra, imagen: reader.result };
-            guardarDatos();
-            mostrar(i, true);
-          };
-          reader.readAsDataURL(file);
-        } else {
-          datos[i] = { palabra, imagen: datos[i]?.imagen || null };
-          guardarDatos();
-          mostrar(i, true);
-        }
-        fileInput.remove();
-      };
-
-      document.body.appendChild(fileInput);
-      fileInput.click();
+    function pintarSeleccion() {
+      [...grid.children].forEach((el, idx) => {
+        const n = idx + 1;
+        el.classList.toggle("selected", n === seleccionado);
+      });
+      numSel.value = seleccionado;
+      // Rellena el panel con lo que ya hay
+      const info = datos[seleccionado] || {};
+      palabraI.value = info.palabra || "";
+      imgI.value = ""; // no se puede pre-cargar por seguridad
     }
 
-    function mostrar(i, hablarAhora = false) {
+    function mostrar(i, hablarAhora = true) {
       const info = datos[i];
-      if (!info) return;
-      output.innerHTML = `<strong>Número ${i}:</strong> ${info.palabra}`;
+      if (!info) {
+        output.innerHTML = `<strong>Número ${i}:</strong> (sin datos)`;
+        return;
+      }
+      output.innerHTML = `<strong>Número ${i}:</strong> ${info.palabra || ""}`;
       if (info.imagen) {
         output.innerHTML += `<div><img src="${info.imagen}" class="image-preview" /></div>`;
       }
-      if (hablarAhora) hablar(info.palabra);
+      if (hablarAhora && info.palabra) hablar(info.palabra);
     }
 
-    // Construir la cuadrícula 1–100
+    // Construye la cuadrícula 1–100
     for (let i = 1; i <= 100; i++) {
       const div = document.createElement("div");
       div.className = "number";
       div.textContent = i;
 
-      // Clic normal: si hay datos → mostrar/decir; si no → editar
-      div.onclick = (e) => {
-        if (e.ctrlKey || e.metaKey) { // Ctrl o Cmd para editar
-          editar(i);
-          return;
-        }
-        if (datos[i]) {
-          mostrar(i, true);
-        } else {
-          editar(i);
-        }
+      div.onclick = () => {
+        seleccionado = i;
+        pintarSeleccion();
+        mostrar(i, true); // solo habla/muestra, no edita ni abre nada
       };
-
-      // Doble clic: editar
-      div.ondblclick = () => editar(i);
 
       grid.appendChild(div);
     }
+
+    // Estado inicial
+    pintarSeleccion();
+    mostrar(seleccionado, false);
+
+    // Cambiar número desde el input
+    numSel.addEventListener("change", () => {
+      const v = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
+      seleccionado = v;
+      pintarSeleccion();
+      mostrar(v, false);
+    });
+
+    // Guardar (palabra + imagen opcional)
+    guardar.addEventListener("click", () => {
+      const palabra = (palabraI.value || "").trim();
+      const actualizar = (imagenDataURL = null) => {
+        const anterior = datos[seleccionado]?.imagen || null;
+        datos[seleccionado] = { palabra, imagen: imagenDataURL ?? anterior };
+        guardarDatos();
+        pintarSeleccion();
+        mostrar(seleccionado, true);
+      };
+
+      const file = imgI.files && imgI.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => actualizar(reader.result);
+        reader.readAsDataURL(file);
+      } else {
+        actualizar(null);
+      }
+    });
+
+    // Borrar datos del número seleccionado
+    borrar.addEventListener("click", () => {
+      if (datos[seleccionado]) {
+        delete datos[seleccionado];
+        guardarDatos();
+        pintarSeleccion();
+        mostrar(seleccionado, false);
+      }
+    });
+
+    // Exportar/Importar JSON
+    exportB.addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(datos)], { type: "application/json" });
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "palabrasNumeros.json"; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    importB.addEventListener("click", () => {
+      const inp = document.createElement("input");
+      inp.type = "file"; inp.accept = "application/json";
+      inp.onchange = () => {
+        const f = inp.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+          try {
+            const obj = JSON.parse(r.result);
+            if (typeof obj === "object" && obj) {
+              datos = obj;
+              guardarDatos();
+              pintarSeleccion();
+              mostrar(seleccionado, false);
+            }
+          } catch (e) { alert("Archivo JSON no válido"); }
+        };
+        r.readAsText(f);
+      };
+      document.body.appendChild(inp);
+      inp.click();
+      inp.remove();
+    });
   </script>
 
-  <!-- Registro del Service Worker (ruta para /Carta-Nomo/) -->
+  <!-- Service Worker en /Carta-Nomo/ -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

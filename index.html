@@ -98,8 +98,8 @@
 
 <script>
 /* === Configura tus credenciales === */
-const ADMIN_EMAIL = "admin@tu-dominio.com";
-const ADMIN_PASS_HASH = "PEGA_AQUI_EL_HASH"; // SHA-256 de tu contraseña
+const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_PASS_HASH = "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270"; // SHA-256 de tu contraseña
 
 async function sha256(txt){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));

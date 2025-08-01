@@ -48,6 +48,8 @@
     <button id="logoutBtn" class="btn" style="display:none">Salir</button>
     <button id="editarBtn" class="btn primary" style="display:none">Editar número</button>
     <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
+    <button id="exportBtn" class="btn" style="display:none">Exportar</button>
+    <button id="importBtn" class="btn" style="display:none">Importar</button>
   </div>
 
   <div class="grid" id="grid"></div>
@@ -99,7 +101,7 @@
 <script>
 /* === Configura tus credenciales === */
 const ADMIN_EMAIL = "admin@tu-dominio.com";
-const ADMIN_PASS_HASH = "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270"; // SHA-256 de tu contraseña
+const ADMIN_PASS_HASH = "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270"; // SHA-256
 
 async function sha256(txt){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
@@ -115,6 +117,7 @@ function guardarDatos(){ localStorage.setItem("palabrasNumeros", JSON.stringify(
 const grid=document.getElementById("grid"),output=document.getElementById("output");
 const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElementById("logoutBtn");
 const editarBtn=document.getElementById("editarBtn"),borrarBtn=document.getElementById("borrarBtn");
+const exportBtn=document.getElementById("exportBtn"),importBtn=document.getElementById("importBtn");
 const userInfo=document.getElementById("userInfo");
 const editBackdrop=document.getElementById("editBackdrop"),numSel=document.getElementById("numSel");
 const palabraInput=document.getElementById("palabra"),imagenInput=document.getElementById("imagen");
@@ -130,6 +133,8 @@ function renderAuthUI(){
   const on=isLogged();
   editarBtn.style.display=on?"":"none";
   borrarBtn.style.display=on?"":"none";
+  exportBtn.style.display=on?"":"none";
+  importBtn.style.display=on?"":"none";
   logoutBtn.style.display=on?"":"none";
   loginBtn.style.display=on?"none":"";
   userInfo.textContent=on?`Sesión: ${ADMIN_EMAIL}`:"Sesión: invitado";
@@ -169,6 +174,42 @@ guardarBtn.onclick=()=>{
 borrarBtn.onclick=()=>{
   if(!isLogged()){alert("Debes iniciar sesión");return;}
   delete datos[seleccionado]; guardarDatos(); mostrar(seleccionado);
+};
+
+/* === Importar / Exportar (solo con sesión) === */
+exportBtn.onclick=()=>{
+  if(!isLogged()){alert("Debes iniciar sesión");return;}
+  const blob=new Blob([JSON.stringify(datos,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="palabrasNumeros.json"; a.click();
+  URL.revokeObjectURL(url);
+};
+
+importBtn.onclick=()=>{
+  if(!isLogged()){alert("Debes iniciar sesión");return;}
+  const inp=document.createElement("input");
+  inp.type="file"; inp.accept="application/json";
+  inp.onchange=()=>{
+    const f=inp.files?.[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const obj=JSON.parse(r.result);
+        if(obj && typeof obj==="object"){
+          // mezcla (merge) — mantiene lo existente y sobreescribe lo importado
+          datos={...datos, ...obj};
+          guardarDatos();
+          mostrar(seleccionado);
+          alert("Importación completada.");
+        } else { alert("JSON no válido"); }
+      }catch{ alert("JSON no válido"); }
+    };
+    r.readAsText(f);
+  };
+  document.body.appendChild(inp);
+  inp.click();
+  inp.remove();
 };
 
 /* === Mostrar === */

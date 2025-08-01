@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <title>Números interactivos 1–100</title>
+
+  <!-- PWA / GitHub Pages (subcarpeta /Carta-Nomo/) -->
+  <link rel="manifest" href="/Carta-Nomo/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="apple-touch-icon" href="/Carta-Nomo/icons/icon-192.png">
+  <link rel="icon" href="/Carta-Nomo/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; text-align: center; margin: 20px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; text-align: center; margin: 20px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -18,60 +25,69 @@
       background: #f0f0f0;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
-      position: relative;
+      font-weight: 600;
+      user-select: none;
+      transition: background .15s ease-in-out;
     }
-    .number:hover {
-      background: #d0eaff;
-    }
-    #output {
-      margin-top: 20px;
-      font-size: 1.5em;
-    }
-    .image-preview {
-      max-width: 100px;
-      margin-top: 10px;
-    }
+    .number:hover { background: #d0eaff; }
+    #output { margin-top: 20px; font-size: 1.2rem; }
+    .image-preview { max-width: 120px; margin-top: 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
   <h1>Carta Nomo Sarria</h1>
+  <p>Toca un número para guardar una palabra (y opcionalmente una imagen). Los datos se guardan en este navegador.</p>
+
   <div class="grid" id="grid"></div>
-  <div id="output"></div>
+  <div id="output" aria-live="polite"></div>
 
   <script>
-    const grid = document.getElementById("grid");
     const output = document.getElementById("output");
-    let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
+    const grid = document.getElementById("grid");
 
-    function guardarDatos() {
-      localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+    // Carga/salvado local
+    let datos = {};
+    try { datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {}; } catch { datos = {}; }
+    const guardarDatos = () => localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+
+    // Utility: hablar sin acumular colas
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "es-ES";
+      speechSynthesis.speak(u);
     }
 
+    // Render de cuadrícula
     for (let i = 1; i <= 100; i++) {
       const div = document.createElement("div");
       div.className = "number";
       div.textContent = i;
-      div.onclick = async () => {
-        let palabra = prompt(`Escribe o modifica la palabra para el número ${i}`, datos[i]?.palabra || "");
-        if (!palabra) return;
 
-        let fileInput = document.createElement("input");
+      div.onclick = async () => {
+        const actual = datos[i]?.palabra || "";
+        const palabra = prompt(`Escribe o modifica la palabra para el número ${i}`, actual);
+        if (palabra === null) return; // canceló prompt
+
+        // Selector de imagen (opcional)
+        const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.accept = "image/*";
 
         fileInput.onchange = () => {
-          const file = fileInput.files[0];
+          const file = fileInput.files?.[0];
           if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-              datos[i] = { palabra: palabra, imagen: reader.result };
+              datos[i] = { palabra, imagen: reader.result };
               guardarDatos();
               mostrar(i);
             };
             reader.readAsDataURL(file);
           } else {
-            datos[i] = { palabra: palabra, imagen: datos[i]?.imagen || null };
+            // Sin imagen nueva: conserva la anterior
+            datos[i] = { palabra, imagen: datos[i]?.imagen || null };
             guardarDatos();
             mostrar(i);
           }
@@ -80,11 +96,8 @@
         document.body.appendChild(fileInput);
         fileInput.click();
         fileInput.remove();
-
-        datos[i] = { palabra: palabra, imagen: datos[i]?.imagen || null };
-        guardarDatos();
-        mostrar(i);
       };
+
       grid.appendChild(div);
     }
 
@@ -93,18 +106,20 @@
       if (!info) return;
       output.innerHTML = `<strong>Número ${i}:</strong> ${info.palabra}`;
       if (info.imagen) {
-        output.innerHTML += `<div><img src="${info.imagen}" class="image-preview"></div>`;
+        output.insertAdjacentHTML("beforeend", `<div><img src="${info.imagen}" class="image-preview" alt="Imagen del número ${i}"></div>`);
       }
-      const utterance = new SpeechSynthesisUtterance(info.palabra);
-      utterance.lang = 'es-ES';
-      speechSynthesis.speak(utterance);
+      speak(info.palabra);
     }
   </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-</script>
 
+  <!-- Service Worker para GitHub Pages (ruta absoluta) -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/Carta-Nomo/service-worker.js")
+          .catch(err => console.error("SW error:", err));
+      });
+    }
+  </script>
 </body>
 </html>

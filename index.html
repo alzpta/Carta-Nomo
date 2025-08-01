@@ -4,63 +4,57 @@
   <meta charset="UTF-8" />
   <title>Números interactivos 1–100</title>
 
-  <!-- PWA (ajustado para GitHub Pages en /Carta-Nomo/) -->
   <link rel="manifest" href="/Carta-Nomo/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
-  <link rel="apple-touch-icon" href="/Carta-Nomo/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/Carta-Nomo/iconos/icon-192.png" />
   <link rel="icon" href="/Carta-Nomo/favicon.ico" />
 
   <style>
     :root { --bg:#fff; --card:#f6f7f8; --accent:#0b5fff; --hover:#e8f1ff; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color:#111; margin: 20px; }
-    h1 { text-align:center; margin-bottom:10px; }
-    .hint { text-align:center; color:#555; margin: 4px 0 16px; font-size: .95rem; }
+    body { font-family: system-ui, sans-serif; margin:20px; background:var(--bg); color:#111; }
+    h1 { text-align:center; }
+    .hint { text-align:center; color:#555; margin:10px 0 20px; }
 
-    .toolbar { max-width:900px; margin: 0 auto 12px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap: wrap; }
-    .btn { padding:10px 14px; border-radius:10px; border:1px solid #d0d7de; background:#fff; cursor:pointer; font-weight:600; }
-    .btn.primary { background: var(--accent); color:#fff; border-color: var(--accent); }
+    .toolbar { max-width:900px; margin:0 auto 12px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:600; }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
     .btn.danger { border-color:#e00; color:#e00; }
-    .btn:active { transform: translateY(1px); }
-    .muted { color:#666; font-size:.9rem; }
+    .muted { color:#666; font-size:.9rem; align-self:center; }
 
-    .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; max-width: 900px; margin: auto; }
-    .number { padding: 12px; background: #f0f0f0; border-radius: 10px; cursor: pointer; font-weight: 700; text-align:center; user-select:none; transition: background .15s ease; }
-    .number:hover { background: var(--hover); }
-    .selected { outline: 2px solid var(--accent); background: #eef3ff; }
+    .grid { display:grid; grid-template-columns:repeat(10,1fr); gap:10px; max-width:900px; margin:auto; }
+    .number { padding:12px; background:#f0f0f0; border-radius:10px; cursor:pointer; font-weight:700; text-align:center; }
+    .number:hover { background:var(--hover); }
+    .selected { outline:2px solid var(--accent); background:#eef3ff; }
 
-    #output { margin: 18px auto 0; font-size: 1.2rem; max-width: 900px; }
-    .image-preview { max-width: 120px; margin-top: 8px; border-radius: 8px; }
+    #output { margin:20px auto 0; font-size:1.2rem; max-width:900px; }
+    .image-preview { max-width:120px; margin-top:8px; border-radius:8px; }
 
-    /* Modales */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; padding: 16px; }
-    .modal { width: 100%; max-width: 560px; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
-    .modal h2 { margin: 0 0 8px; }
-    .row { margin: 10px 0; }
-    .row label { display:block; margin-bottom:4px; font-size: .9rem; color:#333; }
-    .row input { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; }
-    .actions { display:flex; gap:10px; justify-content:flex-end; margin-top: 12px; }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; padding:16px; }
+    .modal { background:#fff; border-radius:14px; padding:16px; width:100%; max-width:500px; }
+    .modal h2 { margin:0 0 10px; }
+    .row { margin:10px 0; }
+    .row label { display:block; margin-bottom:4px; font-size:.9rem; }
+    .row input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; }
+    .actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
   </style>
 </head>
 <body>
   <h1>Carta Nomo Sarria</h1>
-  <p class="hint">Clic en un número = oír y mostrar. Para editar, primero inicia sesión.</p>
+  <p class="hint">Clic en un número = ver y oír. Para editar, primero inicia sesión.</p>
 
   <div class="toolbar">
     <span id="userInfo" class="muted"></span>
     <button id="loginBtn" class="btn">Iniciar sesión</button>
     <button id="logoutBtn" class="btn" style="display:none">Salir</button>
     <button id="editarBtn" class="btn primary" style="display:none">Editar número</button>
-    <button id="borrarBtn" class="btn danger" style="display:none" title="Borra palabra e imagen del número seleccionado">Borrar</button>
-    <button id="exportBtn" class="btn" title="Exporta todos tus datos como JSON">Exportar</button>
-    <button id="importBtn" class="btn" title="Importa un JSON previamente exportado (solo admin)">Importar</button>
+    <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
   </div>
 
   <div class="grid" id="grid"></div>
   <div id="output"></div>
 
-  <!-- Modal de edición -->
-  <div id="editBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- Modal edición -->
+  <div id="editBackdrop" class="modal-backdrop">
     <div class="modal">
       <h2>Editar número</h2>
       <div class="row">
@@ -69,7 +63,7 @@
       </div>
       <div class="row">
         <label for="palabra">Palabra</label>
-        <input type="text" id="palabra" placeholder="Escribe la palabra…" />
+        <input type="text" id="palabra" />
       </div>
       <div class="row">
         <label for="imagen">Imagen (opcional)</label>
@@ -82,299 +76,115 @@
     </div>
   </div>
 
-  <!-- Modal de login -->
-  <div id="loginBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- Modal login -->
+  <div id="loginBackdrop" class="modal-backdrop">
     <div class="modal">
       <h2>Acceso administrador</h2>
       <div class="row">
         <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" placeholder="admin@tu-dominio.com" />
+        <input type="email" id="loginEmail" />
       </div>
       <div class="row">
         <label for="loginPass">Contraseña</label>
-        <input type="password" id="loginPass" placeholder="••••••••" />
+        <input type="password" id="loginPass" />
       </div>
       <div class="actions">
         <button id="loginCancel" class="btn">Cancelar</button>
         <button id="loginSubmit" class="btn primary">Entrar</button>
       </div>
-      <p class="muted">Este login solo activa la edición en este navegador (no es seguridad real).</p>
+      <p class="muted">Este login solo activa la edición en este navegador.</p>
     </div>
   </div>
 
-  <!-- App principal -->
-  <script>
-    /* ====== CONFIGURA TUS CREDENCIALES (Opción A) ====== */
-    const ADMIN_EMAIL = "admin@tu-dominio.com";
-    const ADMIN_PASS_HASH = "admin1234"; // Genera el hash con el bloque de abajo
+<script>
+/* === Configura tus credenciales === */
+const ADMIN_EMAIL = "admin@tu-dominio.com";
+const ADMIN_PASS_HASH = "PEGA_AQUI_EL_HASH"; // SHA-256 de tu contraseña
 
-    async function sha256(text) {
-      const enc = new TextEncoder().encode(text);
-      const buf = await crypto.subtle.digest("SHA-256", enc);
-      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
-    }
+async function sha256(txt){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
 
-    /* ====== ESTADO ====== */
-    let seleccionado = 1;
-    let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {}; // { n: { palabra, imagen (dataURL) } }
-    const guardarDatos = () => localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+/* === Estado === */
+let seleccionado = 1;
+let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
+function guardarDatos(){ localStorage.setItem("palabrasNumeros", JSON.stringify(datos)); }
 
-    /* ====== UI refs ====== */
-    const grid = document.getElementById("grid");
-    const output = document.getElementById("output");
-    const userInfo = document.getElementById("userInfo");
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const editarBtn = document.getElementById("editarBtn");
-    const borrarBtn = document.getElementById("borrarBtn");
-    const exportBtn = document.getElementById("exportBtn");
-    const importBtn = document.getElementById("importBtn");
+/* === UI refs === */
+const grid=document.getElementById("grid"),output=document.getElementById("output");
+const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElementById("logoutBtn");
+const editarBtn=document.getElementById("editarBtn"),borrarBtn=document.getElementById("borrarBtn");
+const userInfo=document.getElementById("userInfo");
+const editBackdrop=document.getElementById("editBackdrop"),numSel=document.getElementById("numSel");
+const palabraInput=document.getElementById("palabra"),imagenInput=document.getElementById("imagen");
+const guardarBtn=document.getElementById("guardarBtn"),cancelarBtn=document.getElementById("cancelarBtn");
+const loginBackdrop=document.getElementById("loginBackdrop"),loginEmail=document.getElementById("loginEmail");
+const loginPass=document.getElementById("loginPass"),loginSubmit=document.getElementById("loginSubmit");
+const loginCancel=document.getElementById("loginCancel");
 
-    const editBackdrop = document.getElementById("editBackdrop");
-    const numSel = document.getElementById("numSel");
-    const palabraInput = document.getElementById("palabra");
-    const imagenInput = document.getElementById("imagen");
-    const guardarBtn = document.getElementById("guardarBtn");
-    const cancelarBtn = document.getElementById("cancelarBtn");
+/* === Sesión === */
+function isLogged(){ return localStorage.getItem("adminLogged")==="1"; }
+function setLogged(v){ localStorage.setItem("adminLogged", v?"1":"0"); renderAuthUI(); }
+function renderAuthUI(){
+  const on=isLogged();
+  editarBtn.style.display=on?"":"none";
+  borrarBtn.style.display=on?"":"none";
+  logoutBtn.style.display=on?"":"none";
+  loginBtn.style.display=on?"none":"";
+  userInfo.textContent=on?`Sesión: ${ADMIN_EMAIL}`:"Sesión: invitado";
+}
+renderAuthUI();
 
-    const loginBackdrop = document.getElementById("loginBackdrop");
-    const loginEmail = document.getElementById("loginEmail");
-    const loginPass = document.getElementById("loginPass");
-    const loginSubmit = document.getElementById("loginSubmit");
-    const loginCancel = document.getElementById("loginCancel");
+/* === Login === */
+loginBtn.onclick=()=>{loginBackdrop.style.display="flex";}
+loginCancel.onclick=()=>{loginBackdrop.style.display="none";}
+loginSubmit.onclick=async()=>{
+  const email=(loginEmail.value||"").trim().toLowerCase(), pass=loginPass.value||"";
+  if(email!==ADMIN_EMAIL){alert("Email inválido");return;}
+  if(await sha256(pass)!==ADMIN_PASS_HASH){alert("Contraseña inválida");return;}
+  setLogged(true); loginBackdrop.style.display="none";
+};
+logoutBtn.onclick=()=>setLogged(false);
 
-    /* ====== Sesión (solo cliente) ====== */
-    function isLogged(){ return localStorage.getItem("adminLogged")==="1"; }
-    function setLogged(v){ localStorage.setItem("adminLogged", v?"1":"0"); renderAuthUI(); }
-    function renderAuthUI(){
-      const on = isLogged();
-      editarBtn.style.display = on ? "" : "none";
-      borrarBtn.style.display = on ? "" : "none";
-      logoutBtn.style.display = on ? "" : "none";
-      loginBtn.style.display = on ? "none" : "";
-      userInfo.textContent = on ? `Sesión: ${ADMIN_EMAIL}` : "Sesión: invitado (solo lectura)";
-    }
-    renderAuthUI();
+/* === Modal edición === */
+editarBtn.onclick=()=>{
+  if(!isLogged()){alert("Debes iniciar sesión");return;}
+  const info=datos[seleccionado]||{};
+  numSel.value=seleccionado; palabraInput.value=info.palabra||""; imagenInput.value="";
+  editBackdrop.style.display="flex";
+};
+cancelarBtn.onclick=()=>{editBackdrop.style.display="none";}
 
-    /* ====== Voz ====== */
-    function hablar(texto){
-      try {
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(texto);
-        u.lang = "es-ES";
-        speechSynthesis.speak(u);
-      } catch {}
-    }
+guardarBtn.onclick=()=>{
+  const n=parseInt(numSel.value,10)||1;
+  const palabra=(palabraInput.value||"").trim();
+  const aplicar=(img)=>{ datos[n]={palabra,imagen:img||datos[n]?.imagen||null};
+    guardarDatos(); mostrar(n); editBackdrop.style.display="none"; };
+  if(imagenInput.files[0]){
+    const r=new FileReader(); r.onload=()=>aplicar(r.result); r.readAsDataURL(imagenInput.files[0]);
+  } else aplicar();
+};
 
-    /* ====== Mostrar número ====== */
-    function mostrar(i, hablarAhora = true) {
-      const info = datos[i];
-      if (!info) {
-        output.innerHTML = `<strong>Número ${i}:</strong> (sin datos)`;
-        return;
-      }
-      output.innerHTML = `<strong>Número ${i}:</strong> ${info.palabra || ""}`;
-      if (info.imagen) {
-        output.innerHTML += `<div><img src="${info.imagen}" class="image-preview" /></div>`;
-      }
-      if (hablarAhora && info.palabra) hablar(info.palabra);
-    }
+borrarBtn.onclick=()=>{
+  if(!isLogged()){alert("Debes iniciar sesión");return;}
+  delete datos[seleccionado]; guardarDatos(); mostrar(seleccionado);
+};
 
-    /* ====== Construir cuadrícula ====== */
-    for (let i = 1; i <= 100; i++) {
-      const d = document.createElement("div");
-      d.className = "number";
-      d.textContent = i;
-      d.onclick = () => {
-        seleccionado = i;
-        [...grid.children].forEach((el, idx) => el.classList.toggle("selected", idx+1===i));
-        mostrar(i, true);
-      };
-      grid.appendChild(d);
-    }
-    // Selección inicial
-    [...grid.children].forEach((el, idx) => el.classList.toggle("selected", idx===0));
-    mostrar(seleccionado, false);
+/* === Mostrar === */
+function mostrar(i){
+  const info=datos[i]; output.innerHTML=`<strong>Número ${i}:</strong> ${info?info.palabra:"(sin datos)"}`;
+  if(info?.imagen){output.innerHTML+=`<div><img src="${info.imagen}" class="image-preview"></div>`;}
+  if(info?.palabra){speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(info.palabra); u.lang="es-ES"; speechSynthesis.speak(u);}
+}
 
-    /* ====== Login ====== */
-    function openLogin(){ loginEmail.value=""; loginPass.value=""; loginBackdrop.style.display="flex"; loginBackdrop.setAttribute("aria-hidden","false"); }
-    function closeLogin(){ loginBackdrop.style.display="none"; loginBackdrop.setAttribute("aria-hidden","true"); }
-    loginBtn.onclick = openLogin;
-    loginCancel.onclick = closeLogin;
-    loginBackdrop.addEventListener("click", (e) => { if (e.target === loginBackdrop) closeLogin(); });
-
-    loginSubmit.onclick = async () => {
-      const email = (loginEmail.value || "").trim().toLowerCase();
-      const pass  = loginPass.value || "";
-      if (email !== ADMIN_EMAIL) { alert("Credenciales inválidas"); return; }
-      const h = await sha256(pass);
-      if (h !== ADMIN_PASS_HASH) { alert("Credenciales inválidas"); return; }
-      setLogged(true);
-      closeLogin();
-    };
-    logoutBtn.onclick = () => setLogged(false);
-
-    /* ====== Modal edición ====== */
-    function openEdit(i){
-      if (!isLogged()) { alert("Debes iniciar sesión para editar."); return; }
-      const info = datos[i] || {};
-      numSel.value = i;
-      palabraInput.value = info.palabra || "";
-      imagenInput.value = "";
-      editBackdrop.style.display = "flex";
-      editBackdrop.setAttribute("aria-hidden","false");
-    }
-    function closeEdit(){
-      editBackdrop.style.display = "none";
-      editBackdrop.setAttribute("aria-hidden","true");
-      imagenInput.value = "";
-    }
-
-    editarBtn.onclick = () => openEdit(seleccionado);
-    cancelarBtn.onclick = closeEdit;
-    editBackdrop.addEventListener("click", (e) => { if (e.target === editBackdrop) closeEdit(); });
-
-    numSel.addEventListener("change", () => {
-      let v = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
-      numSel.value = v;
-      seleccionado = v;
-      [...grid.children].forEach((el, idx) => el.classList.toggle("selected", idx+1===v));
-      const info = datos[v] || {};
-      palabraInput.value = info.palabra || "";
-      imagenInput.value = "";
-    });
-
-    guardarBtn.onclick = () => {
-      if (!isLogged()) { alert("Debes iniciar sesión para guardar."); return; }
-      const n = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
-      const palabra = (palabraInput.value || "").trim();
-
-      const aplicar = (imgData = null) => {
-        const anterior = datos[n]?.imagen || null;
-        datos[n] = { palabra, imagen: imgData ?? anterior };
-        guardarDatos();
-        seleccionado = n;
-        [...grid.children].forEach((el, idx) => el.classList.toggle("selected", idx+1===n));
-        mostrar(n, true);
-        closeEdit();
-      };
-
-      const f = imagenInput.files?.[0];
-      if (f) {
-        const r = new FileReader();
-        r.onload = () => aplicar(r.result);
-        r.readAsDataURL(f);
-      } else {
-        aplicar(null);
-      }
-    };
-
-    /* ====== Borrar / Exportar / Importar ====== */
-    borrarBtn.onclick = () => {
-      if (!isLogged()) { alert("Debes iniciar sesión para borrar."); return; }
-      if (datos[seleccionado]) {
-        delete datos[seleccionado];
-        guardarDatos();
-        mostrar(seleccionado, false);
-      }
-    };
-
-    exportBtn.onclick = () => {
-      const blob = new Blob([JSON.stringify(datos)], { type: "application/json" });
-      const url  = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = "palabrasNumeros.json"; a.click();
-      URL.revokeObjectURL(url);
-    };
-
-    importBtn.onclick = () => {
-      if (!isLogged()) { alert("Debes iniciar sesión para importar."); return; }
-      const inp = document.createElement("input");
-      inp.type = "file"; inp.accept = "application/json";
-      inp.onchange = () => {
-        const f = inp.files?.[0];
-        if (!f) return;
-        const r = new FileReader();
-        r.onload = () => {
-          try {
-            const obj = JSON.parse(r.result);
-            if (obj && typeof obj === "object") {
-              datos = obj;
-              guardarDatos();
-              mostrar(seleccionado, false);
-            }
-          } catch { alert("Archivo JSON no válido"); }
-        };
-        r.readAsText(f);
-      };
-      document.body.appendChild(inp);
-      inp.click();
-      inp.remove();
-    };
-
-    /* ====== Service Worker (PWA) ====== */
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/Carta-Nomo/service-worker.js");
-      });
-    }
-  </script>
-
-  <!-- ===========================================================
-       Generador SHA‑256 para obtener tu ADMIN_PASS_HASH (ÚSALO y LUEGO ELIMÍNALO)
-       =========================================================== -->
-  <div id="hashTool" style="max-width:700px;margin:24px auto;padding:14px;border:1px solid #ddd;border-radius:12px;background:#f9fafb">
-    <h3 style="margin:0 0 10px">Generar ADMIN_PASS_HASH (SHA‑256)</h3>
-    <p style="margin:0 0 10px;color:#555">Escribe tu contraseña. Se calcula localmente en tu navegador.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input id="pwInput" type="password" placeholder="Tu contraseña"
-             style="flex:1;min-width:220px;padding:10px;border:1px solid #ccc;border-radius:8px">
-      <button id="genBtn" style="padding:10px 14px;border:1px solid #ccc;border-radius:8px;cursor:pointer">
-        Generar hash
-      </button>
-      <button id="copyBtn" style="padding:10px 14px;border:1px solid #ccc;border-radius:8px;cursor:pointer" disabled>
-        Copiar
-      </button>
-    </div>
-    <textarea id="hashOut" rows="2" readonly
-              style="margin-top:10px;width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-family:monospace"></textarea>
-    <p style="margin:10px 0 0;color:#777;font-size:.9rem">
-      Copia este valor en: <code>const ADMIN_PASS_HASH = "…"</code>. Luego elimina este bloque por seguridad.
-    </p>
-  </div>
-
-  <script>
-  (function(){
-    const pw = document.getElementById('pwInput');
-    const gen = document.getElementById('genBtn');
-    const out = document.getElementById('hashOut');
-    const copy = document.getElementById('copyBtn');
-
-    async function sha256Local(text) {
-      const enc = new TextEncoder().encode(text);
-      const buf = await crypto.subtle.digest('SHA-256', enc);
-      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
-    }
-
-    gen.addEventListener('click', async () => {
-      const v = pw.value ?? '';
-      if (!v) { out.value = ''; copy.disabled = true; return; }
-      out.value = await sha256Local(v);
-      copy.disabled = !out.value;
-    });
-
-    copy.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(out.value);
-        copy.textContent = 'Copiado ✓';
-        setTimeout(() => copy.textContent = 'Copiar', 1200);
-      } catch {
-        out.select(); document.execCommand('copy');
-      }
-    });
-  })();
-  </script>
-  <!-- ============== FIN BLOQUE GENERADOR (BORRAR AL TERMINAR) ============== -->
-
+/* === Construir grid === */
+for(let i=1;i<=100;i++){
+  const d=document.createElement("div"); d.className="number"; d.textContent=i;
+  d.onclick=()=>{seleccionado=i;document.querySelectorAll(".number").forEach((n,ix)=>n.classList.toggle("selected",ix+1===i)); mostrar(i);}
+  grid.appendChild(d);
+}
+mostrar(seleccionado);
+</script>
 </body>
 </html>

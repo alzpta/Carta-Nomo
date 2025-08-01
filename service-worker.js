@@ -1,4 +1,4 @@
-const CACHE = "v1";
+const CACHE = "v2";
 const BASE = "/Carta-Nomo";
 const ASSETS = [
   `${BASE}/`,

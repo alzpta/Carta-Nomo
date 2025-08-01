@@ -12,85 +12,95 @@
 
   <style>
     :root { --bg:#fff; --card:#f6f7f8; --accent:#0b5fff; --hover:#e8f1ff; }
-    body { font-family: system-ui, sans-serif; background: var(--bg); color:#111; margin: 20px; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color:#111; margin: 20px; }
     h1 { text-align:center; margin-bottom:10px; }
     .hint { text-align:center; color:#555; margin: 4px 0 16px; font-size: .95rem; }
-    .editor {
-      max-width: 900px; margin: 0 auto 18px; padding: 12px;
-      background: var(--card); border-radius: 12px;
-      display: grid; gap: 10px; grid-template-columns: 1fr 2fr 2fr auto;
-      align-items: end;
-    }
-    .editor label { font-size: .85rem; color:#333; display:block; margin-bottom:4px; }
-    .editor input[type="number"],
-    .editor input[type="text"] { width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; }
-    .editor input[type="file"] { width:100%; }
-    .editor button {
-      padding: 10px 14px; border: none; border-radius: 10px; cursor: pointer;
-      background: var(--accent); color: white; font-weight: 600;
-    }
+
+    .toolbar { max-width:900px; margin: 0 auto 12px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap: wrap; }
+    .btn { padding:10px 14px; border-radius:10px; border:1px solid #d0d7de; background:#fff; cursor:pointer; font-weight:600; }
+    .btn.primary { background: var(--accent); color:#fff; border-color: var(--accent); }
+    .btn.danger { border-color:#e00; color:#e00; }
+    .btn:active { transform: translateY(1px); }
+
     .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; max-width: 900px; margin: auto; }
-    .number {
-      padding: 12px; background: #f0f0f0; border-radius: 10px; cursor: pointer;
-      font-weight: 700; text-align:center; user-select:none;
-      transition: background .15s ease;
-    }
+    .number { padding: 12px; background: #f0f0f0; border-radius: 10px; cursor: pointer; font-weight: 700; text-align:center; user-select:none; transition: background .15s ease; }
     .number:hover { background: var(--hover); }
     .selected { outline: 2px solid var(--accent); background: #eef3ff; }
+
     #output { margin: 18px auto 0; font-size: 1.2rem; max-width: 900px; }
     .image-preview { max-width: 120px; margin-top: 8px; border-radius: 8px; }
-    .toolbar { max-width:900px; margin: 0 auto 8px; display:flex; gap:12px; align-items:center; }
-    .toolbar button { padding:6px 10px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; padding: 16px; }
+    .modal { width: 100%; max-width: 560px; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+    .modal h2 { margin: 0 0 8px; }
+    .modal .row { display: grid; gap: 10px; grid-template-columns: 1fr 2fr; margin: 10px 0; }
+    .modal label { font-size: .9rem; color:#333; }
+    .modal input[type="number"],
+    .modal input[type="text"] { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; }
+    .modal input[type="file"] { width:100%; }
+    .modal .actions { display:flex; gap:10px; justify-content:flex-end; margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>Carta Nomo Sarria</h1>
-  <p class="hint">Clic en un número = oír y mostrar. Usa el panel de abajo para asignar/editar palabra e imagen.</p>
-
-  <!-- Panel de edición -->
-  <div class="editor" id="editor">
-    <div>
-      <label for="numSel">Número</label>
-      <input type="number" id="numSel" min="1" max="100" value="1" />
-    </div>
-    <div>
-      <label for="palabra">Palabra</label>
-      <input type="text" id="palabra" placeholder="Escribe la palabra…" />
-    </div>
-    <div>
-      <label for="imagen">Imagen (opcional)</label>
-      <input type="file" id="imagen" accept="image/*" />
-    </div>
-    <div>
-      <button id="guardarBtn">Guardar</button>
-    </div>
-  </div>
+  <p class="hint">Clic en un número = oír y mostrar. Usa el botón “Editar” para asignar/editar palabra e imagen.</p>
 
   <div class="toolbar">
-    <button id="borrarBtn" title="Borra palabra e imagen del número seleccionado">Borrar número</button>
-    <button id="exportBtn" title="Exporta todos tus datos como JSON">Exportar</button>
-    <button id="importBtn" title="Importa un JSON previamente exportado">Importar</button>
+    <button id="editarBtn" class="btn primary">Editar número</button>
+    <button id="borrarBtn" class="btn danger" title="Borra palabra e imagen del número seleccionado">Borrar</button>
+    <button id="exportBtn" class="btn" title="Exporta todos tus datos como JSON">Exportar</button>
+    <button id="importBtn" class="btn" title="Importa un JSON previamente exportado">Importar</button>
   </div>
 
   <div class="grid" id="grid"></div>
   <div id="output"></div>
 
+  <!-- Modal de edición -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <h2>Editar número</h2>
+      <div class="row">
+        <label for="numSel">Número</label>
+        <input type="number" id="numSel" min="1" max="100" />
+      </div>
+      <div class="row">
+        <label for="palabra">Palabra</label>
+        <input type="text" id="palabra" placeholder="Escribe la palabra…" />
+      </div>
+      <div class="row">
+        <label for="imagen">Imagen (opcional)</label>
+        <input type="file" id="imagen" accept="image/*" />
+      </div>
+      <div class="actions">
+        <button id="cancelarBtn" class="btn">Cancelar</button>
+        <button id="guardarBtn" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const grid     = document.getElementById("grid");
-    const output   = document.getElementById("output");
-    const numSel   = document.getElementById("numSel");
-    const palabraI = document.getElementById("palabra");
-    const imgI     = document.getElementById("imagen");
-    const guardar  = document.getElementById("guardarBtn");
-    const borrar   = document.getElementById("borrarBtn");
-    const exportB  = document.getElementById("exportBtn");
-    const importB  = document.getElementById("importBtn");
+    // ---- Estado y utilidades ----
+    const grid = document.getElementById("grid");
+    const output = document.getElementById("output");
+
+    const editarBtn = document.getElementById("editarBtn");
+    const borrarBtn = document.getElementById("borrarBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const importBtn = document.getElementById("importBtn");
+
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const numSel = document.getElementById("numSel");
+    const palabraInput = document.getElementById("palabra");
+    const imagenInput = document.getElementById("imagen");
+    const guardarBtn = document.getElementById("guardarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
 
     let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
     let seleccionado = 1;
 
-    const guardarDatos = () =>
-      localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+    const guardarDatos = () => localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
 
     function hablar(texto) {
       try {
@@ -106,11 +116,6 @@
         const n = idx + 1;
         el.classList.toggle("selected", n === seleccionado);
       });
-      numSel.value = seleccionado;
-      // Rellena el panel con lo que ya hay
-      const info = datos[seleccionado] || {};
-      palabraI.value = info.palabra || "";
-      imgI.value = ""; // no se puede pre-cargar por seguridad
     }
 
     function mostrar(i, hablarAhora = true) {
@@ -126,7 +131,7 @@
       if (hablarAhora && info.palabra) hablar(info.palabra);
     }
 
-    // Construye la cuadrícula 1–100
+    // ---- Construir cuadrícula 1–100 ----
     for (let i = 1; i <= 100; i++) {
       const div = document.createElement("div");
       div.className = "number";
@@ -135,57 +140,81 @@
       div.onclick = () => {
         seleccionado = i;
         pintarSeleccion();
-        mostrar(i, true); // solo habla/muestra, no edita ni abre nada
+        mostrar(i, true); // solo muestra y habla
       };
 
       grid.appendChild(div);
     }
-
-    // Estado inicial
     pintarSeleccion();
     mostrar(seleccionado, false);
 
-    // Cambiar número desde el input
-    numSel.addEventListener("change", () => {
-      const v = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
-      seleccionado = v;
-      pintarSeleccion();
-      mostrar(v, false);
+    // ---- Modal ----
+    function abrirModal(i) {
+      numSel.value = i;
+      const info = datos[i] || {};
+      palabraInput.value = info.palabra || "";
+      imagenInput.value = ""; // por seguridad no se pre-carga
+
+      modalBackdrop.style.display = "flex";
+      modalBackdrop.setAttribute("aria-hidden", "false");
+    }
+
+    function cerrarModal() {
+      modalBackdrop.style.display = "none";
+      modalBackdrop.setAttribute("aria-hidden", "true");
+      imagenInput.value = "";
+    }
+
+    editarBtn.addEventListener("click", () => abrirModal(seleccionado));
+    cancelarBtn.addEventListener("click", cerrarModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) cerrarModal();
     });
 
-    // Guardar (palabra + imagen opcional)
-    guardar.addEventListener("click", () => {
-      const palabra = (palabraI.value || "").trim();
-      const actualizar = (imagenDataURL = null) => {
-        const anterior = datos[seleccionado]?.imagen || null;
-        datos[seleccionado] = { palabra, imagen: imagenDataURL ?? anterior };
+    numSel.addEventListener("change", () => {
+      const v = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
+      numSel.value = v;
+      const info = datos[v] || {};
+      palabraInput.value = info.palabra || "";
+      imagenInput.value = "";
+      seleccionado = v;
+      pintarSeleccion();
+    });
+
+    guardarBtn.addEventListener("click", () => {
+      const n = Math.max(1, Math.min(100, parseInt(numSel.value || "1", 10)));
+      const palabra = (palabraInput.value || "").trim();
+
+      const aplicar = (imgData = null) => {
+        const anterior = datos[n]?.imagen || null;
+        datos[n] = { palabra, imagen: imgData ?? anterior };
         guardarDatos();
+        seleccionado = n;
         pintarSeleccion();
-        mostrar(seleccionado, true);
+        mostrar(n, true);
+        cerrarModal();
       };
 
-      const file = imgI.files && imgI.files[0];
+      const file = imagenInput.files && imagenInput.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = () => actualizar(reader.result);
+        reader.onload = () => aplicar(reader.result);
         reader.readAsDataURL(file);
       } else {
-        actualizar(null);
+        aplicar(null);
       }
     });
 
-    // Borrar datos del número seleccionado
-    borrar.addEventListener("click", () => {
+    // ---- Borrar / Exportar / Importar ----
+    borrarBtn.addEventListener("click", () => {
       if (datos[seleccionado]) {
         delete datos[seleccionado];
         guardarDatos();
-        pintarSeleccion();
         mostrar(seleccionado, false);
       }
     });
 
-    // Exportar/Importar JSON
-    exportB.addEventListener("click", () => {
+    exportBtn.addEventListener("click", () => {
       const blob = new Blob([JSON.stringify(datos)], { type: "application/json" });
       const url  = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -193,7 +222,7 @@
       URL.revokeObjectURL(url);
     });
 
-    importB.addEventListener("click", () => {
+    importBtn.addEventListener("click", () => {
       const inp = document.createElement("input");
       inp.type = "file"; inp.accept = "application/json";
       inp.onchange = () => {
@@ -209,7 +238,7 @@
               pintarSeleccion();
               mostrar(seleccionado, false);
             }
-          } catch (e) { alert("Archivo JSON no válido"); }
+          } catch { alert("Archivo JSON no válido"); }
         };
         r.readAsText(f);
       };

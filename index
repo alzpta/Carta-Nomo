@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Números interactivos 1–100</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin: 20px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 10px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .number {
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      position: relative;
+    }
+    .number:hover {
+      background: #d0eaff;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 1.5em;
+    }
+    .image-preview {
+      max-width: 100px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tabla 1–100 con palabras e imágenes personalizadas</h1>
+  <div class="grid" id="grid"></div>
+  <div id="output"></div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const output = document.getElementById("output");
+    let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
+
+    function guardarDatos() {
+      localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
+    }
+
+    for (let i = 1; i <= 100; i++) {
+      const div = document.createElement("div");
+      div.className = "number";
+      div.textContent = i;
+      div.onclick = async () => {
+        let palabra = prompt(`Escribe o modifica la palabra para el número ${i}`, datos[i]?.palabra || "");
+        if (!palabra) return;
+
+        let fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+
+        fileInput.onchange = () => {
+          const file = fileInput.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              datos[i] = { palabra: palabra, imagen: reader.result };
+              guardarDatos();
+              mostrar(i);
+            };
+            reader.readAsDataURL(file);
+          } else {
+            datos[i] = { palabra: palabra, imagen: datos[i]?.imagen || null };
+            guardarDatos();
+            mostrar(i);
+          }
+        };
+
+        document.body.appendChild(fileInput);
+        fileInput.click();
+        fileInput.remove();
+
+        datos[i] = { palabra: palabra, imagen: datos[i]?.imagen || null };
+        guardarDatos();
+        mostrar(i);
+      };
+      grid.appendChild(div);
+    }
+
+    function mostrar(i) {
+      const info = datos[i];
+      if (!info) return;
+      output.innerHTML = `<strong>Número ${i}:</strong> ${info.palabra}`;
+      if (info.imagen) {
+        output.innerHTML += `<div><img src="${info.imagen}" class="image-preview"></div>`;
+      }
+      const utterance = new SpeechSynthesisUtterance(info.palabra);
+      utterance.lang = 'es-ES';
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>

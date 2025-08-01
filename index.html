@@ -1,65 +1,190 @@
-<script>
-// ===== Configura tus credenciales =====
-const ADMIN_EMAIL = "admin@tu-dominio.com";
-const ADMIN_PASS_HASH = "1ef1870f76d31f4b5e877996faf904fd5214135c9967100ff3eda9f568b4d751"; // ver cómo generarlo más abajo
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Números interactivos 1–100</title>
 
-// ===== Utilidad SHA‑256 =====
-async function sha256(text) {
-  const enc = new TextEncoder().encode(text);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+  <link rel="manifest" href="/Carta-Nomo/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="apple-touch-icon" href="/Carta-Nomo/iconos/icon-192.png" />
+  <link rel="icon" href="/Carta-Nomo/favicon.ico" />
+
+  <style>
+    :root { --bg:#fff; --card:#f6f7f8; --accent:#0b5fff; --hover:#e8f1ff; }
+    body { font-family: system-ui, sans-serif; margin:20px; background:var(--bg); color:#111; }
+    h1 { text-align:center; }
+    .hint { text-align:center; color:#555; margin:10px 0 20px; }
+
+    .toolbar { max-width:900px; margin:0 auto 12px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; font-weight:600; }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .btn.danger { border-color:#e00; color:#e00; }
+    .muted { color:#666; font-size:.9rem; align-self:center; }
+
+    .grid { display:grid; grid-template-columns:repeat(10,1fr); gap:10px; max-width:900px; margin:auto; }
+    .number { padding:12px; background:#f0f0f0; border-radius:10px; cursor:pointer; font-weight:700; text-align:center; }
+    .number:hover { background:var(--hover); }
+    .selected { outline:2px solid var(--accent); background:#eef3ff; }
+
+    #output { margin:20px auto 0; font-size:1.2rem; max-width:900px; }
+    .image-preview { max-width:120px; margin-top:8px; border-radius:8px; }
+
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; padding:16px; }
+    .modal { background:#fff; border-radius:14px; padding:16px; width:100%; max-width:500px; }
+    .modal h2 { margin:0 0 10px; }
+    .row { margin:10px 0; }
+    .row label { display:block; margin-bottom:4px; font-size:.9rem; }
+    .row input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; }
+    .actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <h1>Carta Nomo Sarria</h1>
+  <p class="hint">Clic en un número = ver y oír. Para editar, primero inicia sesión.</p>
+
+  <div class="toolbar">
+    <span id="userInfo" class="muted"></span>
+    <button id="loginBtn" class="btn">Iniciar sesión</button>
+    <button id="logoutBtn" class="btn" style="display:none">Salir</button>
+    <button id="editarBtn" class="btn primary" style="display:none">Editar número</button>
+    <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div id="output"></div>
+
+  <!-- Modal edición -->
+  <div id="editBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <h2>Editar número</h2>
+      <div class="row">
+        <label for="numSel">Número</label>
+        <input type="number" id="numSel" min="1" max="100" />
+      </div>
+      <div class="row">
+        <label for="palabra">Palabra</label>
+        <input type="text" id="palabra" />
+      </div>
+      <div class="row">
+        <label for="imagen">Imagen (opcional)</label>
+        <input type="file" id="imagen" accept="image/*" />
+      </div>
+      <div class="actions">
+        <button id="cancelarBtn" class="btn">Cancelar</button>
+        <button id="guardarBtn" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal login -->
+  <div id="loginBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <h2>Acceso administrador</h2>
+      <div class="row">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" />
+      </div>
+      <div class="row">
+        <label for="loginPass">Contraseña</label>
+        <input type="password" id="loginPass" />
+      </div>
+      <div class="actions">
+        <button id="loginCancel" class="btn">Cancelar</button>
+        <button id="loginSubmit" class="btn primary">Entrar</button>
+      </div>
+      <p class="muted">Este login solo activa la edición en este navegador.</p>
+    </div>
+  </div>
+
+<script>
+/* === Configura tus credenciales === */
+const ADMIN_EMAIL = "admin@tu-dominio.com";
+const ADMIN_PASS_HASH = "PEGA_AQUI_EL_HASH"; // SHA-256 de tu contraseña
+
+async function sha256(txt){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-// ===== Referencias UI =====
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const editarBtn = document.getElementById("editarBtn");
-const borrarBtn = document.getElementById("borrarBtn");
-const userInfo = document.getElementById("userInfo");
+/* === Estado === */
+let seleccionado = 1;
+let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
+function guardarDatos(){ localStorage.setItem("palabrasNumeros", JSON.stringify(datos)); }
 
-const loginBackdrop = document.getElementById("loginBackdrop");
-const loginEmail = document.getElementById("loginEmail");
-const loginPass  = document.getElementById("loginPass");
-const loginSubmit= document.getElementById("loginSubmit");
-const loginCancel= document.getElementById("loginCancel");
+/* === UI refs === */
+const grid=document.getElementById("grid"),output=document.getElementById("output");
+const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElementById("logoutBtn");
+const editarBtn=document.getElementById("editarBtn"),borrarBtn=document.getElementById("borrarBtn");
+const userInfo=document.getElementById("userInfo");
+const editBackdrop=document.getElementById("editBackdrop"),numSel=document.getElementById("numSel");
+const palabraInput=document.getElementById("palabra"),imagenInput=document.getElementById("imagen");
+const guardarBtn=document.getElementById("guardarBtn"),cancelarBtn=document.getElementById("cancelarBtn");
+const loginBackdrop=document.getElementById("loginBackdrop"),loginEmail=document.getElementById("loginEmail");
+const loginPass=document.getElementById("loginPass"),loginSubmit=document.getElementById("loginSubmit");
+const loginCancel=document.getElementById("loginCancel");
 
-// ===== Estado de sesión (localStorage) =====
+/* === Sesión === */
 function isLogged(){ return localStorage.getItem("adminLogged")==="1"; }
 function setLogged(v){ localStorage.setItem("adminLogged", v?"1":"0"); renderAuthUI(); }
 function renderAuthUI(){
-  const on = isLogged();
-  editarBtn.style.display = on ? "" : "none";
-  borrarBtn.style.display = on ? "" : "none";
-  logoutBtn.style.display = on ? "" : "none";
-  loginBtn.style.display = on ? "none" : "";
-  userInfo.textContent = on ? `Sesión: ${ADMIN_EMAIL}` : "Sesión: invitado (solo lectura)";
+  const on=isLogged();
+  editarBtn.style.display=on?"":"none";
+  borrarBtn.style.display=on?"":"none";
+  logoutBtn.style.display=on?"":"none";
+  loginBtn.style.display=on?"none":"";
+  userInfo.textContent=on?`Sesión: ${ADMIN_EMAIL}`:"Sesión: invitado";
 }
 renderAuthUI();
 
-// ===== Abrir/cerrar modal =====
-function openLogin(){ loginEmail.value=""; loginPass.value=""; loginBackdrop.style.display="flex"; loginBackdrop.setAttribute("aria-hidden","false"); }
-function closeLogin(){ loginBackdrop.style.display="none"; loginBackdrop.setAttribute("aria-hidden","true"); }
+/* === Login === */
+loginBtn.onclick=()=>{loginBackdrop.style.display="flex";}
+loginCancel.onclick=()=>{loginBackdrop.style.display="none";}
+loginSubmit.onclick=async()=>{
+  const email=(loginEmail.value||"").trim().toLowerCase(), pass=loginPass.value||"";
+  if(email!==ADMIN_EMAIL){alert("Email inválido");return;}
+  if(await sha256(pass)!==ADMIN_PASS_HASH){alert("Contraseña inválida");return;}
+  setLogged(true); loginBackdrop.style.display="none";
+};
+logoutBtn.onclick=()=>setLogged(false);
 
-loginBtn.onclick = openLogin;
-loginCancel.onclick = closeLogin;
-loginBackdrop.addEventListener("click", e => { if(e.target===loginBackdrop) closeLogin(); });
+/* === Modal edición === */
+editarBtn.onclick=()=>{
+  if(!isLogged()){alert("Debes iniciar sesión");return;}
+  const info=datos[seleccionado]||{};
+  numSel.value=seleccionado; palabraInput.value=info.palabra||""; imagenInput.value="";
+  editBackdrop.style.display="flex";
+};
+cancelarBtn.onclick=()=>{editBackdrop.style.display="none";}
 
-// ===== Validar e iniciar sesión =====
-loginSubmit.onclick = async () => {
-  const email = (loginEmail.value||"").trim().toLowerCase();
-  const pass  = loginPass.value||"";
-  if(email !== ADMIN_EMAIL){ alert("Credenciales inválidas"); return; }
-  const h = await sha256(pass);
-  if(h !== ADMIN_PASS_HASH){ alert("Credenciales inválidas"); return; }
-  setLogged(true);
-  closeLogin();
+guardarBtn.onclick=()=>{
+  const n=parseInt(numSel.value,10)||1;
+  const palabra=(palabraInput.value||"").trim();
+  const aplicar=(img)=>{ datos[n]={palabra,imagen:img||datos[n]?.imagen||null};
+    guardarDatos(); mostrar(n); editBackdrop.style.display="none"; };
+  if(imagenInput.files[0]){
+    const r=new FileReader(); r.onload=()=>aplicar(r.result); r.readAsDataURL(imagenInput.files[0]);
+  } else aplicar();
 };
 
-// ===== Salir =====
-logoutBtn.onclick = () => setLogged(false);
+borrarBtn.onclick=()=>{
+  if(!isLogged()){alert("Debes iniciar sesión");return;}
+  delete datos[seleccionado]; guardarDatos(); mostrar(seleccionado);
+};
 
-// ===== Bloquea edición si no hay sesión (si ya tienes funciones de editar/borrar, respétalo) =====
-// Ejemplo: si tienes una función abrirModal(i):
-// const _abrirModal = abrirModal;
-// window.abrirModal = (i) => { if(!isLogged()){ alert("Inicia sesión para editar."); return; } _abrirModal(i); }
+/* === Mostrar === */
+function mostrar(i){
+  const info=datos[i]; output.innerHTML=`<strong>Número ${i}:</strong> ${info?info.palabra:"(sin datos)"}`;
+  if(info?.imagen){output.innerHTML+=`<div><img src="${info.imagen}" class="image-preview"></div>`;}
+  if(info?.palabra){speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(info.palabra); u.lang="es-ES"; speechSynthesis.speak(u);}
+}
+
+/* === Construir grid === */
+for(let i=1;i<=100;i++){
+  const d=document.createElement("div"); d.className="number"; d.textContent=i;
+  d.onclick=()=>{seleccionado=i;document.querySelectorAll(".number").forEach((n,ix)=>n.classList.toggle("selected",ix+1===i)); mostrar(i);}
+  grid.appendChild(d);
+}
+mostrar(seleccionado);
 </script>
+</body>
+</html>

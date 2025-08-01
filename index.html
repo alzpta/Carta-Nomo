@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Números interactivos 1–100</title>
+  <title>Carta Nomo – Números 1–100</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- PWA (ajustado para GitHub Pages en /Carta-Nomo/) -->
+  <!-- PWA (ajustado para GitHub Pages en /Carta-Nomo/).
+       Si publicas en Firebase Hosting en la raíz, cambia /Carta-Nomo/ por / -->
   <link rel="manifest" href="/Carta-Nomo/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
   <link rel="apple-touch-icon" href="/Carta-Nomo/iconos/icon-192.png" />
@@ -13,128 +14,53 @@
 
   <style>
     :root{
-      --bg:#fff;
-      --card:#f6f7f8;
-      --accent:#0b5fff;
-      --hover:#e8f1ff;
-      --radius:12px;
-      --content-w:1000px;
-
-      /* Grid responsive */
-      --cell-min:64px;
-      --gap:10px;
+      --bg:#fff; --accent:#0b5fff; --hover:#e8f1ff;
+      --radius:12px; --content-w:1000px;
+      --cell-min:64px; --gap:10px;
     }
-
     *{box-sizing:border-box}
     body{
-      margin:0;
-      padding:clamp(12px,2vw,24px);
-      background:var(--bg);
-      color:#111;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      line-height:1.3;
+      margin:0; padding:clamp(12px,2vw,24px); background:var(--bg); color:#111;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; line-height:1.3;
     }
-    .page{max-width:var(--content-w);margin:0 auto}
+    .page{max-width:var(--content-w); margin:0 auto}
+    h1{text-align:center; font-size:clamp(1.4rem,3.5vw,2.2rem); margin:0 0 .4rem}
+    .hint{text-align:center; color:#555; font-size:clamp(.9rem,2.5vw,1rem); margin:0 0 clamp(12px,2.5vw,20px)}
 
-    h1{
-      text-align:center;
-      font-size:clamp(1.4rem,3.5vw,2.2rem);
-      margin:0 0 .4rem;
-    }
-    .hint{
-      text-align:center;color:#555;
-      font-size:clamp(.9rem,2.5vw,1rem);
-      margin:0 0 clamp(12px,2.5vw,20px);
-    }
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; margin:0 auto clamp(12px,3vw,16px)}
+    .btn{padding:clamp(8px,2vw,10px) clamp(10px,3vw,14px); border-radius:var(--radius); border:1px solid #d0d7de; background:#fff; cursor:pointer; font-weight:600; font-size:clamp(.9rem,2.5vw,1rem)}
+    .btn.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
+    .btn.danger{border-color:#e00; color:#e00}
+    .muted{color:#666; font-size:clamp(.85rem,2.2vw,.95rem)}
 
-    /* Toolbar responsive */
-    .toolbar{
-      display:flex;gap:10px;flex-wrap:wrap;
-      align-items:center;justify-content:center;
-      margin:0 auto clamp(12px,3vw,16px);
-    }
-    .btn{
-      padding:clamp(8px,2vw,10px) clamp(10px,3vw,14px);
-      border-radius:var(--radius);
-      border:1px solid #d0d7de;
-      background:#fff;cursor:pointer;font-weight:600;
-      font-size:clamp(.9rem,2.5vw,1rem);
-    }
-    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-    .btn.danger{border-color:#e00;color:#e00}
-    .muted{color:#666;font-size:clamp(.85rem,2.2vw,.95rem)}
-
-    /* GRID totalmente fluido + celdas cuadradas */
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(var(--cell-min),1fr));
-      gap:var(--gap);
-      max-width:var(--content-w);
-      margin:0 auto;
-      padding:0 clamp(2px,1vw,6px);
-    }
+    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(var(--cell-min),1fr)); gap:var(--gap); max-width:var(--content-w); margin:0 auto; padding:0 clamp(2px,1vw,6px)}
     .number{
-      background:#f0f0f0;border-radius:var(--radius);
-      cursor:pointer;font-weight:700;text-align:center;user-select:none;
-      transition:background .15s ease;
-      font-size:clamp(1rem,3.2vw,1.2rem);
-      aspect-ratio:1/1;               /* cuadradas */
-      display:grid;place-items:center; /* centrar número */
-      padding:clamp(6px,1.2vw,10px);
+      background:#f0f0f0; border-radius:var(--radius); cursor:pointer; font-weight:700;
+      text-align:center; user-select:none; transition:background .15s ease;
+      font-size:clamp(1rem,3.2vw,1.2rem); aspect-ratio:1/1; display:grid; place-items:center; padding:clamp(6px,1.2vw,10px)
     }
     .number:hover{background:var(--hover)}
-    .selected{outline:2px solid var(--accent);background:#eef3ff}
+    .selected{outline:2px solid var(--accent); background:#eef3ff}
+    .number.empty{background:#eaf4ff} .number.empty:hover{background:#ddecff}
 
-    /* NUEVO: celdas sin datos en azul pastel */
-    .number.empty{
-      background:#eaf4ff;             /* azul pastel */
-    }
-    .number.empty:hover{
-      background:#ddecff;             /* un poco más intenso al hover */
-    }
+    #output{margin:clamp(14px,3vw,20px) auto 0; font-size:clamp(1rem,3vw,1.2rem); max-width:var(--content-w); padding:0 clamp(2px,1vw,6px)}
+    .image-preview{max-width:min(160px,40vw); width:100%; height:auto; margin-top:8px; border-radius:10px}
 
-    #output{
-      margin:clamp(14px,3vw,20px) auto 0;
-      font-size:clamp(1rem,3vw,1.2rem);
-      max-width:var(--content-w);
-      padding:0 clamp(2px,1vw,6px);
-    }
-    .image-preview{
-      max-width:min(160px,40vw);width:100%;height:auto;
-      margin-top:8px;border-radius:10px;
-    }
+    .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; padding:clamp(10px,3vw,16px); z-index:1000}
+    .modal{width:100%; max-width:min(520px,95vw); background:#fff; border-radius:14px; padding:clamp(12px,3vw,16px); box-shadow:0 10px 30px rgba(0,0,0,.2)}
+    .modal h2{margin:0 0 8px; font-size:clamp(1.1rem,3vw,1.3rem)}
+    .row{margin:10px 0} .row label{display:block; margin-bottom:4px; font-size:clamp(.9rem,2.5vw,1rem)}
+    .row input{width:100%; padding:clamp(8px,2vw,10px); border:1px solid #ccc; border-radius:10px; font-size:clamp(.95rem,2.6vw,1rem)}
+    .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
 
-    /* Modales responsive */
-    .modal-backdrop{
-      position:fixed;inset:0;background:rgba(0,0,0,.4);
-      display:none;align-items:center;justify-content:center;
-      padding:clamp(10px,3vw,16px);z-index:1000;
-    }
-    .modal{
-      width:100%;max-width:min(520px,95vw);
-      background:#fff;border-radius:14px;
-      padding:clamp(12px,3vw,16px);
-      box-shadow:0 10px 30px rgba(0,0,0,.2);
-    }
-    .modal h2{margin:0 0 8px;font-size:clamp(1.1rem,3vw,1.3rem)}
-    .row{margin:10px 0}
-    .row label{display:block;margin-bottom:4px;font-size:clamp(.9rem,2.5vw,1rem)}
-    .row input{
-      width:100%;padding:clamp(8px,2vw,10px);
-      border:1px solid #ccc;border-radius:10px;
-      font-size:clamp(.95rem,2.6vw,1rem);
-    }
-    .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
-
-    /* Ajustes finos móviles */
-    @media (max-width:420px){ :root{--cell-min:54px;--gap:8px} }
+    @media (max-width:420px){ :root{--cell-min:54px; --gap:8px} }
     @media (min-width:1200px){ :root{--cell-min:86px} }
   </style>
 </head>
 <body>
   <div class="page">
     <h1>Carta Nomo Sarria</h1>
-    <p class="hint">Clic en un número = ver y oír. Para editar, primero inicia sesión.</p>
+    <p class="hint">Clic en un número = ver y oír. Para editar, inicia sesión.</p>
 
     <div class="toolbar">
       <span id="userInfo" class="muted"></span>
@@ -154,22 +80,10 @@
   <div id="editBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal">
       <h2>Editar número</h2>
-      <div class="row">
-        <label for="numSel">Número</label>
-        <input type="number" id="numSel" min="1" max="100" />
-      </div>
-      <div class="row">
-        <label for="palabra">Palabra</label>
-        <input type="text" id="palabra" placeholder="Escribe la palabra…" />
-      </div>
-      <div class="row">
-        <label for="imagen">Imagen (opcional)</label>
-        <input type="file" id="imagen" accept="image/*" />
-      </div>
-      <div class="actions">
-        <button id="cancelarBtn" class="btn">Cancelar</button>
-        <button id="guardarBtn" class="btn primary">Guardar</button>
-      </div>
+      <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" /></div>
+      <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
+      <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
+      <div class="actions"><button id="cancelarBtn" class="btn">Cancelar</button><button id="guardarBtn" class="btn primary">Guardar</button></div>
     </div>
   </div>
 
@@ -177,185 +91,219 @@
   <div id="loginBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal">
       <h2>Acceso administrador</h2>
-      <div class="row">
-        <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" placeholder="admin@tu-dominio.com" />
-      </div>
-      <div class="row">
-        <label for="loginPass">Contraseña</label>
-        <input type="password" id="loginPass" placeholder="••••••••" />
-      </div>
-      <div class="actions">
-        <button id="loginCancel" class="btn">Cancelar</button>
-        <button id="loginSubmit" class="btn primary">Entrar</button>
-      </div>
-      <p class="muted">Este login solo activa la edición en este navegador.</p>
+      <div class="row"><label for="loginEmail">Email</label><input type="email" id="loginEmail" placeholder="tu@correo.com" /></div>
+      <div class="row"><label for="loginPass">Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" /></div>
+      <div class="actions"><button id="loginCancel" class="btn">Cancelar</button><button id="loginSubmit" class="btn primary">Entrar</button></div>
+      <p class="muted">La edición requiere sesión. La visualización es pública.</p>
     </div>
   </div>
 
-<script>
-/* === Credenciales (Opción A) === */
-const ADMIN_EMAIL = "admin@tu-dominio.com";
-const ADMIN_PASS_HASH = "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270"; // tu hash
+  <!-- Firebase SDKs (ESM desde CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
-async function sha256(txt){
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
-  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-
-/* === Estado y storage === */
-let seleccionado = 1;
-let datos = JSON.parse(localStorage.getItem("palabrasNumeros")) || {};
-const guardarDatos = () => localStorage.setItem("palabrasNumeros", JSON.stringify(datos));
-
-/* === UI refs === */
-const grid=document.getElementById("grid"),output=document.getElementById("output");
-const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElementById("logoutBtn");
-const editarBtn=document.getElementById("editarBtn"),borrarBtn=document.getElementById("borrarBtn");
-const exportBtn=document.getElementById("exportBtn"),importBtn=document.getElementById("importBtn");
-const userInfo=document.getElementById("userInfo");
-const editBackdrop=document.getElementById("editBackdrop"),numSel=document.getElementById("numSel");
-const palabraInput=document.getElementById("palabra"),imagenInput=document.getElementById("imagen");
-const guardarBtn=document.getElementById("guardarBtn"),cancelarBtn=document.getElementById("cancelarBtn");
-const loginBackdrop=document.getElementById("loginBackdrop"),loginEmail=document.getElementById("loginEmail");
-const loginPass=document.getElementById("loginPass"),loginSubmit=document.getElementById("loginSubmit");
-const loginCancel=document.getElementById("loginCancel");
-
-/* === Helpers de UI === */
-function tieneDatos(n){
-  const d = datos[n];
-  return !!(d && ( (d.palabra && d.palabra.trim()) || d.imagen ));
-}
-function refrescarCeldasVacias(){
-  [...grid.children].forEach((el,ix)=>{
-    const n = ix+1;
-    el.classList.toggle("empty", !tieneDatos(n));
-  });
-}
-
-/* === Sesión === */
-function isLogged(){ return localStorage.getItem("adminLogged")==="1"; }
-function setLogged(v){ localStorage.setItem("adminLogged", v?"1":"0"); renderAuthUI(); }
-function renderAuthUI(){
-  const on=isLogged();
-  editarBtn.style.display=on?"":"none";
-  borrarBtn.style.display=on?"":"none";
-  exportBtn.style.display=on?"":"none";
-  importBtn.style.display=on?"":"none";
-  logoutBtn.style.display=on?"":"none";
-  loginBtn.style.display=on?"none":"";
-  userInfo.textContent=on?`Sesión: ${ADMIN_EMAIL}`:"Sesión: invitado";
-}
-renderAuthUI();
-
-/* === Login === */
-loginBtn.onclick=()=>{loginBackdrop.style.display="flex";}
-loginCancel.onclick=()=>{loginBackdrop.style.display="none";}
-loginSubmit.onclick=async()=>{
-  const email=(loginEmail.value||"").trim().toLowerCase(), pass=loginPass.value||"";
-  if(email!==ADMIN_EMAIL){alert("Email inválido");return;}
-  if(await sha256(pass)!==ADMIN_PASS_HASH){alert("Contraseña inválida");return;}
-  setLogged(true); loginBackdrop.style.display="none";
-};
-logoutBtn.onclick=()=>setLogged(false);
-
-/* === Edición === */
-editarBtn.onclick=()=>{
-  if(!isLogged()){alert("Debes iniciar sesión");return;}
-  const info=datos[seleccionado]||{};
-  numSel.value=seleccionado; palabraInput.value=info.palabra||""; imagenInput.value="";
-  editBackdrop.style.display="flex";
-};
-cancelarBtn.onclick=()=>{editBackdrop.style.display="none";}
-
-guardarBtn.onclick=()=>{
-  const n=Math.max(1,Math.min(100,parseInt(numSel.value,10)||1));
-  const palabra=(palabraInput.value||"").trim();
-  const aplicar=(img)=>{
-    datos[n]={palabra, imagen: img ?? datos[n]?.imagen ?? null};
-    guardarDatos(); seleccionar(n); mostrar(n);
-    editBackdrop.style.display="none";
-    refrescarCeldasVacias(); // <- actualizar colores
-  };
-  const f=imagenInput.files[0];
-  if(f){ const r=new FileReader(); r.onload=()=>aplicar(r.result); r.readAsDataURL(f); }
-  else aplicar();
-};
-
-borrarBtn.onclick=()=>{
-  if(!isLogged()){alert("Debes iniciar sesión");return;}
-  delete datos[seleccionado]; guardarDatos(); mostrar(seleccionado);
-  refrescarCeldasVacias(); // <- actualizar colores
-};
-
-/* === Importar / Exportar === */
-exportBtn.onclick=()=>{
-  if(!isLogged()){alert("Debes iniciar sesión");return;}
-  const blob=new Blob([JSON.stringify(datos,null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a"); a.href=url; a.download="palabrasNumeros.json"; a.click();
-  URL.revokeObjectURL(url);
-};
-importBtn.onclick=()=>{
-  if(!isLogged()){alert("Debes iniciar sesión");return;}
-  const inp=document.createElement("input"); inp.type="file"; inp.accept="application/json";
-  inp.onchange=()=>{
-    const f=inp.files?.[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload=()=>{
-      try{
-        const obj=JSON.parse(r.result);
-        if(obj && typeof obj==="object"){
-          const limpio={};
-          Object.keys(obj).forEach(k=>{
-            const n=Number(k);
-            if(Number.isInteger(n) && n>=1 && n<=100){
-              const p=typeof obj[k]?.palabra==="string" ? obj[k].palabra : "";
-              const im=typeof obj[k]?.imagen==="string" ? obj[k].imagen : null;
-              limpio[n]={palabra:p, imagen:im};
-            }
-          });
-          datos={...datos, ...limpio};
-          guardarDatos(); mostrar(seleccionado);
-          refrescarCeldasVacias(); // <- actualizar colores
-          alert("Importación completada.");
-        } else { alert("JSON no válido"); }
-      }catch{ alert("JSON no válido"); }
+    // --- Tu configuración Firebase ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqqDLPFmtAPHXm5ZzpHyxRZZpW31f4Of0",
+      authDomain: "carta-nomo.firebaseapp.com",
+      projectId: "carta-nomo",
+      storageBucket: "carta-nomo.firebasestorage.app",
+      messagingSenderId: "354109744323",
+      appId: "1:354109744323:web:d7548e8cfd0a1d4a41ae76",
+      measurementId: "G-LWB4H4F6TD"
     };
-    r.readAsText(f);
-  };
-  document.body.appendChild(inp); inp.click(); inp.remove();
-};
 
-/* === Mostrar / Voz === */
-function hablar(texto){
-  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(texto); u.lang="es-ES"; speechSynthesis.speak(u);}catch{}
-}
-function mostrar(i){
-  const info=datos[i];
-  output.innerHTML=`<strong>Número ${i}:</strong> ${info?info.palabra:"(sin datos)"}`;
-  if(info?.imagen){output.innerHTML+=`<div><img src="${info.imagen}" class="image-preview" alt="Imagen del número ${i}"></div>`;}
-  if(info?.palabra){hablar(info.palabra);}
-}
+    // --- Inicialización ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-/* === Grid: construir y seleccionar === */
-function seleccionar(n){
-  seleccionado=n;
-  [...grid.children].forEach((el,ix)=>el.classList.toggle("selected",ix+1===n));
-}
-for(let i=1;i<=100;i++){
-  const d=document.createElement("div"); d.className="number"; d.textContent=i;
-  d.onclick=()=>{seleccionar(i); mostrar(i);}
-  grid.appendChild(d);
-}
-seleccionar(1); mostrar(1);
-/* pinta azul pastel las que no tienen datos */
-refrescarCeldasVacias();
+    // --- Referencias UI ---
+    const grid = document.getElementById("grid");
+    const output = document.getElementById("output");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const editarBtn = document.getElementById("editarBtn");
+    const borrarBtn = document.getElementById("borrarBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const importBtn = document.getElementById("importBtn");
+    const userInfo = document.getElementById("userInfo");
 
-/* === PWA SW === */
-if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=>navigator.serviceWorker.register("/Carta-Nomo/service-worker.js"));
-}
-</script>
+    const editBackdrop = document.getElementById("editBackdrop");
+    const numSel = document.getElementById("numSel");
+    const palabraInput = document.getElementById("palabra");
+    const imagenInput = document.getElementById("imagen");
+    const guardarBtn = document.getElementById("guardarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
+
+    const loginBackdrop = document.getElementById("loginBackdrop");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPass = document.getElementById("loginPass");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginCancel = document.getElementById("loginCancel");
+
+    // --- Estado ---
+    let seleccionado = 1;
+    let datos = {}; // {n: {palabra, imagenUrl}}
+
+    const hablar = (t) => { try { speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="es-ES"; speechSynthesis.speak(u);} catch{} };
+    const tieneDatos = (n) => {
+      const d = datos[n];
+      return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl));
+    };
+    const refrescarCeldasVacias = () => {
+      [...grid.children].forEach((el,ix)=>el.classList.toggle("empty", !tieneDatos(ix+1)));
+    };
+    const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle("selected", ix+1===seleccionado)); };
+    const mostrar = (i, speak=true) => {
+      const d = datos[i];
+      output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? "(sin datos)"}`;
+      if (d?.imagenUrl) output.innerHTML += `<div><img class="image-preview" src="${d.imagenUrl}" alt="Imagen ${i}"></div>`;
+      if (speak && d?.palabra) hablar(d.palabra);
+    };
+
+    // --- Auth UI ---
+    const renderAuthUI = (user) => {
+      const on = !!user;
+      editarBtn.style.display = on ? "" : "none";
+      borrarBtn.style.display = on ? "" : "none";
+      exportBtn.style.display = on ? "" : "none";
+      importBtn.style.display = on ? "" : "none";
+      logoutBtn.style.display = on ? "" : "none";
+      loginBtn.style.display = on ? "none" : "";
+      userInfo.textContent = on ? `Sesión: ${user.email}` : "Sesión: invitado";
+    };
+    onAuthStateChanged(auth, renderAuthUI);
+
+    // --- Login modal ---
+    const openLogin = () => { loginEmail.value=""; loginPass.value=""; loginBackdrop.style.display="flex"; };
+    const closeLogin = () => { loginBackdrop.style.display="none"; };
+    loginBtn.onclick = openLogin; loginCancel.onclick = closeLogin;
+    loginBackdrop.addEventListener("click", e => { if (e.target===loginBackdrop) closeLogin(); });
+    loginSubmit.onclick = async () => {
+      try { await signInWithEmailAndPassword(auth, (loginEmail.value||"").trim(), loginPass.value||""); closeLogin(); }
+      catch(e){ alert("No se pudo iniciar sesión: " + (e?.message||e)); }
+    };
+    logoutBtn.onclick = () => signOut(auth);
+
+    // --- Editar / Guardar ---
+    editarBtn.onclick = () => {
+      if (!auth.currentUser) return alert("Debes iniciar sesión para editar.");
+      const info = datos[seleccionado] || {};
+      numSel.value = seleccionado;
+      palabraInput.value = info.palabra || "";
+      imagenInput.value = "";
+      editBackdrop.style.display = "flex";
+    };
+    cancelarBtn.onclick = () => { editBackdrop.style.display="none"; imagenInput.value=""; };
+
+    numSel.onchange = () => {
+      let v = Math.max(1, Math.min(100, parseInt(numSel.value||"1",10)));
+      numSel.value = v; seleccionado = v; pintarSeleccion();
+      const info = datos[v] || {};
+      palabraInput.value = info.palabra || ""; imagenInput.value = "";
+    };
+
+    async function guardarNumero(n, palabra, file){
+      if (!auth.currentUser) throw new Error("No autenticado");
+      let imagenUrl = datos[n]?.imagenUrl || null;
+      if (file) {
+        const ref = storageRef(storage, `imagenes/${n}`);
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        await uploadBytes(ref, bytes, { contentType: file.type || "image/png" });
+        imagenUrl = await getDownloadURL(ref);
+      }
+      await setDoc(doc(collection(db, "numeros"), String(n)), {
+        palabra: palabra || "",
+        imagenUrl: imagenUrl || null,
+        updatedAt: Date.now()
+      });
+    }
+
+    guardarBtn.onclick = async () => {
+      try{
+        const n = Math.max(1, Math.min(100, parseInt(numSel.value||"1",10)));
+        const palabra = (palabraInput.value||"").trim();
+        const file = imagenInput.files?.[0] || null;
+        await guardarNumero(n, palabra, file);
+        seleccionado = n; pintarSeleccion(); editBackdrop.style.display="none";
+      }catch(e){ alert("Error al guardar: " + (e?.message||e)); }
+    };
+
+    borrarBtn.onclick = async () => {
+      if (!auth.currentUser) return alert("Debes iniciar sesión para borrar.");
+      const n = seleccionado;
+      try {
+        try { await deleteObject(storageRef(storage, `imagenes/${n}`)); } catch {}
+        await deleteDoc(doc(collection(db,"numeros"), String(n)));
+      } catch(e){ alert("No se pudo borrar: " + (e?.message||e)); }
+    };
+
+    // --- Importar / Exportar ---
+    exportBtn.onclick = () => {
+      if (!auth.currentUser) return alert("Inicia sesión.");
+      const blob = new Blob([JSON.stringify(datos, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "palabrasNumeros.json"; a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    importBtn.onclick = () => {
+      if (!auth.currentUser) return alert("Inicia sesión.");
+      const inp = document.createElement("input");
+      inp.type="file"; inp.accept="application/json";
+      inp.onchange = async () => {
+        const f = inp.files?.[0]; if(!f) return;
+        try{
+          const obj = JSON.parse(await f.text());
+          const ops = [];
+          for (const [k,v] of Object.entries(obj||{})) {
+            const n = Number(k); if (!Number.isInteger(n) || n<1 || n>100) continue;
+            ops.push(setDoc(doc(collection(db,"numeros"), String(n)), {
+              palabra: typeof v?.palabra==="string" ? v.palabra : "",
+              imagenUrl: typeof v?.imagenUrl==="string" ? v.imagenUrl : null,
+              updatedAt: Date.now()
+            }));
+          }
+          await Promise.all(ops);
+          alert("Importación completada.");
+        }catch(e){ alert("JSON no válido: " + (e?.message||e)); }
+      };
+      document.body.appendChild(inp); inp.click(); inp.remove();
+    };
+
+    // --- Realtime: escuchar Firestore ---
+    onSnapshot(collection(db,"numeros"), (snap) => {
+      const nuevo = {};
+      snap.forEach(d => {
+        const n = parseInt(d.id,10);
+        if (!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || "", imagenUrl: d.data().imagenUrl || null };
+      });
+      datos = nuevo;
+      refrescarCeldasVacias();
+      mostrar(seleccionado, false);
+    });
+
+    // --- Construir grid ---
+    for (let i=1; i<=100; i++){
+      const d = document.createElement("div");
+      d.className = "number";
+      d.textContent = i;
+      d.onclick = () => { seleccionado = i; pintarSeleccion(); mostrar(i); };
+      grid.appendChild(d);
+    }
+    pintarSeleccion(); mostrar(seleccionado, false);
+
+    // --- PWA SW (opcional) ---
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/Carta-Nomo/service-worker.js");
+      });
+    }
+  </script>
 </body>
 </html>

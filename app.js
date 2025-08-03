@@ -134,6 +134,9 @@
     };
 
     // Importar / Exportar
+    const MAX_PALABRA_LENGTH = 50;
+    const MAX_IMPORT_ENTRIES = 100;
+    const MAX_IMPORT_FILE_SIZE = 1024 * 1024; // 1MB
     exportBtn.onclick = () => {
       if (!auth.currentUser) return alert('Inicia sesión.');
       const blob = new Blob([JSON.stringify(datos, null, 2)], {type:'application/json'});
@@ -143,14 +146,33 @@
     importBtn.onclick = () => {
       if (!auth.currentUser) return alert('Inicia sesión.');
       const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
-      inp.onchange = async () => { const f = inp.files?.[0]; if(!f) return; try{
-        const obj = JSON.parse(await f.text()); const ops=[];
-        for (const [k,v] of Object.entries(obj||{})){
-          const n = Number(k); if(!Number.isInteger(n)||n<1||n>100) continue;
-          ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { palabra: typeof v?.palabra==='string'?v.palabra:'', imagenUrl: typeof v?.imagenUrl==='string'?v.imagenUrl:null, updatedAt: Date.now() }));
-        }
-        await Promise.all(ops); alert('Importación completada.');
-      }catch(e){ alert('JSON no válido: ' + (e?.message||e)); } };
+      inp.onchange = async () => {
+        const f = inp.files?.[0];
+        if(!f) return;
+        if (f.size > MAX_IMPORT_FILE_SIZE) return alert('Archivo demasiado grande.');
+        try{
+          const obj = JSON.parse(await f.text());
+          const entries = Object.entries(obj||{});
+          if (entries.length > MAX_IMPORT_ENTRIES) return alert('Demasiadas entradas.');
+          const ops=[]; const errors=[];
+          for (const [k,v] of entries){
+            const n = Number(k); if(!Number.isInteger(n)||n<1||n>100) continue;
+            const palabra = typeof v?.palabra==='string'?v.palabra.trim():'';
+            if (palabra.length>MAX_PALABRA_LENGTH || /<|>/.test(palabra)) { errors.push(`Palabra inválida para ${n}`); continue; }
+            let imagenUrl = null;
+            if (typeof v?.imagenUrl === 'string'){
+              try{
+                const url = new URL(v.imagenUrl);
+                if (url.protocol==='http:'||url.protocol==='https:') imagenUrl = url.href; else { errors.push(`URL no permitida para ${n}`); continue; }
+              }catch{ errors.push(`URL inválida para ${n}`); continue; }
+            }
+            ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { palabra, imagenUrl, updatedAt: Date.now() }));
+          }
+          await Promise.all(ops);
+          if (errors.length){ console.error('Errores de importación:', errors); alert('Importación completada con errores. Revisa la consola.'); }
+          else alert('Importación completada.');
+        }catch(e){ alert('JSON no válido: ' + (e?.message||e)); }
+      };
       document.body.appendChild(inp); inp.click(); inp.remove();
     };
 

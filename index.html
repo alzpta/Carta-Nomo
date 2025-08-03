@@ -15,7 +15,7 @@
 
   <style>
     /* ————————————————————————————————————————————————
-       Liquid Glass UI + Popup + Accesibilidad
+       Liquid Glass UI + Popup + Carrusel + Admin + TTS
        ———————————————————————————————————————————————— */
     :root{
       --bg: #0a0d14; --bg2: #0e1420; --ink: #eaf2ff; --muted: #a9b5c8;
@@ -62,6 +62,7 @@
     .btn:focus-visible{ outline:none; box-shadow: var(--ring), var(--shadow) }
     .btn.primary{ color:#00131f; background: linear-gradient(180deg, color-mix(in oklab, var(--tint) 85%, white), color-mix(in oklab, var(--tint) 65%, white)) }
     .btn.danger{ color:#2b0000; background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 85%, white), color-mix(in oklab, var(--danger) 65%, white)) }
+    .btn.icon{ display:inline-grid; place-items:center; width:36px; height:36px; padding:0 }
     .btn.toggle[aria-pressed="true"]{ outline:2px solid var(--tint); }
 
     .card{ margin-top: clamp(12px, 2.2vw, 18px); padding: clamp(10px, 2.2vw, 16px) }
@@ -76,21 +77,33 @@
     .cell.selected{ outline:2px solid var(--tint); background: linear-gradient(180deg, rgba(57,160,255,.22), rgba(57,160,255,.08)) }
     .cell.empty{ color: color-mix(in oklab, var(--tint) 90%, white); background: linear-gradient(180deg, rgba(57,160,255,.26), rgba(124,247,230,.10)) }
 
-    #output{ padding: 8px clamp(6px, 1.6vw, 10px) 12px; font-size: clamp(1rem, 2.8vw, 1.15rem) }
-    .preview{ max-width:min(220px, 50vw); width:100%; height:auto; border-radius: 14px; box-shadow: var(--shadow); margin-top:8px }
-
     /* Popup (visor) */
     .popup-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); z-index:1000 }
     .popup-backdrop[aria-hidden="false"]{ display:flex }
-    .popup{ width:min(760px,95vw); border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.25); box-shadow: var(--shadow-lg); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06)) }
+    .popup{ width:min(860px,96vw); border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.25); box-shadow: var(--shadow-lg); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06)) }
     .popup header{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.2) }
     .popup h3{ margin:0; font-size:1.1rem }
-    .popup .content{ display:grid; grid-template-columns: 1fr 1.2fr; gap:14px; padding:14px }
+    .popup .content{ display:grid; grid-template-columns: 1.2fr 1fr; gap:16px; padding:14px }
     .popup img{ width:100%; height:auto; border-radius:14px; box-shadow: var(--shadow) }
     .popup p{ margin:.25rem 0 0 }
     .popup .close{ border:1px solid rgba(255,255,255,.28); border-radius:999px; padding:8px 12px; background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08)); color:inherit; cursor:pointer }
-    @media (max-width:640px){ .popup .content{ grid-template-columns: 1fr } }
 
+    /* Carrusel */
+    .carousel{ position:relative }
+    .carousel-main{ position:relative; min-height:240px; display:grid; place-items:center }
+    .carousel-thumbs{ display:flex; gap:8px; overflow:auto; padding-top:10px }
+    .thumb{ border:1px solid rgba(255,255,255,.28); border-radius:12px; overflow:hidden; width:72px; height:72px; cursor:pointer; opacity:.8 }
+    .thumb[aria-current="true"]{ outline:2px solid var(--tint); opacity:1 }
+    .nav{ position:absolute; top:50%; transform:translateY(-50%); display:flex; gap:8px; width:100%; justify-content:space-between; pointer-events:none }
+    .nav button{ pointer-events:auto }
+
+    /* Admin dentro del visor */
+    .admin{ display:none; gap:8px; align-items:center; flex-wrap:wrap; }
+    .admin.on{ display:flex }
+    .admin .row{ width:100% }
+    .admin textarea{ width:100%; min-height:90px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); color:inherit; resize:vertical }
+
+    @media (max-width:760px){ .popup .content{ grid-template-columns: 1fr } }
     @media (max-width:460px){ :root{ --cell-min: 60px } }
     @media (min-width:1280px){ :root{ --cell-min: 86px } }
     @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
@@ -113,8 +126,6 @@
         <button id="ttsBtn" class="btn toggle" aria-pressed="false" title="Leer en voz alta al abrir">Leer</button>
         <button id="loginBtn" class="btn">Iniciar sesión</button>
         <button id="logoutBtn" class="btn" style="display:none">Salir</button>
-        <button id="editarBtn" class="btn primary" style="display:none">Editar</button>
-        <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
         <button id="exportBtn" class="btn" style="display:none">Exportar</button>
         <button id="importBtn" class="btn" style="display:none">Importar</button>
       </div>
@@ -128,17 +139,36 @@
     </section>
   </div>
 
-  <!-- Popup visor -->
+  <!-- Popup visor con carrusel y edición admin -->
   <div id="viewerBackdrop" class="popup-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="popup" role="document">
       <header>
         <h3 id="viewerTitle">Plato</h3>
-        <button id="viewerClose" class="close" aria-label="Cerrar">Cerrar</button>
+        <div style="display:flex; gap:8px; align-items:center">
+          <button id="editToggle" class="btn" style="display:none">Editar</button>
+          <button id="viewerClose" class="close" aria-label="Cerrar">Cerrar</button>
+        </div>
       </header>
       <div class="content">
-        <div><img id="viewerImg" alt="Imagen del plato" /></div>
+        <div class="carousel">
+          <div class="carousel-main" id="carouselMain"></div>
+          <div class="nav">
+            <button id="prevImg" class="btn icon" aria-label="Anterior">‹</button>
+            <button id="nextImg" class="btn icon" aria-label="Siguiente">›</button>
+          </div>
+          <div id="carouselThumbs" class="carousel-thumbs" aria-label="Miniaturas"></div>
+        </div>
         <div>
           <p id="viewerDesc">Descripción del plato…</p>
+          <div id="adminPanel" class="admin">
+            <div class="row"><label for="descInput">Descripción</label><textarea id="descInput" placeholder="Escribe la descripción…"></textarea></div>
+            <div class="row"><label for="imgsInput">Añadir imágenes</label><input id="imgsInput" type="file" accept="image/*" multiple /></div>
+            <div class="row" id="manageThumbs" style="display:flex; gap:8px; flex-wrap:wrap"></div>
+            <div style="display:flex; gap:8px; justify-content:flex-end">
+              <button id="deleteNumber" class="btn danger">Borrar número</button>
+              <button id="saveChanges" class="btn primary">Guardar cambios</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -148,7 +178,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig = {
@@ -171,8 +201,6 @@
     const output = document.getElementById("output");
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
-    const editarBtn = document.getElementById("editarBtn");
-    const borrarBtn = document.getElementById("borrarBtn");
     const exportBtn = document.getElementById("exportBtn");
     const importBtn = document.getElementById("importBtn");
     const userInfo = document.getElementById("userInfo");
@@ -181,18 +209,26 @@
     // Popup refs
     const viewerBackdrop = document.getElementById('viewerBackdrop');
     const viewerTitle = document.getElementById('viewerTitle');
-    const viewerImg = document.getElementById('viewerImg');
     const viewerDesc = document.getElementById('viewerDesc');
     const viewerClose = document.getElementById('viewerClose');
+    const editToggle = document.getElementById('editToggle');
+    const adminPanel = document.getElementById('adminPanel');
+    const descInput = document.getElementById('descInput');
+    const imgsInput = document.getElementById('imgsInput');
+    const manageThumbs = document.getElementById('manageThumbs');
+    const deleteNumberBtn = document.getElementById('deleteNumber');
+    const saveChangesBtn = document.getElementById('saveChanges');
 
-    // Edit modal refs (reuse existing admin flow)
-    const editBackdrop = document.createElement('div');
-    // (Para mantener el ejemplo centrado en el visor, seguimos usando botones de admin existentes del proyecto base.)
+    const carouselMain = document.getElementById('carouselMain');
+    const carouselThumbs = document.getElementById('carouselThumbs');
+    const prevImgBtn = document.getElementById('prevImg');
+    const nextImgBtn = document.getElementById('nextImg');
 
     // Estado
     let seleccionado = 1;
-    let datos = {}; // {n: {palabra, imagenUrl}}
+    let datos = {}; // {n: {descripcion?:string, imagenes?:string[], palabra?:string, imagenUrl?:string}}
     let readAloud = (localStorage.getItem('readAloud') === '1');
+    let currentUser = null;
 
     function setTTSUI(){ ttsBtn.setAttribute('aria-pressed', String(readAloud)); ttsBtn.textContent = readAloud ? 'Leer: ON' : 'Leer'; }
     setTTSUI();
@@ -200,7 +236,12 @@
 
     const hablar = (t) => { try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch{} };
 
-    const tieneDatos = (n) => { const d = datos[n]; return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl)); };
+    const tieneDatos = (n) => {
+      const d = datos[n]; if (!d) return false;
+      const des = (d.descripcion || d.palabra || '').trim();
+      const imgs = Array.isArray(d.imagenes) ? d.imagenes : (d.imagenUrl ? [d.imagenUrl] : []);
+      return !!(des || imgs.length);
+    };
 
     function renderGrid(){
       grid.innerHTML = '';
@@ -214,26 +255,134 @@
       }
     }
 
+    // ——— VISOR + CARRUSEL ———
+    let currentIndex = 0;
+    function getImagenes(d){
+      if (Array.isArray(d?.imagenes) && d.imagenes.length) return d.imagenes;
+      if (d?.imagenUrl) return [d.imagenUrl];
+      return [];
+    }
+
+    function renderCarousel(imgs){
+      carouselMain.innerHTML = '';
+      if (!imgs.length){ carouselMain.innerHTML = '<div class="subtitle">(Sin imagen)</div>'; carouselThumbs.innerHTML=''; return; }
+      currentIndex = Math.max(0, Math.min(currentIndex, imgs.length-1));
+
+      const img = document.createElement('img');
+      img.src = imgs[currentIndex]; img.alt = `Imagen ${currentIndex+1}`; img.loading='lazy'; img.style.borderRadius='14px'; img.style.maxHeight='60vh';
+      carouselMain.appendChild(img);
+
+      // thumbs
+      carouselThumbs.innerHTML = '';
+      imgs.forEach((u,ix)=>{
+        const t = document.createElement('img'); t.src = u; t.alt = `Miniatura ${ix+1}`; t.className='thumb';
+        if (ix===currentIndex) t.setAttribute('aria-current','true');
+        t.onclick=()=>{ currentIndex=ix; renderCarousel(imgs); };
+        carouselThumbs.appendChild(t);
+      });
+    }
+
     function openViewer(i){
       const d = datos[i] || {};
+      const descripcion = d.descripcion || d.palabra || '';
+      const imgs = getImagenes(d);
       viewerTitle.textContent = `Número ${i}`;
-      if (d.imagenUrl){ viewerImg.src = d.imagenUrl; viewerImg.style.display='block'; }
-      else { viewerImg.removeAttribute('src'); viewerImg.style.display='none'; }
-      viewerDesc.textContent = d.palabra || '(sin descripción)';
+      viewerDesc.textContent = descripcion || '(sin descripción)';
+      currentIndex = 0; renderCarousel(imgs);
+
+      // Admin panel visible si hay user
+      editToggle.style.display = currentUser ? '' : 'none';
+      adminPanel.classList.toggle('on', false);
+
+      // Pre-cargar valores admin
+      descInput.value = descripcion;
+      renderManageThumbs(imgs);
+
       viewerBackdrop.setAttribute('aria-hidden','false');
       document.body.style.overflow = 'hidden';
-      if (readAloud && d.palabra) hablar(d.palabra);
-    }
-    function closeViewer(){ viewerBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+      if (readAloud && descripcion) hablar(descripcion);
 
+      // Navegación carrusel
+      prevImgBtn.onclick = () => { if (imgs.length){ currentIndex=(currentIndex-1+imgs.length)%imgs.length; renderCarousel(imgs);} };
+      nextImgBtn.onclick = () => { if (imgs.length){ currentIndex=(currentIndex+1)%imgs.length; renderCarousel(imgs);} };
+
+      // Guardar cambios
+      saveChangesBtn.onclick = () => saveChanges(i);
+      deleteNumberBtn.onclick = () => deleteNumber(i);
+      editToggle.onclick = () => adminPanel.classList.toggle('on');
+    }
+
+    function closeViewer(){ viewerBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
     viewerBackdrop.addEventListener('click', (e)=>{ if(e.target===viewerBackdrop) closeViewer(); });
     viewerClose.addEventListener('click', closeViewer);
     window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && viewerBackdrop.getAttribute('aria-hidden')==='false') closeViewer(); });
 
+    function renderManageThumbs(imgs){
+      manageThumbs.innerHTML = '';
+      imgs.forEach((u)=>{
+        const wrap = document.createElement('div'); wrap.style.position='relative'; wrap.style.display='inline-block';
+        const im = document.createElement('img'); im.src=u; im.className='thumb'; im.style.width='84px'; im.style.height='84px';
+        const x = document.createElement('button'); x.textContent='×'; x.className='btn icon'; x.style.position='absolute'; x.style.top='-8px'; x.style.right='-8px'; x.title='Eliminar imagen';
+        x.onclick = async () => {
+          if (!confirm('¿Eliminar esta imagen?')) return;
+          try{ await deleteObject(storageRef(storage, u)); }catch{}
+          // Actualiza array en Firestore
+          const n = String(seleccionado);
+          const docRef = doc(collection(db,'numeros'), n);
+          const snap = await getDoc(docRef);
+          const d = snap.exists() ? snap.data() : {};
+          const arr = getImagenes(d).filter(x => x !== u);
+          await setDoc(docRef, { descripcion: d.descripcion || d.palabra || '', imagenes: arr, updatedAt: Date.now() });
+        };
+        wrap.appendChild(im); wrap.appendChild(x); manageThumbs.appendChild(wrap);
+      });
+    }
+
+    async function saveChanges(n){
+      if (!currentUser) return alert('Debes iniciar sesión.');
+      const numero = String(n);
+      const docRef = doc(collection(db,'numeros'), numero);
+      // Subir nuevas imágenes
+      let newUrls = [];
+      const files = Array.from(imgsInput.files || []);
+      if (files.length){
+        const uploads = files.map(async (file,ix)=>{
+          const path = `imagenes/${n}/${Date.now()}_${ix}_${file.name}`;
+          const ref = storageRef(storage, path);
+          const bytes = new Uint8Array(await file.arrayBuffer());
+          await uploadBytes(ref, bytes, { contentType: file.type || 'image/jpeg' });
+          return await getDownloadURL(ref);
+        });
+        newUrls = await Promise.all(uploads);
+      }
+      imgsInput.value = '';
+
+      const snap = await getDoc(docRef);
+      const d = snap.exists() ? snap.data() : {};
+      const prev = getImagenes(d);
+      const imagenes = [...prev, ...newUrls];
+      const descripcion = (descInput.value||'').trim();
+
+      await setDoc(docRef, { descripcion, imagenes, updatedAt: Date.now() });
+      alert('Cambios guardados');
+    }
+
+    async function deleteNumber(n){
+      if (!currentUser) return alert('Debes iniciar sesión.');
+      if (!confirm(`¿Borrar el número ${n}?`)) return;
+      try {
+        // intenta borrar imágenes conocidas
+        const d = datos[n] || {}; const imgs = getImagenes(d);
+        await Promise.all(imgs.map(u => deleteObject(storageRef(storage, u)).catch(()=>{})));
+        await deleteDoc(doc(collection(db,'numeros'), String(n)));
+        closeViewer();
+      } catch(e){ alert('No se pudo borrar: ' + (e?.message||e)); }
+    }
+
+    // ——— AUTH + Import/Export ———
     const renderAuthUI = (user) => {
+      currentUser = user || null;
       const on = !!user;
-      editarBtn.style.display = on ? '' : 'none';
-      borrarBtn.style.display = on ? '' : 'none';
       exportBtn.style.display = on ? '' : 'none';
       importBtn.style.display = on ? '' : 'none';
       logoutBtn.style.display = on ? '' : 'none';
@@ -243,43 +392,42 @@
 
     onAuthStateChanged(auth, renderAuthUI);
 
-    // Login (simple prompt modal para demo, ajusta a tu modal real si ya lo tienes)
     loginBtn.onclick = async () => {
       const email = prompt('Email:'); if(!email) return; const pass = prompt('Contraseña:'); if(pass==null) return;
       try{ await signInWithEmailAndPassword(auth, email.trim(), pass); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); }
     };
     logoutBtn.onclick = () => signOut(auth);
 
-    // Exportar / Importar
     exportBtn.onclick = () => {
-      if (!auth.currentUser) return alert('Inicia sesión.');
+      if (!currentUser) return alert('Inicia sesión.');
       const blob = new Blob([JSON.stringify(datos, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = 'palabrasNumeros.json'; a.click(); URL.revokeObjectURL(url);
     };
     importBtn.onclick = () => {
-      if (!auth.currentUser) return alert('Inicia sesión.');
+      if (!currentUser) return alert('Inicia sesión.');
       const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
       inp.onchange = async () => { const f = inp.files?.[0]; if(!f) return; try{
         const obj = JSON.parse(await f.text()); const ops=[];
         for (const [k,v] of Object.entries(obj||{})){
           const n = Number(k); if(!Number.isInteger(n)||n<1||n>100) continue;
-          ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { palabra: typeof v?.palabra==='string'?v.palabra:'', imagenUrl: typeof v?.imagenUrl==='string'?v.imagenUrl:null, updatedAt: Date.now() }));
+          // Migración de campos antiguos si existen
+          const imagenes = Array.isArray(v?.imagenes) ? v.imagenes : (typeof v?.imagenUrl==='string' ? [v.imagenUrl] : []);
+          const descripcion = typeof v?.descripcion==='string' ? v.descripcion : (typeof v?.palabra==='string' ? v.palabra : '');
+          ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { descripcion, imagenes, updatedAt: Date.now() }));
         }
         await Promise.all(ops); alert('Importación completada.');
       }catch(e){ alert('JSON no válido: ' + (e?.message||e)); } };
       document.body.appendChild(inp); inp.click(); inp.remove();
     };
 
-    // Realtime Firestore
+    // ——— Firestore realtime ———
     onSnapshot(collection(db,'numeros'), (snap) => {
-      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null }; });
+      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if (!isNaN(n)) nuevo[n] = d.data(); });
       datos = nuevo; renderGrid();
-      // Mantener selección visible
-      const node = grid.children[seleccionado-1]; if (node) node.classList.add('selected');
     });
 
-    // Navegación con teclado (sin interferir inputs/modales)
+    // ——— Teclado global (sin interferir inputs/modales) ———
     const isTextInput = (el) => { if(!el) return false; const t = el.tagName?.toLowerCase(); return el.isContentEditable || t==='input'||t==='textarea'||t==='select'; };
     window.addEventListener('keydown', (e) => {
       const modalOpen = viewerBackdrop.getAttribute('aria-hidden')==='false';
@@ -291,7 +439,7 @@
       if (!handled) return; e.preventDefault(); renderGrid();
     });
 
-    // Construir grid inicial
+    // Construcción inicial
     renderGrid();
 
     // Service Worker

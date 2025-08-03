@@ -1,86 +1,3 @@
-<!DOCTYPE html>
-<html lang="es" class="h-full">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Carta Nomo · Sarria — Liquid Glass</title>
-
-  <!-- PWA en GitHub Pages (/Carta-Nomo/) -->
-  <link rel="manifest" href="/Carta-Nomo/manifest.json" />
-  <meta name="theme-color" content="#ffffff" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <link rel="apple-touch-icon" href="/Carta-Nomo/icons/icon-192.png" />
-  <link rel="icon" href="/Carta-Nomo/favicon.ico" />
-
-  <link rel="stylesheet" href="/Carta-Nomo/styles.css">
-</head>
-<body>
-  <div class="page">
-    <header class="glass appbar" role="banner">
-      <div class="title">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 2c-2.5 0-4.5 2-4.5 4.5S9.5 11 12 11s4.5-2 4.5-4.5S14.5 2 12 2Zm0 10c-4.4 0-8 2.2-8 5v1.5c0 .8.7 1.5 1.5 1.5h13c.8 0 1.5-.7 1.5-1.5V17c0-2.8-3.6-5-8-5Z" fill="currentColor" opacity=".9"/>
-        </svg>
-        <div>
-          <h1>Carta Nomo · Sarria</h1>
-          <p class="subtitle">Toca un número para ver y escuchar. Azul = libre/no existe en menú.</p>
-        </div>
-      </div>
-      <div class="toolbar" role="toolbar" aria-label="Acciones">
-        <span id="userInfo" class="subtitle" aria-live="polite">Sesión: invitado</span>
-        <button id="loginBtn" class="btn">Iniciar sesión</button>
-        <button id="logoutBtn" class="btn" style="display:none">Salir</button>
-        <button id="editarBtn" class="btn primary" style="display:none">Editar</button>
-        <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
-        <button id="exportBtn" class="btn" style="display:none">Exportar</button>
-        <button id="importBtn" class="btn" style="display:none">Importar</button>
-      </div>
-    </header>
-
-    <section class="glass card" aria-labelledby="gridLabel">
-      <h2 id="gridLabel" class="subtitle" style="position:absolute;left:-9999px">Selección de números</h2>
-      <div id="grid" class="grid" role="grid" aria-describedby="gridHelp"></div>
-      <p id="gridHelp" class="subtitle" style="padding: 6px 6px 0">Consejo: usa ← → para moverte, Enter para escuchar.</p>
-      <div id="output" aria-live="polite" aria-atomic="true"></div>
-    </section>
-  </div>
-
-  <!-- Sheet edición -->
-  <div id="editBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="glass sheet" role="document">
-      <header><h2>Editar número</h2></header>
-      <div class="body">
-        <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" inputmode="numeric" /></div>
-        <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
-        <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
-      </div>
-      <div class="actions">
-        <button id="cancelarBtn" class="btn">Cancelar</button>
-        <button id="guardarBtn" class="btn primary">Guardar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sheet login -->
-  <div id="loginBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="glass sheet" role="document">
-      <header><h2>Acceso administrador</h2></header>
-      <div class="body">
-        <div class="row"><label for="loginEmail">Email</label><input type="email" id="loginEmail" placeholder="tu@correo.com" autocomplete="username" /></div>
-        <div class="row"><label for="loginPass">Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" /></div>
-        <p class="subtitle">La edición requiere sesión. La visualización es pública.</p>
-      </div>
-      <div class="actions">
-        <button id="loginCancel" class="btn">Cancelar</button>
-        <button id="loginSubmit" class="btn primary">Entrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Firebase SDKs (ESM desde CDN) -->
-
-  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -136,34 +53,8 @@
     const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
     const mostrar = (i, speak=true) => {
       const d = datos[i];
-      output.textContent = '';
-
-      const strong = document.createElement('strong');
-      strong.textContent = `Número ${i}:`;
-      output.appendChild(strong);
-      output.append(' ');
-
-      const wordSpan = document.createElement('span');
-      wordSpan.textContent = d?.palabra ?? '(sin datos)';
-      output.appendChild(wordSpan);
-
-      if (d?.imagenUrl) {
-        try {
-          const url = new URL(d.imagenUrl, window.location.href);
-          if (url.protocol === 'http:' || url.protocol === 'https:') {
-            const div = document.createElement('div');
-            const img = document.createElement('img');
-            img.className = 'preview';
-            img.src = url.href;
-            img.alt = `Imagen ${i}`;
-            img.loading = 'lazy';
-            img.referrerPolicy = 'no-referrer';
-            div.appendChild(img);
-            output.appendChild(div);
-          }
-        } catch {}
-      }
-
+      output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? '(sin datos)'}`;
+      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer"></div>`;
       if (speak && d?.palabra) hablar(d.palabra);
     };
 
@@ -272,10 +163,4 @@
     if ('serviceWorker' in navigator){
       window.addEventListener('load', () => navigator.serviceWorker.register('/Carta-Nomo/service-worker.js'));
     }
-  </script>
-
-  <script type="module" src="/Carta-Nomo/app.js"></script>
-
-</body>
-</html>
 

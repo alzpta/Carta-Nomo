@@ -15,20 +15,27 @@
 
   <style>
     /* ————————————————————————————————————————————————
-       Liquid Glass UI + Popup + Carrusel + Admin + TTS
+       Liquid Glass UI
        ———————————————————————————————————————————————— */
     :root{
-      --bg: #0a0d14; --bg2: #0e1420; --ink: #eaf2ff; --muted: #a9b5c8;
-      --tint: #39a0ff; --accent: #7cf7e6; --danger: #ff4d4d;
+      --bg: #0a0d14;
+      --bg2: #0e1420;
+      --ink: #eaf2ff;
+      --muted: #a9b5c8;
+      --tint: #39a0ff;
+      --accent: #7cf7e6;
+      --danger: #ff4d4d;
       --ring: 0 0 0 3px color-mix(in oklab, var(--tint) 30%, transparent);
-      --r: 18px; --r-lg: 26px; --gap: 12px; --cell-min: 70px; --page-w: 1080px;
+      --r: 18px; --r-lg: 26px; --gap: 12px;
+      --cell-min: 70px; --page-w: 1080px;
       --shadow-lg: 0 20px 60px rgba(0,0,0,.45), 0 4px 20px rgba(0,0,0,.35);
       --shadow: 0 12px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.28);
     }
     @media (prefers-color-scheme: light){
-      :root{ --bg:#e9f0ff; --bg2:#f6f8ff; --ink:#0a1320; --muted:#5b6980;
+      :root{
+        --bg:#e9f0ff; --bg2:#f6f8ff; --ink:#0a1320; --muted:#5b6980;
         --shadow-lg: 0 20px 60px rgba(10,30,60,.18), 0 4px 20px rgba(10,30,60,.16);
-        --shadow: 0 12px 30px rgba(10,30,60,.14), 0 2px 10px rgba(10,30,60,.12);
+        --shadow:    0 12px 30px rgba(10,30,60,.14), 0 2px 10px rgba(10,30,60,.12);
       }
     }
 
@@ -46,64 +53,102 @@
 
     .page{max-width:var(--page-w); margin:0 auto; padding:clamp(14px,2.4vw,22px)}
 
-    .glass{ position:relative; background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06)); border-radius: var(--r-lg); border: 1px solid rgba(255,255,255,.25); box-shadow: var(--shadow-lg); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); overflow:hidden; }
-    .glass::before{ content:""; position:absolute; inset:0; pointer-events:none; border-radius: inherit; padding:1px; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; background: conic-gradient(from 180deg at 50% 50%, #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%); opacity:.45; }
-    .glass::after{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; background: radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.45), transparent 60%); mix-blend-mode: screen; opacity:.55; }
+    /* Vidrio líquido reutilizable */
+    .glass{
+      position:relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      overflow:hidden;
+    }
+    .glass::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      border-radius: inherit; padding:1px; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      background: conic-gradient(from 180deg at 50% 50%,
+        #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%);
+      opacity:.45;
+    }
+    .glass::after{
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+      background: radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.45), transparent 60%);
+      mix-blend-mode: screen; opacity:.55;
+    }
 
-    header.appbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding: clamp(10px, 1.8vw, 14px) clamp(12px, 2.2vw, 18px) }
+    header.appbar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: clamp(10px, 1.8vw, 14px) clamp(12px, 2.2vw, 18px);
+    }
     .title{display:flex; gap:12px; align-items:center}
     .title h1{margin:0; font-weight:800; letter-spacing:-.01em; font-size: clamp(1.25rem,3.6vw,1.9rem)}
     .subtitle{margin:0; color:var(--muted); font-size:clamp(.9rem,2.4vw,1rem)}
 
     .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .btn{ border:1px solid rgba(255,255,255,.28); background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08)); color:var(--ink); padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:700; box-shadow: var(--shadow); backdrop-filter: blur(16px) saturate(140%); transition: transform .08s ease, box-shadow .2s ease, background .2s ease }
+    .btn{
+      border:1px solid rgba(255,255,255,.28);
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+      color:var(--ink); padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:700;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px) saturate(140%);
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+    }
     .btn:hover{ transform: translateY(-1px) }
     .btn:active{ transform: translateY(0) scale(.98) }
     .btn:focus-visible{ outline:none; box-shadow: var(--ring), var(--shadow) }
-    .btn.primary{ color:#00131f; background: linear-gradient(180deg, color-mix(in oklab, var(--tint) 85%, white), color-mix(in oklab, var(--tint) 65%, white)) }
-    .btn.danger{ color:#2b0000; background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 85%, white), color-mix(in oklab, var(--danger) 65%, white)) }
-    .btn.icon{ display:inline-grid; place-items:center; width:36px; height:36px; padding:0 }
-    .btn.toggle[aria-pressed="true"]{ outline:2px solid var(--tint); }
+    .btn.primary{ color:#00131f; background: linear-gradient(180deg, color-mix(in oklab, var(--tint) 85%, white), color-mix(in oklab, var(--tint) 65%, white)); }
+    .btn.danger{ color:#2b0000; background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 85%, white), color-mix(in oklab, var(--danger) 65%, white)); }
 
     .card{ margin-top: clamp(12px, 2.2vw, 18px); padding: clamp(10px, 2.2vw, 16px) }
 
+    /* GRID */
     .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(var(--cell-min), 1fr)); gap: var(--gap); padding: clamp(6px, 1.6vw, 10px) }
-    .cell{ position:relative; display:grid; place-items:center; aspect-ratio:1/1; cursor:pointer; user-select:none; border-radius: var(--r); background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06)); border:1px solid rgba(255,255,255,.26); box-shadow: var(--shadow); backdrop-filter: blur(14px) saturate(140%); font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:.02em; font-size: clamp(1.05rem, 2.8vw, 1.25rem); transition: transform .08s ease, box-shadow .2s ease, background .2s ease, outline-color .2s ease; color: var(--ink); overflow:hidden }
-    .cell::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background: radial-gradient(130% 90% at 50% -10%, rgba(255,255,255,.45), transparent 60%); mix-blend-mode: screen; opacity:.6 }
-    .cell::after{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; background: conic-gradient(from 180deg at 50% 50%, #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%); opacity:.25; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); padding:1px; -webkit-mask-composite:xor; mask-composite:exclude }
+    .cell{
+      position:relative; display:grid; place-items:center; aspect-ratio:1/1; cursor:pointer; user-select:none;
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.26);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px) saturate(140%);
+      font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:.02em;
+      font-size: clamp(1.05rem, 2.8vw, 1.25rem);
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, outline-color .2s ease;
+      color: var(--ink);
+      overflow:hidden;
+    }
+    .cell::before{
+      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+      background: radial-gradient(130% 90% at 50% -10%, rgba(255,255,255,.45), transparent 60%);
+      mix-blend-mode: screen; opacity:.6;
+    }
+    .cell::after{
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+      background: conic-gradient(from 180deg at 50% 50%, #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%);
+      opacity:.25; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); padding:1px; -webkit-mask-composite:xor; mask-composite:exclude;
+    }
     .cell:hover{ transform: translateY(-1px) }
     .cell:active{ transform: translateY(0) scale(.98) }
     .cell:focus-visible{ outline: 3px solid color-mix(in oklab, var(--tint) 55%, transparent); outline-offset: 2px }
-    .cell.selected{ outline:2px solid var(--tint); background: linear-gradient(180deg, rgba(57,160,255,.22), rgba(57,160,255,.08)) }
-    .cell.empty{ color: color-mix(in oklab, var(--tint) 90%, white); background: linear-gradient(180deg, rgba(57,160,255,.26), rgba(124,247,230,.10)) }
+    .cell.selected{ outline:2px solid var(--tint); background: linear-gradient(180deg, rgba(57,160,255,.22), rgba(57,160,255,.08)); }
+    .cell.empty{ color: color-mix(in oklab, var(--tint) 90%, white); background: linear-gradient(180deg, rgba(57,160,255,.26), rgba(124,247,230,.10)); }
 
-    /* Popup (visor) */
-    .popup-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); z-index:1000 }
-    .popup-backdrop[aria-hidden="false"]{ display:flex }
-    .popup{ width:min(860px,96vw); border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.25); box-shadow: var(--shadow-lg); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06)) }
-    .popup header{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.2) }
-    .popup h3{ margin:0; font-size:1.1rem }
-    .popup .content{ display:grid; grid-template-columns: 1.2fr 1fr; gap:16px; padding:14px }
-    .popup img{ width:100%; height:auto; border-radius:14px; box-shadow: var(--shadow) }
-    .popup p{ margin:.25rem 0 0 }
-    .popup .close{ border:1px solid rgba(255,255,255,.28); border-radius:999px; padding:8px 12px; background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08)); color:inherit; cursor:pointer }
+    #output{ padding: 8px clamp(6px, 1.6vw, 10px) 12px; font-size: clamp(1rem, 2.8vw, 1.15rem) }
+    .preview{ max-width:min(220px, 50vw); width:100%; height:auto; border-radius: 14px; box-shadow: var(--shadow); margin-top:8px }
 
-    /* Carrusel */
-    .carousel{ position:relative }
-    .carousel-main{ position:relative; min-height:240px; display:grid; place-items:center }
-    .carousel-thumbs{ display:flex; gap:8px; overflow:auto; padding-top:10px }
-    .thumb{ border:1px solid rgba(255,255,255,.28); border-radius:12px; overflow:hidden; width:72px; height:72px; cursor:pointer; opacity:.8 }
-    .thumb[aria-current="true"]{ outline:2px solid var(--tint); opacity:1 }
-    .nav{ position:absolute; top:50%; transform:translateY(-50%); display:flex; gap:8px; width:100%; justify-content:space-between; pointer-events:none }
-    .nav button{ pointer-events:auto }
+    /* Modales */
+    .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:flex-end; justify-content:center; padding: clamp(10px,3vw,16px); z-index:1000 }
+    .sheet{ width:min(640px,96vw); border-radius: 24px; overflow:hidden; padding:0 }
+    .sheet header{ padding:16px 16px 8px }
+    .sheet h2{ margin:0; font-size: clamp(1.05rem,3vw,1.25rem) }
+    .sheet .body{ padding: 12px 16px 6px }
+    .row{ margin: 10px 0 }
+    .row label{ display:block; margin: 0 0 6px; font-weight:700 }
+    .row input{ width:100%; padding:12px 14px; border-radius:14px; border:1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); color:inherit; font-size:1rem; backdrop-filter: blur(10px) }
+    .row input:focus{ outline:none; box-shadow: var(--ring) }
+    .actions{ display:flex; gap:10px; justify-content:flex-end; padding: 10px 16px 16px }
 
-    /* Admin dentro del visor */
-    .admin{ display:none; gap:8px; align-items:center; flex-wrap:wrap; }
-    .admin.on{ display:flex }
-    .admin .row{ width:100% }
-    .admin textarea{ width:100%; min-height:90px; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); color:inherit; resize:vertical }
-
-    @media (max-width:760px){ .popup .content{ grid-template-columns: 1fr } }
     @media (max-width:460px){ :root{ --cell-min: 60px } }
     @media (min-width:1280px){ :root{ --cell-min: 86px } }
     @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
@@ -123,9 +168,10 @@
       </div>
       <div class="toolbar" role="toolbar" aria-label="Acciones">
         <span id="userInfo" class="subtitle" aria-live="polite">Sesión: invitado</span>
-        <button id="ttsBtn" class="btn toggle" aria-pressed="false" title="Leer en voz alta al abrir">Leer</button>
         <button id="loginBtn" class="btn">Iniciar sesión</button>
         <button id="logoutBtn" class="btn" style="display:none">Salir</button>
+        <button id="editarBtn" class="btn primary" style="display:none">Editar</button>
+        <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
         <button id="exportBtn" class="btn" style="display:none">Exportar</button>
         <button id="importBtn" class="btn" style="display:none">Importar</button>
       </div>
@@ -134,42 +180,39 @@
     <section class="glass card" aria-labelledby="gridLabel">
       <h2 id="gridLabel" class="subtitle" style="position:absolute;left:-9999px">Selección de números</h2>
       <div id="grid" class="grid" role="grid" aria-describedby="gridHelp"></div>
-      <p id="gridHelp" class="subtitle" style="padding: 6px 6px 0">Consejo: usa ← → para moverte, Enter para abrir.</p>
+      <p id="gridHelp" class="subtitle" style="padding: 6px 6px 0">Consejo: usa ← → para moverte, Enter para escuchar.</p>
       <div id="output" aria-live="polite" aria-atomic="true"></div>
     </section>
   </div>
 
-  <!-- Popup visor con carrusel y edición admin -->
-  <div id="viewerBackdrop" class="popup-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="popup" role="document">
-      <header>
-        <h3 id="viewerTitle">Plato</h3>
-        <div style="display:flex; gap:8px; align-items:center">
-          <button id="editToggle" class="btn" style="display:none">Editar</button>
-          <button id="viewerClose" class="close" aria-label="Cerrar">Cerrar</button>
-        </div>
-      </header>
-      <div class="content">
-        <div class="carousel">
-          <div class="carousel-main" id="carouselMain"></div>
-          <div class="nav">
-            <button id="prevImg" class="btn icon" aria-label="Anterior">‹</button>
-            <button id="nextImg" class="btn icon" aria-label="Siguiente">›</button>
-          </div>
-          <div id="carouselThumbs" class="carousel-thumbs" aria-label="Miniaturas"></div>
-        </div>
-        <div>
-          <p id="viewerDesc">Descripción del plato…</p>
-          <div id="adminPanel" class="admin">
-            <div class="row"><label for="descInput">Descripción</label><textarea id="descInput" placeholder="Escribe la descripción…"></textarea></div>
-            <div class="row"><label for="imgsInput">Añadir imágenes</label><input id="imgsInput" type="file" accept="image/*" multiple /></div>
-            <div class="row" id="manageThumbs" style="display:flex; gap:8px; flex-wrap:wrap"></div>
-            <div style="display:flex; gap:8px; justify-content:flex-end">
-              <button id="deleteNumber" class="btn danger">Borrar número</button>
-              <button id="saveChanges" class="btn primary">Guardar cambios</button>
-            </div>
-          </div>
-        </div>
+  <!-- Sheet edición -->
+  <div id="editBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="glass sheet" role="document">
+      <header><h2>Editar número</h2></header>
+      <div class="body">
+        <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" inputmode="numeric" /></div>
+        <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
+        <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
+      </div>
+      <div class="actions">
+        <button id="cancelarBtn" class="btn">Cancelar</button>
+        <button id="guardarBtn" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sheet login -->
+  <div id="loginBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="glass sheet" role="document">
+      <header><h2>Acceso administrador</h2></header>
+      <div class="body">
+        <div class="row"><label for="loginEmail">Email</label><input type="email" id="loginEmail" placeholder="tu@correo.com" autocomplete="username" /></div>
+        <div class="row"><label for="loginPass">Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" /></div>
+        <p class="subtitle">La edición requiere sesión. La visualización es pública.</p>
+      </div>
+      <div class="actions">
+        <button id="loginCancel" class="btn">Cancelar</button>
+        <button id="loginSubmit" class="btn primary">Entrar</button>
       </div>
     </div>
   </div>
@@ -178,7 +221,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig = {
@@ -201,246 +244,141 @@
     const output = document.getElementById("output");
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
+    const editarBtn = document.getElementById("editarBtn");
+    const borrarBtn = document.getElementById("borrarBtn");
     const exportBtn = document.getElementById("exportBtn");
     const importBtn = document.getElementById("importBtn");
     const userInfo = document.getElementById("userInfo");
-    const ttsBtn = document.getElementById('ttsBtn');
 
-    // Popup refs
-    const viewerBackdrop = document.getElementById('viewerBackdrop');
-    const viewerTitle = document.getElementById('viewerTitle');
-    const viewerDesc = document.getElementById('viewerDesc');
-    const viewerClose = document.getElementById('viewerClose');
-    const editToggle = document.getElementById('editToggle');
-    const adminPanel = document.getElementById('adminPanel');
-    const descInput = document.getElementById('descInput');
-    const imgsInput = document.getElementById('imgsInput');
-    const manageThumbs = document.getElementById('manageThumbs');
-    const deleteNumberBtn = document.getElementById('deleteNumber');
-    const saveChangesBtn = document.getElementById('saveChanges');
+    const editBackdrop = document.getElementById("editBackdrop");
+    const numSel = document.getElementById("numSel");
+    const palabraInput = document.getElementById("palabra");
+    const imagenInput = document.getElementById("imagen");
+    const guardarBtn = document.getElementById("guardarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
 
-    const carouselMain = document.getElementById('carouselMain');
-    const carouselThumbs = document.getElementById('carouselThumbs');
-    const prevImgBtn = document.getElementById('prevImg');
-    const nextImgBtn = document.getElementById('nextImg');
+    const loginBackdrop = document.getElementById("loginBackdrop");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPass = document.getElementById("loginPass");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginCancel = document.getElementById("loginCancel");
 
     // Estado
     let seleccionado = 1;
-    let datos = {}; // {n: {descripcion?:string, imagenes?:string[], palabra?:string, imagenUrl?:string}}
-    let readAloud = (localStorage.getItem('readAloud') === '1');
-    let currentUser = null;
-
-    function setTTSUI(){ ttsBtn.setAttribute('aria-pressed', String(readAloud)); ttsBtn.textContent = readAloud ? 'Leer: ON' : 'Leer'; }
-    setTTSUI();
-    ttsBtn.onclick = () => { readAloud = !readAloud; localStorage.setItem('readAloud', readAloud ? '1' : '0'); setTTSUI(); };
+    let datos = {}; // {n: {palabra, imagenUrl}}
 
     const hablar = (t) => { try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch{} };
 
-    const tieneDatos = (n) => {
-      const d = datos[n]; if (!d) return false;
-      const des = (d.descripcion || d.palabra || '').trim();
-      const imgs = Array.isArray(d.imagenes) ? d.imagenes : (d.imagenUrl ? [d.imagenUrl] : []);
-      return !!(des || imgs.length);
+    const tieneDatos = (n) => { const d = datos[n]; return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl)); };
+    const refrescarCeldasVacias = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('empty', !tieneDatos(ix+1))); };
+    const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
+    const mostrar = (i, speak=true) => {
+      const d = datos[i];
+      output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? '(sin datos)'}`;
+      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer"></div>`;
+      if (speak && d?.palabra) hablar(d.palabra);
     };
 
-    function renderGrid(){
-      grid.innerHTML = '';
-      for(let i=1;i<=100;i++){
-        const cell = document.createElement('button');
-        cell.type='button'; cell.className = 'cell' + (i===seleccionado ? ' selected':'') + (!tieneDatos(i) ? ' empty':'');
-        cell.textContent = i;
-        cell.onclick = ()=>{ seleccionado=i; renderGrid(); openViewer(i); };
-        cell.onkeydown = (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); seleccionado=i; renderGrid(); openViewer(i);} };
-        grid.appendChild(cell);
-      }
-    }
-
-    // ——— VISOR + CARRUSEL ———
-    let currentIndex = 0;
-    function getImagenes(d){
-      if (Array.isArray(d?.imagenes) && d.imagenes.length) return d.imagenes;
-      if (d?.imagenUrl) return [d.imagenUrl];
-      return [];
-    }
-
-    function renderCarousel(imgs){
-      carouselMain.innerHTML = '';
-      if (!imgs.length){ carouselMain.innerHTML = '<div class="subtitle">(Sin imagen)</div>'; carouselThumbs.innerHTML=''; return; }
-      currentIndex = Math.max(0, Math.min(currentIndex, imgs.length-1));
-
-      const img = document.createElement('img');
-      img.src = imgs[currentIndex]; img.alt = `Imagen ${currentIndex+1}`; img.loading='lazy'; img.style.borderRadius='14px'; img.style.maxHeight='60vh';
-      carouselMain.appendChild(img);
-
-      // thumbs
-      carouselThumbs.innerHTML = '';
-      imgs.forEach((u,ix)=>{
-        const t = document.createElement('img'); t.src = u; t.alt = `Miniatura ${ix+1}`; t.className='thumb';
-        if (ix===currentIndex) t.setAttribute('aria-current','true');
-        t.onclick=()=>{ currentIndex=ix; renderCarousel(imgs); };
-        carouselThumbs.appendChild(t);
-      });
-    }
-
-    function openViewer(i){
-      const d = datos[i] || {};
-      const descripcion = d.descripcion || d.palabra || '';
-      const imgs = getImagenes(d);
-      viewerTitle.textContent = `Número ${i}`;
-      viewerDesc.textContent = descripcion || '(sin descripción)';
-      currentIndex = 0; renderCarousel(imgs);
-
-      // Admin panel visible si hay user
-      editToggle.style.display = currentUser ? '' : 'none';
-      adminPanel.classList.toggle('on', false);
-
-      // Pre-cargar valores admin
-      descInput.value = descripcion;
-      renderManageThumbs(imgs);
-
-      viewerBackdrop.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-      if (readAloud && descripcion) hablar(descripcion);
-
-      // Navegación carrusel
-      prevImgBtn.onclick = () => { if (imgs.length){ currentIndex=(currentIndex-1+imgs.length)%imgs.length; renderCarousel(imgs);} };
-      nextImgBtn.onclick = () => { if (imgs.length){ currentIndex=(currentIndex+1)%imgs.length; renderCarousel(imgs);} };
-
-      // Guardar cambios
-      saveChangesBtn.onclick = () => saveChanges(i);
-      deleteNumberBtn.onclick = () => deleteNumber(i);
-      editToggle.onclick = () => adminPanel.classList.toggle('on');
-    }
-
-    function closeViewer(){ viewerBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
-    viewerBackdrop.addEventListener('click', (e)=>{ if(e.target===viewerBackdrop) closeViewer(); });
-    viewerClose.addEventListener('click', closeViewer);
-    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && viewerBackdrop.getAttribute('aria-hidden')==='false') closeViewer(); });
-
-    function renderManageThumbs(imgs){
-      manageThumbs.innerHTML = '';
-      imgs.forEach((u)=>{
-        const wrap = document.createElement('div'); wrap.style.position='relative'; wrap.style.display='inline-block';
-        const im = document.createElement('img'); im.src=u; im.className='thumb'; im.style.width='84px'; im.style.height='84px';
-        const x = document.createElement('button'); x.textContent='×'; x.className='btn icon'; x.style.position='absolute'; x.style.top='-8px'; x.style.right='-8px'; x.title='Eliminar imagen';
-        x.onclick = async () => {
-          if (!confirm('¿Eliminar esta imagen?')) return;
-          try{ await deleteObject(storageRef(storage, u)); }catch{}
-          // Actualiza array en Firestore
-          const n = String(seleccionado);
-          const docRef = doc(collection(db,'numeros'), n);
-          const snap = await getDoc(docRef);
-          const d = snap.exists() ? snap.data() : {};
-          const arr = getImagenes(d).filter(x => x !== u);
-          await setDoc(docRef, { descripcion: d.descripcion || d.palabra || '', imagenes: arr, updatedAt: Date.now() });
-        };
-        wrap.appendChild(im); wrap.appendChild(x); manageThumbs.appendChild(wrap);
-      });
-    }
-
-    async function saveChanges(n){
-      if (!currentUser) return alert('Debes iniciar sesión.');
-      const numero = String(n);
-      const docRef = doc(collection(db,'numeros'), numero);
-      // Subir nuevas imágenes
-      let newUrls = [];
-      const files = Array.from(imgsInput.files || []);
-      if (files.length){
-        const uploads = files.map(async (file,ix)=>{
-          const path = `imagenes/${n}/${Date.now()}_${ix}_${file.name}`;
-          const ref = storageRef(storage, path);
-          const bytes = new Uint8Array(await file.arrayBuffer());
-          await uploadBytes(ref, bytes, { contentType: file.type || 'image/jpeg' });
-          return await getDownloadURL(ref);
-        });
-        newUrls = await Promise.all(uploads);
-      }
-      imgsInput.value = '';
-
-      const snap = await getDoc(docRef);
-      const d = snap.exists() ? snap.data() : {};
-      const prev = getImagenes(d);
-      const imagenes = [...prev, ...newUrls];
-      const descripcion = (descInput.value||'').trim();
-
-      await setDoc(docRef, { descripcion, imagenes, updatedAt: Date.now() });
-      alert('Cambios guardados');
-    }
-
-    async function deleteNumber(n){
-      if (!currentUser) return alert('Debes iniciar sesión.');
-      if (!confirm(`¿Borrar el número ${n}?`)) return;
-      try {
-        // intenta borrar imágenes conocidas
-        const d = datos[n] || {}; const imgs = getImagenes(d);
-        await Promise.all(imgs.map(u => deleteObject(storageRef(storage, u)).catch(()=>{})));
-        await deleteDoc(doc(collection(db,'numeros'), String(n)));
-        closeViewer();
-      } catch(e){ alert('No se pudo borrar: ' + (e?.message||e)); }
-    }
-
-    // ——— AUTH + Import/Export ———
     const renderAuthUI = (user) => {
-      currentUser = user || null;
       const on = !!user;
+      editarBtn.style.display = on ? '' : 'none';
+      borrarBtn.style.display = on ? '' : 'none';
       exportBtn.style.display = on ? '' : 'none';
       importBtn.style.display = on ? '' : 'none';
       logoutBtn.style.display = on ? '' : 'none';
       loginBtn.style.display = on ? 'none' : '';
       userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
     };
-
     onAuthStateChanged(auth, renderAuthUI);
 
-    loginBtn.onclick = async () => {
-      const email = prompt('Email:'); if(!email) return; const pass = prompt('Contraseña:'); if(pass==null) return;
-      try{ await signInWithEmailAndPassword(auth, email.trim(), pass); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); }
-    };
+    // Login modal
+    const openLogin = () => { loginEmail.value=''; loginPass.value=''; loginBackdrop.style.display='flex'; loginBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; loginEmail.focus(); };
+    const closeLogin = () => { loginBackdrop.style.display='none'; loginBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; };
+    loginBtn.onclick = openLogin; loginCancel.onclick = closeLogin;
+    loginBackdrop.addEventListener('click', e => { if (e.target===loginBackdrop) closeLogin(); });
+    loginSubmit.onclick = async () => { try{ await signInWithEmailAndPassword(auth, (loginEmail.value||'').trim(), loginPass.value||''); closeLogin(); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); } };
     logoutBtn.onclick = () => signOut(auth);
 
+    // Editar
+    const openEdit = () => {
+      if (!auth.currentUser) return alert('Debes iniciar sesión para editar.');
+      const info = datos[seleccionado] || {}; numSel.value = seleccionado; palabraInput.value = info.palabra || ''; imagenInput.value = '';
+      editBackdrop.style.display='flex'; editBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; numSel.focus();
+    };
+    const closeEdit = () => { editBackdrop.style.display='none'; editBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; imagenInput.value=''; };
+    editarBtn.onclick = openEdit; cancelarBtn.onclick = closeEdit;
+    editBackdrop.addEventListener('click', e => { if (e.target===editBackdrop) closeEdit(); });
+
+    numSel.onchange = () => { let v = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10))); numSel.value=v; seleccionado=v; pintarSeleccion(); const info=datos[v]||{}; palabraInput.value = info.palabra||''; imagenInput.value=''; };
+
+    async function guardarNumero(n, palabra, file){
+      if (!auth.currentUser) throw new Error('No autenticado');
+      let imagenUrl = datos[n]?.imagenUrl || null;
+      if (file) { const ref = storageRef(storage, `imagenes/${n}`); const bytes = new Uint8Array(await file.arrayBuffer()); await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' }); imagenUrl = await getDownloadURL(ref); }
+      await setDoc(doc(collection(db, 'numeros'), String(n)), { palabra: palabra || '', imagenUrl: imagenUrl || null, updatedAt: Date.now() });
+    }
+
+    guardarBtn.onclick = async () => {
+      try{ const n = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10))); const palabra=(palabraInput.value||'').trim(); const file = imagenInput.files?.[0]||null; await guardarNumero(n, palabra, file); seleccionado=n; pintarSeleccion(); closeEdit(); }
+      catch(e){ alert('Error al guardar: ' + (e?.message||e)); }
+    };
+
+    borrarBtn.onclick = async () => {
+      if (!auth.currentUser) return alert('Debes iniciar sesión para borrar.');
+      const n = seleccionado; if (!confirm(`¿Borrar el número ${n}?`)) return;
+      try { try{ await deleteObject(storageRef(storage, `imagenes/${n}`)); }catch{} await deleteDoc(doc(collection(db,'numeros'), String(n))); }
+      catch(e){ alert('No se pudo borrar: ' + (e?.message||e)); }
+    };
+
+    // Importar / Exportar
     exportBtn.onclick = () => {
-      if (!currentUser) return alert('Inicia sesión.');
+      if (!auth.currentUser) return alert('Inicia sesión.');
       const blob = new Blob([JSON.stringify(datos, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = 'palabrasNumeros.json'; a.click(); URL.revokeObjectURL(url);
     };
     importBtn.onclick = () => {
-      if (!currentUser) return alert('Inicia sesión.');
+      if (!auth.currentUser) return alert('Inicia sesión.');
       const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
       inp.onchange = async () => { const f = inp.files?.[0]; if(!f) return; try{
         const obj = JSON.parse(await f.text()); const ops=[];
         for (const [k,v] of Object.entries(obj||{})){
           const n = Number(k); if(!Number.isInteger(n)||n<1||n>100) continue;
-          // Migración de campos antiguos si existen
-          const imagenes = Array.isArray(v?.imagenes) ? v.imagenes : (typeof v?.imagenUrl==='string' ? [v.imagenUrl] : []);
-          const descripcion = typeof v?.descripcion==='string' ? v.descripcion : (typeof v?.palabra==='string' ? v.palabra : '');
-          ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { descripcion, imagenes, updatedAt: Date.now() }));
+          ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { palabra: typeof v?.palabra==='string'?v.palabra:'', imagenUrl: typeof v?.imagenUrl==='string'?v.imagenUrl:null, updatedAt: Date.now() }));
         }
         await Promise.all(ops); alert('Importación completada.');
       }catch(e){ alert('JSON no válido: ' + (e?.message||e)); } };
       document.body.appendChild(inp); inp.click(); inp.remove();
     };
 
-    // ——— Firestore realtime ———
+    // Snapshot realtime
     onSnapshot(collection(db,'numeros'), (snap) => {
-      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if (!isNaN(n)) nuevo[n] = d.data(); });
-      datos = nuevo; renderGrid();
+      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null }; });
+      datos = nuevo; refrescarCeldasVacias(); mostrar(seleccionado, false);
     });
 
-    // ——— Teclado global (sin interferir inputs/modales) ———
+    // Crear grid
+    for (let i=1;i<=100;i++){
+      const cell = document.createElement('button');
+      cell.className='cell'; cell.type='button'; cell.textContent = i;
+      cell.setAttribute('role','gridcell'); cell.setAttribute('aria-label', `Número ${i}`);
+      cell.onclick = () => { seleccionado=i; pintarSeleccion(); mostrar(i); };
+      cell.onkeydown = (e) => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); seleccionado=i; pintarSeleccion(); mostrar(i);} };
+      grid.appendChild(cell);
+    }
+    pintarSeleccion(); mostrar(seleccionado, false);
+
+    // Navegación con teclado (sin interferir inputs/modales)
     const isTextInput = (el) => { if(!el) return false; const t = el.tagName?.toLowerCase(); return el.isContentEditable || t==='input'||t==='textarea'||t==='select'; };
     window.addEventListener('keydown', (e) => {
-      const modalOpen = viewerBackdrop.getAttribute('aria-hidden')==='false';
-      if (modalOpen || isTextInput(document.activeElement)) return;
+      const anySheetOpen = editBackdrop.getAttribute('aria-hidden')==='false' || loginBackdrop.getAttribute('aria-hidden')==='false';
+      if (anySheetOpen || isTextInput(document.activeElement)) return;
       const max=100; let handled=false;
       if (e.key==='ArrowRight'){ seleccionado=Math.min(max, seleccionado+1); handled=true; }
       if (e.key==='ArrowLeft'){ seleccionado=Math.max(1, seleccionado-1); handled=true; }
-      if (e.key==='Enter'){ openViewer(seleccionado); handled=true; }
-      if (!handled) return; e.preventDefault(); renderGrid();
+      if (e.key==='Enter'){ mostrar(seleccionado); handled=true; }
+      if (!handled) return; e.preventDefault(); pintarSeleccion(); const node=grid.children[seleccionado-1]; if (node) node.focus({preventScroll:true});
     });
-
-    // Construcción inicial
-    renderGrid();
 
     // Service Worker
     if ('serviceWorker' in navigator){

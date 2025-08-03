@@ -5,8 +5,8 @@ const APP_SHELL = [
   '/Carta-Nomo/',
   '/Carta-Nomo/index.html',
   '/Carta-Nomo/manifest.json',
-  '/Carta-Nomo/iconos/icon-192.png',
-  '/Carta-Nomo/iconos/icon-512.png',
+  '/Carta-Nomo/icons/icon-192.png',
+  '/Carta-Nomo/icons/icon-512.png',
   '/Carta-Nomo/favicon.ico'
 ];
 

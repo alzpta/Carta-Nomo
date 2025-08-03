@@ -237,7 +237,7 @@
 
     // Service Worker
     if ('serviceWorker' in navigator){
-      window.addEventListener('load', () => navigator.serviceWorker.register('/Carta-Nomo/service-worker.js'));
+      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
     }
 
     })();

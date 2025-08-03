@@ -1,15 +1,15 @@
-/* Service Worker para Carta Nomo (scope: /Carta-Nomo/) */
+/* Service Worker para Carta Nomo (scope: ./) */
 const VERSION = 'v1.0.1';
 const CACHE_NAME = `carta-nomo-${VERSION}`;
 const APP_SHELL = [
-  '/Carta-Nomo/',
-  '/Carta-Nomo/index.html',
-  '/Carta-Nomo/app.js',
-  '/Carta-Nomo/styles.css',
-  '/Carta-Nomo/manifest.json',
-  '/Carta-Nomo/icons/icon-192.png',
-  '/Carta-Nomo/icons/icon-512.png',
-  '/Carta-Nomo/favicon.ico'
+  './',
+  './index.html',
+  './app.js',
+  './styles.css',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './favicon.ico'
 ];
 
 const ORIGIN_WHITELIST = ['https://firebasestorage.googleapis.com'];
@@ -75,7 +75,7 @@ self.addEventListener('fetch', (event) => {
           }
           return res;
         })
-        .catch(() => caches.match(request).then((r) => r || caches.match('/Carta-Nomo/index.html')))
+        .catch(() => caches.match(request).then((r) => r || caches.match('./index.html')))
     );
     return;
   }

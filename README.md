@@ -13,3 +13,7 @@ Una app web interactiva para visualizar, editar y escuchar palabras asociadas a 
   - Auth: sistema de login.
   - Storage: subida de imágenes.
 - 📱 **PWA lista para móvil**: se puede instalar como app en dispositivos.
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia [MIT](LICENSE).

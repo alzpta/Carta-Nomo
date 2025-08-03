@@ -3,9 +3,14 @@
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "firebase/firestore";
     import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
+(async () => {
+
     // Carga de configuración segura
-    const configResp = await fetch('/config.json');
-    if (!configResp.ok) throw new Error('No se pudo cargar /config.json');
+    const configResp = await fetch(new URL('config.json', import.meta.url));
+    if (!configResp.ok) {
+        document.getElementById('output').textContent = 'No se pudo cargar config.json';
+        return;
+    }
     const firebaseConfig = await configResp.json();
 
     const app = initializeApp(firebaseConfig);
@@ -235,3 +240,4 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('/Carta-Nomo/service-worker.js'));
     }
 
+    })();

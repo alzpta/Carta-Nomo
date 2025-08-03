@@ -40,6 +40,18 @@ archivo en el entorno de despliegue y mantenerlo fuera del control de versiones.
 La aplicación realiza un `fetch` a `/config.json` para inicializar Firebase, por
 lo que el archivo debe estar accesible en el servidor.
 
+## 🧼 Sanitización de entradas
+
+Para proteger contra inyección de código, las palabras introducidas manualmente o
+mediante importación se validan y sanitizan antes de guardarse:
+
+- Se rechazan entradas que superen 50 caracteres o incluyan los símbolos
+  `<`, `>`, `&`, `"` o `'`.
+- Las cadenas válidas se procesan con [DOMPurify](https://github.com/cure53/DOMPurify)
+  para eliminar cualquier contenido HTML no deseado antes de almacenarse en Firestore.
+
+Estas reglas ayudan a mantener coherencia y seguridad en futuras modificaciones.
+
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia [MIT](LICENSE).

@@ -37,6 +37,9 @@
     const loginSubmit = document.getElementById("loginSubmit");
     const loginCancel = document.getElementById("loginCancel");
 
+    const sanitizePalabra = (str) => DOMPurify.sanitize(str, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    const INVALID_PALABRA_CHARS = /[<>&"']/;
+
     // Estado
     let seleccionado = 1;
     let datos = {}; // {n: {palabra, imagenUrl}}
@@ -114,6 +117,7 @@
 
     async function guardarNumero(n, palabra, file){
       if (!auth.currentUser) throw new Error('No autenticado');
+      palabra = sanitizePalabra(palabra);
       let imagenUrl = datos[n]?.imagenUrl || null;
       if (file) {
         if (!ALLOWED_IMAGE_TYPES.includes(file.type) || file.size > MAX_IMAGE_SIZE) {
@@ -132,7 +136,12 @@
     guardarBtn.onclick = async () => {
       try{
         const n = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10)));
-        const palabra=(palabraInput.value||'').trim();
+        const palabraRaw=(palabraInput.value||'').trim();
+        if (palabraRaw.length > MAX_PALABRA_LENGTH || INVALID_PALABRA_CHARS.test(palabraRaw)) {
+          alert('Palabra no válida.');
+          return;
+        }
+        const palabra = sanitizePalabra(palabraRaw);
         const file = imagenInput.files?.[0]||null;
         const ok = await guardarNumero(n, palabra, file);
         if (ok === false) return;
@@ -172,8 +181,9 @@
           const ops=[]; const errors=[];
           for (const [k,v] of entries){
             const n = Number(k); if(!Number.isInteger(n)||n<1||n>100) continue;
-            const palabra = typeof v?.palabra==='string'?v.palabra.trim():'';
-            if (palabra.length>MAX_PALABRA_LENGTH || /<|>/.test(palabra)) { errors.push(`Palabra inválida para ${n}`); continue; }
+            const palabraRaw = typeof v?.palabra==='string'?v.palabra.trim():'';
+            if (palabraRaw.length>MAX_PALABRA_LENGTH || INVALID_PALABRA_CHARS.test(palabraRaw)) { errors.push(`Palabra inválida para ${n}`); continue; }
+            const palabra = sanitizePalabra(palabraRaw);
             let imagenUrl = null;
             if (typeof v?.imagenUrl === 'string'){
               try{

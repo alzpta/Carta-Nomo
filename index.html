@@ -16,17 +16,14 @@
   <style>
     /* ————————————————————————————————————————————————
        Liquid Glass UI
-       - vidrio líquido con brillo especular y bordes iridiscentes
-       - contraste accesible, animaciones sutiles
-       - dark/light automáticos
        ———————————————————————————————————————————————— */
     :root{
       --bg: #0a0d14;
       --bg2: #0e1420;
       --ink: #eaf2ff;
       --muted: #a9b5c8;
-      --tint: #39a0ff; /* azul líquido */
-      --accent: #7cf7e6; /* cian verdoso */
+      --tint: #39a0ff;
+      --accent: #7cf7e6;
       --danger: #ff4d4d;
       --ring: 0 0 0 3px color-mix(in oklab, var(--tint) 30%, transparent);
       --r: 18px; --r-lg: 26px; --gap: 12px;
@@ -35,9 +32,10 @@
       --shadow: 0 12px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.28);
     }
     @media (prefers-color-scheme: light){
-      :root{ --bg:#e9f0ff; --bg2:#f6f8ff; --ink:#0a1320; --muted:#5b6980;
+      :root{
+        --bg:#e9f0ff; --bg2:#f6f8ff; --ink:#0a1320; --muted:#5b6980;
         --shadow-lg: 0 20px 60px rgba(10,30,60,.18), 0 4px 20px rgba(10,30,60,.16);
-        --shadow: 0 12px 30px rgba(10,30,60,.14), 0 2px 10px rgba(10,30,60,.12);
+        --shadow:    0 12px 30px rgba(10,30,60,.14), 0 2px 10px rgba(10,30,60,.12);
       }
     }
 
@@ -66,7 +64,6 @@
       -webkit-backdrop-filter: blur(22px) saturate(140%);
       overflow:hidden;
     }
-    /* borde iridiscente */
     .glass::before{
       content:""; position:absolute; inset:0; pointer-events:none;
       border-radius: inherit; padding:1px; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -75,7 +72,6 @@
         #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%);
       opacity:.45;
     }
-    /* brillo especular superior */
     .glass::after{
       content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
       background: radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.45), transparent 60%);
@@ -92,7 +88,6 @@
 
     .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
     .btn{
-      position:relative; isolation:isolate;
       border:1px solid rgba(255,255,255,.28);
       background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
       color:var(--ink); padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:700;
@@ -123,12 +118,12 @@
       color: var(--ink);
       overflow:hidden;
     }
-    .cell::before{ /* highlight */
+    .cell::before{
       content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
       background: radial-gradient(130% 90% at 50% -10%, rgba(255,255,255,.45), transparent 60%);
       mix-blend-mode: screen; opacity:.6;
     }
-    .cell::after{ /* borde cromático sutil */
+    .cell::after{
       content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
       background: conic-gradient(from 180deg at 50% 50%, #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%);
       opacity:.25; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); padding:1px; -webkit-mask-composite:xor; mask-composite:exclude;
@@ -142,7 +137,7 @@
     #output{ padding: 8px clamp(6px, 1.6vw, 10px) 12px; font-size: clamp(1rem, 2.8vw, 1.15rem) }
     .preview{ max-width:min(220px, 50vw); width:100%; height:auto; border-radius: 14px; box-shadow: var(--shadow); margin-top:8px }
 
-    /* Modales tipo sheet */
+    /* Modales */
     .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:flex-end; justify-content:center; padding: clamp(10px,3vw,16px); z-index:1000 }
     .sheet{ width:min(640px,96vw); border-radius: 24px; overflow:hidden; padding:0 }
     .sheet header{ padding:16px 16px 8px }

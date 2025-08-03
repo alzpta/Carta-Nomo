@@ -242,21 +242,29 @@
           else alert('Importación completada.');
         }catch(e){ alert('JSON no válido: ' + (e?.message||e)); }
       };
-      document.body.appendChild(inp); inp.click(); inp.remove();
+    document.body.appendChild(inp); inp.click(); inp.remove();
     };
 
     // Snapshot realtime
+    const errHandler = (e) => {
+      console.error('Error al leer datos:', e);
+      alert('No se pudieron cargar los datos: ' + (e?.message || e));
+    };
+
     if (db) {
-      onSnapshot(collection(db,'numeros'), (snap) => {
-        const nuevo = {};
-        snap.forEach(d => {
-          const n = parseInt(d.id,10);
-          if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null };
-        });
-        datos = nuevo;
-        [...grid.children].forEach((el, ix) => actualizarCelda(el, ix + 1));
-        datosCargados = true;
-        mostrar(seleccionado, false);
+      onSnapshot(collection(db,'numeros'), {
+        next: (snap) => {
+          const nuevo = {};
+          snap.forEach(d => {
+            const n = parseInt(d.id,10);
+            if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null };
+          });
+          datos = nuevo;
+          [...grid.children].forEach((el, ix) => actualizarCelda(el, ix + 1));
+          datosCargados = true;
+          mostrar(seleccionado, false);
+        },
+        error: errHandler
       });
     } else {
       datosCargados = true;

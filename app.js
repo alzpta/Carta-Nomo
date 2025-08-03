@@ -3,15 +3,10 @@
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAqqDLPFmtAPHXm5ZzpHyxRZZpW31f4Of0",
-      authDomain: "carta-nomo.firebaseapp.com",
-      projectId: "carta-nomo",
-      storageBucket: "carta-nomo.firebasestorage.app",
-      messagingSenderId: "354109744323",
-      appId: "1:354109744323:web:d7548e8cfd0a1d4a41ae76",
-      measurementId: "G-LWB4H4F6TD"
-    };
+    // Carga de configuración segura
+    const configResp = await fetch('/config.json');
+    if (!configResp.ok) throw new Error('No se pudo cargar /config.json');
+    const firebaseConfig = await configResp.json();
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);

@@ -1,5 +1,5 @@
 /* Service Worker para Carta Nomo (scope: /Carta-Nomo/) */
-const VERSION = 'v1.1.0';
+const VERSION = 'v1.0.0';
 const CACHE_NAME = `carta-nomo-${VERSION}`;
 const APP_SHELL = [
   '/Carta-Nomo/',

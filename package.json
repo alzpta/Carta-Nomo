@@ -1,0 +1,13 @@
+{
+  "name": "carta-nomo",
+  "version": "1.0.0",
+  "description": "Una app web interactiva para visualizar, editar y escuchar palabras asociadas a números del 1 al 100. Desarrollada con Firebase, HTML, CSS y JavaScript. Perfecta para aprendizaje, accesibilidad o menús visuales personalizados.",
+  "main": "app.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs"
+}

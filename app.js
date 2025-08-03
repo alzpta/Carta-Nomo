@@ -52,6 +52,7 @@
     // Estado
     let seleccionado = 1;
     let datos = {}; // {n: {palabra, imagenUrl}}
+    let datosCargados = false;
 
     const hablar = (t) => { try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch{} };
 
@@ -59,6 +60,10 @@
     const refrescarCeldasVacias = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('empty', !tieneDatos(ix+1))); };
     const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
     const mostrar = (i, speak=true) => {
+      if (!datosCargados) {
+        output.textContent = 'Cargando...';
+        return;
+      }
       const d = datos[i];
       output.textContent = '';
 
@@ -220,9 +225,19 @@
     // Snapshot realtime
     if (db) {
       onSnapshot(collection(db,'numeros'), (snap) => {
-        const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null }; });
-        datos = nuevo; refrescarCeldasVacias(); mostrar(seleccionado, false);
+        const nuevo = {};
+        snap.forEach(d => {
+          const n = parseInt(d.id,10);
+          if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null };
+        });
+        datos = nuevo;
+        refrescarCeldasVacias();
+        datosCargados = true;
+        mostrar(seleccionado, false);
       });
+    } else {
+      datosCargados = true;
+      mostrar(seleccionado, false);
     }
 
     // Crear grid
@@ -234,7 +249,8 @@
       cell.onkeydown = (e) => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); seleccionado=i; pintarSeleccion(); mostrar(i);} };
       grid.appendChild(cell);
     }
-    refrescarCeldasVacias(); pintarSeleccion(); mostrar(seleccionado, false);
+    refrescarCeldasVacias(); pintarSeleccion();
+    output.textContent = 'Cargando...';
 
     // Navegación con teclado (sin interferir inputs/modales)
     const isTextInput = (el) => { if(!el) return false; const t = el.tagName?.toLowerCase(); return el.isContentEditable || t==='input'||t==='textarea'||t==='select'; };

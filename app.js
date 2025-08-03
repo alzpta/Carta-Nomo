@@ -7,6 +7,7 @@
 
     // Carga de configuración segura
     let app, auth, db, storage;
+    let configCargada = true;
     try {
         const configResp = await fetch(new URL('config.json', import.meta.url));
         if (configResp.ok) {
@@ -16,9 +17,11 @@
             db = getFirestore(app);
             storage = getStorage(app);
         } else {
+            configCargada = false;
             console.warn('config.json no encontrado; la aplicación funcionará sin Firebase.');
         }
     } catch (e) {
+        configCargada = false;
         console.warn('Error al cargar config.json', e);
     }
 
@@ -72,6 +75,10 @@
         output.textContent = 'Cargando...';
         return;
       }
+      if (!configCargada) {
+        output.textContent = 'No se pudo cargar la configuración. Los datos no estarán disponibles';
+        return;
+      }
       const d = datos[i];
       output.textContent = '';
 
@@ -115,6 +122,14 @@
     if (auth) onAuthStateChanged(auth, renderAuthUI);
     else renderAuthUI(null);
 
+    if (!configCargada) {
+      output.textContent = 'No se pudo cargar la configuración. Los datos no estarán disponibles';
+      [loginBtn, editarBtn, borrarBtn, exportBtn, importBtn].forEach(btn => {
+        btn.disabled = true;
+        btn.style.display = '';
+      });
+    }
+
     // Login modal
     const openLogin = () => { loginEmail.value=''; loginPass.value=''; loginBackdrop.style.display='flex'; loginBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; loginEmail.focus(); };
     const closeLogin = () => { loginBackdrop.style.display='none'; loginBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; };
@@ -124,7 +139,7 @@
       loginSubmit.onclick = async () => { try{ await signInWithEmailAndPassword(auth, (loginEmail.value||'').trim(), loginPass.value||''); closeLogin(); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); } };
       logoutBtn.onclick = () => signOut(auth);
     } else {
-      loginBtn.style.display = 'none';
+      if (configCargada) loginBtn.style.display = 'none';
       logoutBtn.style.display = 'none';
     }
 
@@ -245,7 +260,7 @@
       });
     } else {
       datosCargados = true;
-      mostrar(seleccionado, false);
+      if (configCargada) mostrar(seleccionado, false);
     }
 
     // Crear grid

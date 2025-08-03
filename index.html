@@ -477,15 +477,34 @@
     const pintarInicial = () => { pintarSeleccion(); mostrar(seleccionado, false); };
     pintarInicial();
 
-    // Navegación con teclado del grid
-    window.addEventListener("keydown", (e) => {
-      const max = 100;
-      if (e.key === "ArrowRight") { seleccionado = Math.min(max, seleccionado + 1); e.preventDefault(); }
-      if (e.key === "ArrowLeft") { seleccionado = Math.max(1, seleccionado - 1); e.preventDefault(); }
-      if (e.key === "Enter") { mostrar(seleccionado); }
-      pintarSeleccion();
-      const node = grid.children[seleccionado-1]; if (node) node.focus({ preventScroll:true });
-    });
+   // Navegación con teclado del grid
+const isTextInput = (el) => {
+  if (!el) return false;
+  const t = el.tagName?.toLowerCase();
+  return el.isContentEditable || t === 'input' || t === 'textarea' || t === 'select';
+};
+
+window.addEventListener("keydown", (e) => {
+  // No capturar teclas si hay un modal abierto o si estás escribiendo en un campo de texto
+  const anySheetOpen =
+    editBackdrop.getAttribute('aria-hidden') === 'false' ||
+    loginBackdrop.getAttribute('aria-hidden') === 'false';
+
+  if (anySheetOpen || isTextInput(document.activeElement)) return;
+
+  const max = 100;
+  let handled = false;
+  if (e.key === "ArrowRight") { seleccionado = Math.min(max, seleccionado + 1); handled = true; }
+  if (e.key === "ArrowLeft")  { seleccionado = Math.max(1, seleccionado - 1); handled = true; }
+  if (e.key === "Enter")      { mostrar(seleccionado); handled = true; }
+
+  if (!handled) return;
+  e.preventDefault();
+  pintarSeleccion();
+  const node = grid.children[seleccionado-1];
+  if (node) node.focus({ preventScroll: true });
+});
+
 
     // — Service Worker (PWA) —
     if ("serviceWorker" in navigator) {

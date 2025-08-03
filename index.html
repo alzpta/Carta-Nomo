@@ -16,174 +16,80 @@
   <style>
     /* ——————————————————————————————————————————————————
        Diseño: inspirado en apps de Apple
-       - Tipografía sistema (SF en iOS/macOS)
-       - Translucidez con blur, sombras suaves, esquinas redondeadas
-       - Enfoques accesibles y animaciones sutiles
-       - Light/Dark con prefers-color-scheme
        —————————————————————————————————————————————————— */
 
     :root{
-      /* Paleta base (modo claro) */
       --bg: #f5f7fb;
-      --surface: #ffffffcc; /* translúcido */
+      --surface: #ffffffcc;
       --on-surface: #0b1220;
       --secondary: #5f6b85;
-      --tint: #0a84ff; /* iOS blue */
+      --tint: #0a84ff;
       --tint-pressed: #006bd6;
       --danger: #ff3b30;
-      --radius: 14px;
-      --radius-lg: 22px;
+      --radius: 14px; --radius-lg: 22px;
       --shadow: 0 8px 24px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06);
       --ring: 0 0 0 3px color-mix(in oklab, var(--tint) 20%, transparent);
-      --page-w: 1080px;
-      --gap: 12px;
-      --cell-min: 68px;
-      --grid-pad: clamp(6px, 1.6vw, 10px);
+      --page-w: 1080px; --gap: 12px; --cell-min: 68px; --grid-pad: clamp(6px, 1.6vw, 10px);
     }
-
     @media (prefers-color-scheme: dark){
-      :root{
-        --bg: #0b0f14;
-        --surface: #0f141acc;
-        --on-surface: #eef1f5;
-        --secondary: #a9b1c0;
-        --tint: #0a84ff;
-        --tint-pressed: #409cff;
-        --shadow: 0 10px 28px rgba(0,0,0,.55), 0 2px 10px rgba(0,0,0,.6);
-      }
+      :root{ --bg:#0b0f14; --surface:#0f141acc; --on-surface:#eef1f5; --secondary:#a9b1c0; --tint:#0a84ff; --tint-pressed:#409cff; --shadow:0 10px 28px rgba(0,0,0,.55), 0 2px 10px rgba(0,0,0,.6); }
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--on-surface);
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      line-height:1.35; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    }
+    body{ margin:0; background:var(--bg); color:var(--on-surface); font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; line-height:1.35; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
-    /* Fondo con suave degradado radial */
-    .bg-radial{
-      position:fixed; inset:0; pointer-events:none; z-index:-1;
-      background:
-        radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--tint) 14%, transparent) 0, transparent 60%),
-        radial-gradient(900px 500px at -10% 100%, color-mix(in oklab, #34c759 12%, transparent) 0, transparent 60%);
+    .bg-radial{ position:fixed; inset:0; pointer-events:none; z-index:-1; background:
+      radial-gradient(1200px 600px at 80% -10%, color-mix(in oklab, var(--tint) 14%, transparent) 0, transparent 60%),
+      radial-gradient(900px 500px at -10% 100%, color-mix(in oklab, #34c759 12%, transparent) 0, transparent 60%);
       filter:saturate(.9);
     }
-
     .page{max-width:var(--page-w); margin:0 auto; padding:clamp(12px,2.2vw,22px)}
 
-    header.appbar{
-      position:sticky; top:12px; z-index:10;
-      display:flex; align-items:center; gap:12px; justify-content:space-between;
-      backdrop-filter: saturate(180%) blur(20px);
-      background:var(--surface);
-      border:1px solid color-mix(in oklab, #000 10%, transparent);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-      padding: clamp(10px,1.8vw,14px) clamp(12px,2.2vw,18px);
-    }
+    header.appbar{ position:sticky; top:12px; z-index:10; display:flex; align-items:center; gap:12px; justify-content:space-between; backdrop-filter:saturate(180%) blur(20px); background:var(--surface); border:1px solid color-mix(in oklab, #000 10%, transparent); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:clamp(10px,1.8vw,14px) clamp(12px,2.2vw,18px); }
+    .title{ display:flex; align-items:center; gap:10px; }
+    .title h1{ margin:0; font-weight:700; letter-spacing:-.01em; font-size:clamp(1.2rem,3.6vw,1.8rem); }
+    .subtitle{ margin:0; color:var(--secondary); font-size:clamp(.9rem,2.4vw,1rem) }
 
-    .title{
-      display:flex; align-items:center; gap:10px;
-    }
-    .title h1{margin:0; font-weight:700; letter-spacing:-.01em;
-      font-size: clamp(1.2rem, 3.6vw, 1.8rem);
-    }
-    .subtitle{margin:0; color:var(--secondary); font-size:clamp(.9rem,2.4vw,1rem)}
+    .toolbar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    .btn{ appearance:none; border:1px solid color-mix(in oklab,#000 12%,transparent); background:linear-gradient(to bottom, color-mix(in oklab,#fff 85%,transparent), color-mix(in oklab,#fff 65%,transparent)); color:var(--on-surface); font-weight:600; letter-spacing:.005em; padding:10px 14px; border-radius:999px; cursor:pointer; box-shadow:var(--shadow); transition:transform .08s ease, box-shadow .2s ease, background .2s ease; }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:active{ transform:translateY(0) scale(.98) }
+    .btn:focus-visible{ outline:none; box-shadow:var(--ring), var(--shadow) }
+    .btn.primary{ background:linear-gradient(to bottom, color-mix(in oklab, var(--tint) 94%, white 0%), var(--tint)); color:#fff; border-color:color-mix(in oklab, var(--tint) 60%, transparent) }
+    .btn.primary:active{ background:var(--tint-pressed) }
+    .btn.ghost{ background:color-mix(in oklab, var(--surface) 92%, transparent) }
+    .btn.danger{ color:var(--danger) }
+    .user{ color:var(--secondary); font-size:.95rem }
 
-    /* Controles estilo iOS */
-    .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-    .btn{
-      appearance:none; border:1px solid color-mix(in oklab, #000 12%, transparent);
-      background:linear-gradient(to bottom, color-mix(in oklab, #fff 85%, transparent), color-mix(in oklab, #fff 65%, transparent));
-      color:var(--on-surface); font-weight:600; letter-spacing:.005em;
-      padding:10px 14px; border-radius:999px; cursor:pointer; box-shadow:var(--shadow);
-      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
-      will-change: transform;
-    }
-    .btn:hover{transform: translateY(-1px)}
-    .btn:active{transform: translateY(0) scale(.98)}
-    .btn:focus-visible{outline:none; box-shadow:var(--ring), var(--shadow)}
+    .card{ margin-top:clamp(12px,2.4vw,18px); backdrop-filter:saturate(180%) blur(18px); background:var(--surface); border:1px solid color-mix(in oklab,#000 10%,transparent); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:clamp(10px,2.2vw,16px) }
 
-    .btn.primary{
-      background: linear-gradient(to bottom, color-mix(in oklab, var(--tint) 94%, white 0%), var(--tint));
-      color:#fff; border-color: color-mix(in oklab, var(--tint) 60%, transparent);
-    }
-    .btn.primary:active{background:var(--tint-pressed)}
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(var(--cell-min),1fr)); gap:var(--gap); padding:var(--grid-pad) }
+    .cell{ position:relative; display:grid; place-items:center; aspect-ratio:1/1; user-select:none; cursor:pointer; background:linear-gradient(to bottom right, color-mix(in oklab,#fff 82%,transparent), color-mix(in oklab,#fff 70%,transparent)); border:1px solid color-mix(in oklab,#000 12%,transparent); border-radius:var(--radius); box-shadow:var(--shadow); font-weight:800; letter-spacing:.02em; font-variant-numeric:tabular-nums; font-size:clamp(1.05rem,2.8vw,1.25rem); transition:transform .08s ease, box-shadow .2s ease, background .2s ease }
+    .cell:hover{ transform:translateY(-1px) }
+    .cell:active{ transform:translateY(0) scale(.98) }
+    .cell:focus-visible{ outline:3px solid color-mix(in oklab, var(--tint) 55%, transparent); outline-offset:2px }
+    .cell.selected{ outline:2px solid var(--tint); background:color-mix(in oklab, var(--tint) 10%, #fff) }
+    .cell.empty{ color:color-mix(in oklab, var(--tint) 85%, #274b6d); background:color-mix(in oklab, var(--tint) 8%, #f0f6ff) }
 
-    .btn.ghost{
-      background: color-mix(in oklab, var(--surface) 92%, transparent);
-    }
+    #output{ padding:8px var(--grid-pad) 12px; font-size:clamp(1rem,2.8vw,1.15rem) }
+    #announce{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
+    .preview{ max-width:min(220px,50vw); width:100%; height:auto; border-radius:12px; margin-top:8px; box-shadow:var(--shadow) }
 
-    .btn.danger{ color:var(--danger); }
+    .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:flex-end; justify-content:center; padding:clamp(10px,3vw,16px); z-index:1000 }
+    .sheet{ width:min(620px,96vw); border-radius:20px; overflow:hidden; backdrop-filter:saturate(180%) blur(24px); background:var(--surface); border:1px solid color-mix(in oklab,#000 12%,transparent); box-shadow:0 24px 60px rgba(0,0,0,.35); transform:translateY(8%); opacity:.98; transition:transform .22s ease, opacity .22s ease }
+    .backdrop[aria-hidden="false"] .sheet{ transform:translateY(0); opacity:1 }
+    .sheet header{ padding:16px 16px 8px; border-bottom:1px solid color-mix(in oklab,#000 10%,transparent) }
+    .sheet h2{ margin:0; font-size:clamp(1.05rem,3vw,1.25rem) }
+    .sheet .body{ padding:12px 16px 6px }
+    .row{ margin:10px 0 }
+    .row label{ display:block; margin:0 0 6px; font-weight:600 }
+    .row input{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid color-mix(in oklab,#000 16%,transparent); background:color-mix(in oklab,#fff 94%,transparent); color:inherit; font-size:1rem }
+    .row input:focus{ outline:none; box-shadow:var(--ring) }
+    .actions{ display:flex; gap:10px; justify-content:flex-end; padding:10px 16px 16px }
 
-    .user{color:var(--secondary); font-size:.95rem}
-
-    /* Tarjeta contenedora */
-    .card{
-      margin-top: clamp(12px, 2.4vw, 18px);
-      backdrop-filter: saturate(180%) blur(18px);
-      background: var(--surface);
-      border:1px solid color-mix(in oklab, #000 10%, transparent);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-      padding: clamp(10px, 2.2vw, 16px);
-    }
-
-    /* Grid de números */
-    .grid{display:grid; grid-template-columns: repeat(auto-fill, minmax(var(--cell-min), 1fr)); gap: var(--gap); padding: var(--grid-pad)}
-    .cell{
-      position:relative; display:grid; place-items:center; aspect-ratio:1/1; user-select:none; cursor:pointer;
-      background: linear-gradient(to bottom right, color-mix(in oklab, #fff 82%, transparent), color-mix(in oklab, #fff 70%, transparent));
-      border:1px solid color-mix(in oklab, #000 12%, transparent);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      font-weight:800; letter-spacing:.02em; font-variant-numeric: tabular-nums;
-      font-size: clamp(1.05rem, 2.8vw, 1.25rem);
-      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, outline-color .2s ease;
-    }
-    .cell:hover{transform: translateY(-1px)}
-    .cell:active{transform: translateY(0) scale(.98)}
-    .cell:focus-visible{outline: 3px solid color-mix(in oklab, var(--tint) 55%, transparent); outline-offset: 2px}
-
-    .cell.selected{ outline: 2px solid var(--tint); background: color-mix(in oklab, var(--tint) 10%, #fff); }
-    .cell.empty{ color: color-mix(in oklab, var(--tint) 85%, #274b6d); background: color-mix(in oklab, var(--tint) 8%, #f0f6ff); }
-
-    /* Panel de salida */
-    #output{ padding: 8px var(--grid-pad) 12px; font-size: clamp(1rem, 2.8vw, 1.15rem) }
-    #announce { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
-    .preview{ max-width:min(220px, 50vw); width:100%; height:auto; border-radius:12px; margin-top:8px; box-shadow: var(--shadow) }
-
-    /* Modales estilo hoja (sheet) */
-    .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:flex-end; justify-content:center; padding: clamp(10px,3vw,16px); z-index:1000; }
-    .sheet{
-      width:min(620px, 96vw); border-radius: 20px; overflow:hidden;
-      backdrop-filter: saturate(180%) blur(24px);
-      background: var(--surface);
-      border:1px solid color-mix(in oklab, #000 12%, transparent);
-      box-shadow: 0 24px 60px rgba(0,0,0,.35);
-      transform: translateY(8%); opacity:.98;
-      transition: transform .22s ease, opacity .22s ease;
-    }
-    .backdrop[aria-hidden="false"] .sheet{ transform: translateY(0); opacity:1 }
-
-    .sheet header{ padding:16px 16px 8px; border-bottom:1px solid color-mix(in oklab, #000 10%, transparent) }
-    .sheet h2{ margin:0; font-size: clamp(1.05rem,3vw,1.25rem) }
-    .sheet .body{ padding: 12px 16px 6px }
-    .row{ margin: 10px 0 }
-    .row label{ display:block; margin: 0 0 6px; font-weight:600 }
-    .row input{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid color-mix(in oklab, #000 16%, transparent); background: color-mix(in oklab, #fff 94%, transparent); color:inherit; font-size:1rem }
-    .row input:focus{ outline:none; box-shadow: var(--ring) }
-    .actions{ display:flex; gap:10px; justify-content:flex-end; padding: 10px 16px 16px }
-
-    /* Ayudas de accesibilidad y preferencias */
-    @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; animation:none !important }
-    }
-
-    @media (max-width: 420px){ :root{ --cell-min: 58px; --gap: 10px } }
-    @media (min-width: 1280px){ :root{ --cell-min: 86px } }
+    @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
+    @media (max-width:420px){ :root{ --cell-min:58px; --gap:10px } }
+    @media (min-width:1280px){ :root{ --cell-min:86px } }
   </style>
 </head>
 <body>
@@ -191,9 +97,7 @@
   <div class="page">
     <header class="appbar" role="banner">
       <div class="title">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 2c-2.5 0-4.5 2-4.5 4.5S9.5 11 12 11s4.5-2 4.5-4.5S14.5 2 12 2Zm0 10c-4.4 0-8 2.2-8 5v1.5c0 .8.7 1.5 1.5 1.5h13c.8 0 1.5-.7 1.5-1.5V17c0-2.8-3.6-5-8-5Z" fill="currentColor" opacity=".85"/>
-        </svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c-2.5 0-4.5 2-4.5 4.5S9.5 11 12 11s4.5-2 4.5-4.5S14.5 2 12 2Zm0 10c-4.4 0-8 2.2-8 5v1.5c0 .8.7 1.5 1.5 1.5h13c.8 0 1.5-.7 1.5-1.5V17c0-2.8-3.6-5-8-5Z" fill="currentColor" opacity=".85"/></svg>
         <div>
           <h1>Carta Nomo · Sarria</h1>
           <p class="subtitle">Toca un número para ver y escuchar. Azul = libre/no existe en menú.</p>
@@ -258,24 +162,22 @@
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
-    // — Configuración Firebase —
     const firebaseConfig = {
       apiKey: "AIzaSyAqqDLPFmtAPHXm5ZzpHyxRZZpW31f4Of0",
       authDomain: "carta-nomo.firebaseapp.com",
       projectId: "carta-nomo",
-      storageBucket: "carta-nomo.firebasestorage.app", // si usas hosting distinto, ajústalo
+      storageBucket: "carta-nomo.firebasestorage.app",
       messagingSenderId: "354109744323",
       appId: "1:354109744323:web:d7548e8cfd0a1d4a41ae76",
       measurementId: "G-LWB4H4F6TD"
     };
 
-    // — Inicialización —
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // — Referencias UI —
+    // UI refs
     const grid = document.getElementById("grid");
     const output = document.getElementById("output");
     const loginBtn = document.getElementById("loginBtn");
@@ -300,41 +202,27 @@
     const loginSubmit = document.getElementById("loginSubmit");
     const loginCancel = document.getElementById("loginCancel");
 
-    // — Estado —
+    // Estado
     let seleccionado = 1;
     let datos = {}; // {n: {palabra, imagenUrl}}
 
+    // Voz
     const hablar = (t) => {
-      try {
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(t);
-        u.lang = "es-ES"; u.rate = 1; u.pitch = 1;
-        speechSynthesis.speak(u);
-      } catch {}
+      try { speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="es-ES"; u.rate=1; u.pitch=1; speechSynthesis.speak(u);} catch{}
     };
 
-    const tieneDatos = (n) => {
-      const d = datos[n];
-      return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl));
-    };
-
-    const refrescarCeldasVacias = () => {
-      [...grid.children].forEach((el, ix) => el.classList.toggle("empty", !tieneDatos(ix+1)));
-    };
-
-    const pintarSeleccion = () => {
-      [...grid.children].forEach((el, ix) => el.classList.toggle("selected", ix+1 === seleccionado));
-    };
-
-    const mostrar = (i, speak = true) => {
+    const tieneDatos = (n) => { const d = datos[n]; return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl)); };
+    const refrescarCeldasVacias = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle("empty", !tieneDatos(ix+1))); };
+    const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle("selected", ix+1===seleccionado)); };
+    const mostrar = (i, speak=true) => {
       const d = datos[i];
       output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? "(sin datos)"}`;
-      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer" /></div>`;
+      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer"></div>`;
       if (speak && d?.palabra) hablar(d.palabra);
-      announce.textContent = `Número ${i}${d?.palabra ? ": " + d.palabra : " sin datos"}`; // lector de pantalla
+      announce.textContent = `Número ${i}${d?.palabra ? ": "+d.palabra : " sin datos"}`;
     };
 
-    // — Auth UI —
+    // Auth UI
     const renderAuthUI = (user) => {
       const on = !!user;
       editarBtn.style.display = on ? "" : "none";
@@ -347,166 +235,107 @@
     };
     onAuthStateChanged(auth, renderAuthUI);
 
-    // — Login —
-    const openLogin = () => { loginEmail.value = ""; loginPass.value = ""; loginBackdrop.style.display = "flex"; loginBackdrop.setAttribute("aria-hidden", "false"); loginEmail.focus(); };
-    const closeLogin = () => { loginBackdrop.style.display = "none"; loginBackdrop.setAttribute("aria-hidden", "true"); };
+    // Login modal
+    const openLogin = () => { loginEmail.value=""; loginPass.value=""; loginBackdrop.style.display="flex"; loginBackdrop.setAttribute("aria-hidden","false"); document.body.style.overflow='hidden'; loginEmail.focus(); };
+    const closeLogin = () => { loginBackdrop.style.display="none"; loginBackdrop.setAttribute("aria-hidden","true"); document.body.style.overflow=''; };
     loginBtn.onclick = openLogin; loginCancel.onclick = closeLogin;
-    loginBackdrop.addEventListener("click", e => { if (e.target === loginBackdrop) closeLogin(); });
+    loginBackdrop.addEventListener("click", e => { if (e.target===loginBackdrop) closeLogin(); });
     loginSubmit.onclick = async () => {
-      try {
-        await signInWithEmailAndPassword(auth, (loginEmail.value||"").trim(), loginPass.value||"");
-        closeLogin();
-      } catch(e) { alert("No se pudo iniciar sesión: " + (e?.message||e)); }
+      try { await signInWithEmailAndPassword(auth, (loginEmail.value||"").trim(), loginPass.value||""); closeLogin(); }
+      catch(e){ alert("No se pudo iniciar sesión: " + (e?.message||e)); }
     };
     logoutBtn.onclick = () => signOut(auth);
 
-    // — Edición —
+    // Editar / Guardar
     const openEdit = () => {
       if (!auth.currentUser) return alert("Debes iniciar sesión para editar.");
-      const info = datos[seleccionado] || {};
-      numSel.value = seleccionado;
-      palabraInput.value = info.palabra || "";
-      imagenInput.value = "";
-      editBackdrop.style.display = "flex"; editBackdrop.setAttribute("aria-hidden", "false");
-      numSel.focus();
+      const info = datos[seleccionado] || {}; numSel.value = seleccionado; palabraInput.value = info.palabra || ""; imagenInput.value = "";
+      editBackdrop.style.display = "flex"; editBackdrop.setAttribute("aria-hidden","false"); document.body.style.overflow='hidden'; numSel.focus();
     };
-    const closeEdit = () => { editBackdrop.style.display = "none"; editBackdrop.setAttribute("aria-hidden", "true"); imagenInput.value = ""; };
-
+    const closeEdit = () => { editBackdrop.style.display="none"; editBackdrop.setAttribute("aria-hidden","true"); document.body.style.overflow=''; imagenInput.value=""; };
     editarBtn.onclick = openEdit; cancelarBtn.onclick = closeEdit;
-    editBackdrop.addEventListener("click", e => { if (e.target === editBackdrop) closeEdit(); });
+    editBackdrop.addEventListener("click", e => { if (e.target===editBackdrop) closeEdit(); });
 
-    numSel.onchange = () => {
-      let v = Math.max(1, Math.min(100, parseInt(numSel.value||"1",10)));
-      numSel.value = v; seleccionado = v; pintarSeleccion();
-      const info = datos[v] || {}; palabraInput.value = info.palabra || ""; imagenInput.value = "";
-    };
+    numSel.onchange = () => { let v = Math.max(1, Math.min(100, parseInt(numSel.value||"1",10))); numSel.value=v; seleccionado=v; pintarSeleccion(); const info = datos[v] || {}; palabraInput.value = info.palabra || ""; imagenInput.value = ""; };
 
     async function guardarNumero(n, palabra, file){
       if (!auth.currentUser) throw new Error("No autenticado");
       let imagenUrl = datos[n]?.imagenUrl || null;
-      if (file) {
-        const ref = storageRef(storage, `imagenes/${n}`);
-        const bytes = new Uint8Array(await file.arrayBuffer());
-        await uploadBytes(ref, bytes, { contentType: file.type || "image/png" });
-        imagenUrl = await getDownloadURL(ref);
-      }
-      await setDoc(doc(collection(db, "numeros"), String(n)), {
-        palabra: palabra || "",
-        imagenUrl: imagenUrl || null,
-        updatedAt: Date.now()
-      });
+      if (file) { const ref = storageRef(storage, `imagenes/${n}`); const bytes = new Uint8Array(await file.arrayBuffer()); await uploadBytes(ref, bytes, { contentType: file.type || "image/png" }); imagenUrl = await getDownloadURL(ref); }
+      await setDoc(doc(collection(db, "numeros"), String(n)), { palabra: palabra || "", imagenUrl: imagenUrl || null, updatedAt: Date.now() });
     }
 
     guardarBtn.onclick = async () => {
-      try{
-        const n = Math.max(1, Math.min(100, parseInt(numSel.value||"1",10)));
-        const palabra = (palabraInput.value||"").trim();
-        const file = imagenInput.files?.[0] || null;
-        await guardarNumero(n, palabra, file);
-        seleccionado = n; pintarSeleccion(); closeEdit();
-      }catch(e){ alert("Error al guardar: " + (e?.message||e)); }
+      try{ const n = Math.max(1, Math.min(100, parseInt(numSel.value||"1",10))); const palabra = (palabraInput.value||"").trim(); const file = imagenInput.files?.[0] || null; await guardarNumero(n, palabra, file); seleccionado = n; pintarSeleccion(); closeEdit(); }
+      catch(e){ alert("Error al guardar: " + (e?.message||e)); }
     };
 
     borrarBtn.onclick = async () => {
       if (!auth.currentUser) return alert("Debes iniciar sesión para borrar.");
-      const n = seleccionado;
-      if (!confirm(`¿Borrar el número ${n}?`)) return;
-      try {
-        try { await deleteObject(storageRef(storage, `imagenes/${n}`)); } catch {}
-        await deleteDoc(doc(collection(db,"numeros"), String(n)));
-      } catch(e){ alert("No se pudo borrar: " + (e?.message||e)); }
+      const n = seleccionado; if (!confirm(`¿Borrar el número ${n}?`)) return;
+      try { try { await deleteObject(storageRef(storage, `imagenes/${n}`)); } catch {} await deleteDoc(doc(collection(db,"numeros"), String(n))); }
+      catch(e){ alert("No se pudo borrar: " + (e?.message||e)); }
     };
 
-    // — Importar / Exportar —
+    // Importar / Exportar
     exportBtn.onclick = () => {
       if (!auth.currentUser) return alert("Inicia sesión.");
       const blob = new Blob([JSON.stringify(datos, null, 2)], {type:"application/json"});
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href = url; a.download = "palabrasNumeros.json"; a.click();
-      URL.revokeObjectURL(url);
+      const a = document.createElement("a"); a.href = url; a.download = "palabrasNumeros.json"; a.click(); URL.revokeObjectURL(url);
     };
 
     importBtn.onclick = () => {
       if (!auth.currentUser) return alert("Inicia sesión.");
-      const inp = document.createElement("input");
-      inp.type="file"; inp.accept="application/json";
+      const inp = document.createElement("input"); inp.type="file"; inp.accept="application/json";
       inp.onchange = async () => {
         const f = inp.files?.[0]; if(!f) return;
-        try{
-          const obj = JSON.parse(await f.text());
-          const ops = [];
+        try{ const obj = JSON.parse(await f.text()); const ops = [];
           for (const [k,v] of Object.entries(obj||{})) {
             const n = Number(k); if (!Number.isInteger(n) || n<1 || n>100) continue;
-            ops.push(setDoc(doc(collection(db,"numeros"), String(n)), {
-              palabra: typeof v?.palabra === "string" ? v.palabra : "",
-              imagenUrl: typeof v?.imagenUrl === "string" ? v.imagenUrl : null,
-              updatedAt: Date.now()
-            }));
+            ops.push(setDoc(doc(collection(db,"numeros"), String(n)), { palabra: typeof v?.palabra==="string" ? v.palabra : "", imagenUrl: typeof v?.imagenUrl==="string" ? v.imagenUrl : null, updatedAt: Date.now() }));
           }
-          await Promise.all(ops);
-          alert("Importación completada.");
+          await Promise.all(ops); alert("Importación completada.");
         }catch(e){ alert("JSON no válido: " + (e?.message||e)); }
       };
       document.body.appendChild(inp); inp.click(); inp.remove();
     };
 
-    // — Realtime Firestore —
+    // Realtime Firestore
     onSnapshot(collection(db,"numeros"), (snap) => {
-      const nuevo = {};
-      snap.forEach(d => {
-        const n = parseInt(d.id,10);
-        if (!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || "", imagenUrl: d.data().imagenUrl || null };
-      });
-      datos = nuevo;
-      refrescarCeldasVacias();
-      mostrar(seleccionado, false);
+      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if (!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || "", imagenUrl: d.data().imagenUrl || null }; });
+      datos = nuevo; refrescarCeldasVacias(); mostrar(seleccionado, false);
     });
 
-    // — Construcción del grid + accesibilidad —
+    // Construcción del grid
     for (let i=1; i<=100; i++){
       const cell = document.createElement("button");
       cell.className = "cell"; cell.type = "button"; cell.textContent = i;
-      cell.setAttribute("role","gridcell");
-      cell.setAttribute("aria-label", `Número ${i}`);
+      cell.setAttribute("role","gridcell"); cell.setAttribute("aria-label", `Número ${i}`);
       cell.onclick = () => { seleccionado = i; pintarSeleccion(); mostrar(i); };
-      cell.onkeydown = (e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); seleccionado = i; pintarSeleccion(); mostrar(i); }
-      };
+      cell.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); seleccionado = i; pintarSeleccion(); mostrar(i); } };
       grid.appendChild(cell);
     }
     const pintarInicial = () => { pintarSeleccion(); mostrar(seleccionado, false); };
     pintarInicial();
 
-   // Navegación con teclado del grid
-const isTextInput = (el) => {
-  if (!el) return false;
-  const t = el.tagName?.toLowerCase();
-  return el.isContentEditable || t === 'input' || t === 'textarea' || t === 'select';
-};
+    // Navegación con teclado (protegida para no interferir con inputs y modales)
+    const isTextInput = (el) => {
+      if (!el) return false; const t = el.tagName?.toLowerCase();
+      return el.isContentEditable || t === 'input' || t === 'textarea' || t === 'select';
+    };
+    window.addEventListener("keydown", (e) => {
+      const anySheetOpen = editBackdrop.getAttribute('aria-hidden') === 'false' || loginBackdrop.getAttribute('aria-hidden') === 'false';
+      if (anySheetOpen || isTextInput(document.activeElement)) return;
+      const max = 100; let handled = false;
+      if (e.key === "ArrowRight") { seleccionado = Math.min(max, seleccionado + 1); handled = true; }
+      if (e.key === "ArrowLeft")  { seleccionado = Math.max(1, seleccionado - 1); handled = true; }
+      if (e.key === "Enter")      { mostrar(seleccionado); handled = true; }
+      if (!handled) return; e.preventDefault(); pintarSeleccion();
+      const node = grid.children[seleccionado-1]; if (node) node.focus({ preventScroll:true });
+    });
 
-window.addEventListener("keydown", (e) => {
-  // No capturar teclas si hay un modal abierto o si estás escribiendo en un campo de texto
-  const anySheetOpen =
-    editBackdrop.getAttribute('aria-hidden') === 'false' ||
-    loginBackdrop.getAttribute('aria-hidden') === 'false';
-
-  if (anySheetOpen || isTextInput(document.activeElement)) return;
-
-  const max = 100;
-  let handled = false;
-  if (e.key === "ArrowRight") { seleccionado = Math.min(max, seleccionado + 1); handled = true; }
-  if (e.key === "ArrowLeft")  { seleccionado = Math.max(1, seleccionado - 1); handled = true; }
-  if (e.key === "Enter")      { mostrar(seleccionado); handled = true; }
-
-  if (!handled) return;
-  e.preventDefault();
-  pintarSeleccion();
-  const node = grid.children[seleccionado-1];
-  if (node) node.focus({ preventScroll: true });
-});
-
-
-    // — Service Worker (PWA) —
+    // Service Worker (PWA)
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("/Carta-Nomo/service-worker.js");
@@ -515,4 +344,3 @@ window.addEventListener("keydown", (e) => {
   </script>
 </body>
 </html>
-

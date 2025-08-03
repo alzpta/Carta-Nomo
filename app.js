@@ -53,9 +53,33 @@
     const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
     const mostrar = (i, speak=true) => {
       const d = datos[i];
-      output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? '(sin datos)'}`;
-      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer"></div>`;
-      if (speak && d?.palabra) hablar(d.palabra);
+      output.textContent = '';
+
+      const strong = document.createElement('strong');
+      strong.textContent = `Número ${i}:`;
+      output.appendChild(strong);
+
+      const palabra = typeof d?.palabra === 'string' ? d.palabra.trim() : '';
+      output.appendChild(document.createTextNode(' ' + (palabra || '(sin datos)')));
+
+      if (d?.imagenUrl) {
+        try {
+          const url = new URL(d.imagenUrl, location.href);
+          if (url.protocol === 'http:' || url.protocol === 'https:') {
+            const div = document.createElement('div');
+            const img = document.createElement('img');
+            img.className = 'preview';
+            img.src = url.href;
+            img.alt = `Imagen ${i}`;
+            img.loading = 'lazy';
+            img.referrerPolicy = 'no-referrer';
+            div.appendChild(img);
+            output.appendChild(div);
+          }
+        } catch {}
+      }
+
+      if (speak && palabra) hablar(palabra);
     };
 
     const renderAuthUI = (user) => {

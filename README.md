@@ -19,6 +19,8 @@ Una app web interactiva para visualizar, editar y escuchar palabras asociadas a 
 Las credenciales de Firebase ya no se incluyen en el código fuente. La aplicación
 carga un archivo `config.json` al iniciar, por lo que debes proporcionar este
 archivo en el entorno de despliegue y mantenerlo fuera del control de versiones.
+Si el archivo no está presente, la app se ejecutará en modo vacío sin conexión
+a Firebase.
 
 1. Crea un archivo `config.json` junto a `index.html` con el siguiente formato:
 
@@ -36,6 +38,9 @@ archivo en el entorno de despliegue y mantenerlo fuera del control de versiones.
 
 2. Usa variables de entorno u otros mecanismos seguros para generar ese archivo
    sin exponer las claves en el repositorio.
+3. Durante el despliegue, copia `config.json` junto a `index.html` (por ejemplo,
+   en el directorio público de tu hosting) para que el `fetch` a `/config.json`
+   pueda resolverlo correctamente.
 
 La aplicación realiza un `fetch` a `/config.json` para inicializar Firebase, por
 lo que el archivo debe estar accesible en el servidor.

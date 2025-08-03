@@ -1,7 +1,7 @@
 {
   "name": "Carta Nomo · Sarria",
   "short_name": "Carta Nomo",
-  "description": "Explora la carta tocando números: muestra palabra e imagen, con lectura en voz alta.",
+  "description": "Explora la carta tocando números, con imágenes y descripción, lectura en voz alta y modo offline.",
   "lang": "es-ES",
   "start_url": "/Carta-Nomo/",
   "scope": "/Carta-Nomo/",

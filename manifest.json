@@ -1,13 +1,16 @@
 {
-  "name": "Carta-Nomo",
-  "short_name": "CartaNomo",
+  "name": "Carta Nomo · Sarria",
+  "short_name": "Carta Nomo",
+  "description": "Explora la carta tocando números: muestra palabra e imagen, con lectura en voz alta.",
+  "lang": "es-ES",
   "start_url": "/Carta-Nomo/",
   "scope": "/Carta-Nomo/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
-    { "src": "/Carta-Nomo/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/Carta-Nomo/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/Carta-Nomo/iconos/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/Carta-Nomo/iconos/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

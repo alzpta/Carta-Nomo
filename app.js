@@ -109,15 +109,35 @@
 
     numSel.onchange = () => { let v = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10))); numSel.value=v; seleccionado=v; pintarSeleccion(); const info=datos[v]||{}; palabraInput.value = info.palabra||''; imagenInput.value=''; };
 
+    const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+
     async function guardarNumero(n, palabra, file){
       if (!auth.currentUser) throw new Error('No autenticado');
       let imagenUrl = datos[n]?.imagenUrl || null;
-      if (file) { const ref = storageRef(storage, `imagenes/${n}`); const bytes = new Uint8Array(await file.arrayBuffer()); await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' }); imagenUrl = await getDownloadURL(ref); }
+      if (file) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type) || file.size > MAX_IMAGE_SIZE) {
+          alert('Archivo no válido. Debe ser PNG/JPEG/GIF/WebP y menor de 2MB.');
+          return false;
+        }
+        const ref = storageRef(storage, `imagenes/${n}`);
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
+        imagenUrl = await getDownloadURL(ref);
+      }
       await setDoc(doc(collection(db, 'numeros'), String(n)), { palabra: palabra || '', imagenUrl: imagenUrl || null, updatedAt: Date.now() });
+      return true;
     }
 
     guardarBtn.onclick = async () => {
-      try{ const n = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10))); const palabra=(palabraInput.value||'').trim(); const file = imagenInput.files?.[0]||null; await guardarNumero(n, palabra, file); seleccionado=n; pintarSeleccion(); closeEdit(); }
+      try{
+        const n = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10)));
+        const palabra=(palabraInput.value||'').trim();
+        const file = imagenInput.files?.[0]||null;
+        const ok = await guardarNumero(n, palabra, file);
+        if (ok === false) return;
+        seleccionado=n; pintarSeleccion(); closeEdit();
+      }
       catch(e){ alert('Error al guardar: ' + (e?.message||e)); }
     };
 

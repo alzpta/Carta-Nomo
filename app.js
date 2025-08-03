@@ -6,17 +6,21 @@
 (async () => {
 
     // Carga de configuración segura
-    const configResp = await fetch(new URL('config.json', import.meta.url));
-    if (!configResp.ok) {
-        document.getElementById('output').textContent = 'No se pudo cargar config.json';
-        return;
+    let app, auth, db, storage;
+    try {
+        const configResp = await fetch(new URL('config.json', import.meta.url));
+        if (configResp.ok) {
+            const firebaseConfig = await configResp.json();
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+        } else {
+            console.warn('config.json no encontrado; la aplicación funcionará sin Firebase.');
+        }
+    } catch (e) {
+        console.warn('Error al cargar config.json', e);
     }
-    const firebaseConfig = await configResp.json();
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
 
     // UI refs
     const grid = document.getElementById("grid");
@@ -86,28 +90,34 @@
     };
 
     const renderAuthUI = (user) => {
-      const on = !!user;
+      const on = !!user && !!auth;
       editarBtn.style.display = on ? '' : 'none';
       borrarBtn.style.display = on ? '' : 'none';
       exportBtn.style.display = on ? '' : 'none';
       importBtn.style.display = on ? '' : 'none';
       logoutBtn.style.display = on ? '' : 'none';
-      loginBtn.style.display = on ? 'none' : '';
+      loginBtn.style.display = auth ? (on ? 'none' : '') : 'none';
       userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
     };
-    onAuthStateChanged(auth, renderAuthUI);
+    if (auth) onAuthStateChanged(auth, renderAuthUI);
+    else renderAuthUI(null);
 
     // Login modal
     const openLogin = () => { loginEmail.value=''; loginPass.value=''; loginBackdrop.style.display='flex'; loginBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; loginEmail.focus(); };
     const closeLogin = () => { loginBackdrop.style.display='none'; loginBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; };
-    loginBtn.onclick = openLogin; loginCancel.onclick = closeLogin;
-    loginBackdrop.addEventListener('click', e => { if (e.target===loginBackdrop) closeLogin(); });
-    loginSubmit.onclick = async () => { try{ await signInWithEmailAndPassword(auth, (loginEmail.value||'').trim(), loginPass.value||''); closeLogin(); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); } };
-    logoutBtn.onclick = () => signOut(auth);
+    if (auth) {
+      loginBtn.onclick = openLogin; loginCancel.onclick = closeLogin;
+      loginBackdrop.addEventListener('click', e => { if (e.target===loginBackdrop) closeLogin(); });
+      loginSubmit.onclick = async () => { try{ await signInWithEmailAndPassword(auth, (loginEmail.value||'').trim(), loginPass.value||''); closeLogin(); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); } };
+      logoutBtn.onclick = () => signOut(auth);
+    } else {
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'none';
+    }
 
     // Editar
     const openEdit = () => {
-      if (!auth.currentUser) return alert('Debes iniciar sesión para editar.');
+      if (!auth || !auth.currentUser) return alert('Debes iniciar sesión para editar.');
       const info = datos[seleccionado] || {}; numSel.value = seleccionado; palabraInput.value = info.palabra || ''; imagenInput.value = '';
       editBackdrop.style.display='flex'; editBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; numSel.focus();
     };
@@ -121,7 +131,7 @@
     const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 
     async function guardarNumero(n, palabra, file){
-      if (!auth.currentUser) throw new Error('No autenticado');
+      if (!auth || !auth.currentUser || !db) throw new Error('No autenticado');
       palabra = sanitizePalabra(palabra);
       let imagenUrl = datos[n]?.imagenUrl || null;
       if (file) {
@@ -129,6 +139,7 @@
           alert('Archivo no válido. Debe ser PNG/JPEG/GIF/WebP y menor de 2MB.');
           return false;
         }
+        if (!storage) return false;
         const ref = storageRef(storage, `imagenes/${n}`);
         const bytes = new Uint8Array(await file.arrayBuffer());
         await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
@@ -156,9 +167,9 @@
     };
 
     borrarBtn.onclick = async () => {
-      if (!auth.currentUser) return alert('Debes iniciar sesión para borrar.');
+      if (!auth || !auth.currentUser || !db) return alert('Debes iniciar sesión para borrar.');
       const n = seleccionado; if (!confirm(`¿Borrar el número ${n}?`)) return;
-      try { try{ await deleteObject(storageRef(storage, `imagenes/${n}`)); }catch{} await deleteDoc(doc(collection(db,'numeros'), String(n))); }
+      try { try{ if (storage) await deleteObject(storageRef(storage, `imagenes/${n}`)); }catch{} await deleteDoc(doc(collection(db,'numeros'), String(n))); }
       catch(e){ alert('No se pudo borrar: ' + (e?.message||e)); }
     };
 
@@ -167,13 +178,13 @@
     const MAX_IMPORT_ENTRIES = 100;
     const MAX_IMPORT_FILE_SIZE = 1024 * 1024; // 1MB
     exportBtn.onclick = () => {
-      if (!auth.currentUser) return alert('Inicia sesión.');
+      if (!auth || !auth.currentUser) return alert('Inicia sesión.');
       const blob = new Blob([JSON.stringify(datos, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = 'palabrasNumeros.json'; a.click(); URL.revokeObjectURL(url);
     };
     importBtn.onclick = () => {
-      if (!auth.currentUser) return alert('Inicia sesión.');
+      if (!auth || !auth.currentUser || !db) return alert('Inicia sesión.');
       const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
       inp.onchange = async () => {
         const f = inp.files?.[0];
@@ -207,10 +218,12 @@
     };
 
     // Snapshot realtime
-    onSnapshot(collection(db,'numeros'), (snap) => {
-      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null }; });
-      datos = nuevo; refrescarCeldasVacias(); mostrar(seleccionado, false);
-    });
+    if (db) {
+      onSnapshot(collection(db,'numeros'), (snap) => {
+        const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null }; });
+        datos = nuevo; refrescarCeldasVacias(); mostrar(seleccionado, false);
+      });
+    }
 
     // Crear grid
     for (let i=1;i<=100;i++){
@@ -221,7 +234,7 @@
       cell.onkeydown = (e) => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); seleccionado=i; pintarSeleccion(); mostrar(i);} };
       grid.appendChild(cell);
     }
-    pintarSeleccion(); mostrar(seleccionado, false);
+    refrescarCeldasVacias(); pintarSeleccion(); mostrar(seleccionado, false);
 
     // Navegación con teclado (sin interferir inputs/modales)
     const isTextInput = (el) => { if(!el) return false; const t = el.tagName?.toLowerCase(); return el.isContentEditable || t==='input'||t==='textarea'||t==='select'; };

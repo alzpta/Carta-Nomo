@@ -57,7 +57,15 @@
     const hablar = (t) => { try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch{} };
 
     const tieneDatos = (n) => { const d = datos[n]; return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl)); };
-    const refrescarCeldasVacias = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('empty', !tieneDatos(ix+1))); };
+    const actualizarCelda = (el, n) => {
+      const d = datos[n];
+      const hay = tieneDatos(n);
+      el.classList.toggle('empty', !hay);
+      el.classList.toggle('has-data', hay);
+      if (hay) el.textContent = d.palabra || '🖼️';
+      else el.textContent = n;
+    };
+    const refrescarCeldasVacias = () => { [...grid.children].forEach((el,ix)=>actualizarCelda(el, ix+1)); };
     const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
     const mostrar = (i, speak=true) => {
       if (!datosCargados) {
@@ -231,7 +239,7 @@
           if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null };
         });
         datos = nuevo;
-        refrescarCeldasVacias();
+        [...grid.children].forEach((el, ix) => actualizarCelda(el, ix + 1));
         datosCargados = true;
         mostrar(seleccionado, false);
       });

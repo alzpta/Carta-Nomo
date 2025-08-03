@@ -57,6 +57,19 @@
     let datos = {}; // {n: {palabra, imagenUrl}}
     let datosCargados = false;
 
+    try {
+      const cache = localStorage.getItem('datos');
+      if (cache) {
+        const obj = JSON.parse(cache);
+        if (obj && typeof obj === 'object') {
+          datos = obj;
+          datosCargados = true;
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo leer datos locales', e);
+    }
+
     const hablar = (t) => { try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch{} };
 
     const tieneDatos = (n) => { const d = datos[n]; return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl)); };
@@ -260,6 +273,7 @@
             if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null };
           });
           datos = nuevo;
+          try { localStorage.setItem('datos', JSON.stringify(datos)); } catch {}
           [...grid.children].forEach((el, ix) => actualizarCelda(el, ix + 1));
           datosCargados = true;
           mostrar(seleccionado, false);
@@ -281,7 +295,8 @@
       grid.appendChild(cell);
     }
     refrescarCeldasVacias(); pintarSeleccion();
-    output.textContent = 'Cargando...';
+    if (datosCargados) mostrar(seleccionado, false);
+    else output.textContent = 'Cargando...';
 
     // Navegación con teclado (sin interferir inputs/modales)
     const isTextInput = (el) => { if(!el) return false; const t = el.tagName?.toLowerCase(); return el.isContentEditable || t==='input'||t==='textarea'||t==='select'; };

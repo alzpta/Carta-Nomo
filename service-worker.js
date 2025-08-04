@@ -12,7 +12,19 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+  event.waitUntil((async () => {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const results = await Promise.allSettled(APP_SHELL.map((url) => cache.add(url)));
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          console.warn('Failed to precache', APP_SHELL[index], result.reason);
+        }
+      });
+    } catch (err) {
+      console.error('Failed to install service worker', err);
+    }
+  })());
   self.skipWaiting();
 });
 

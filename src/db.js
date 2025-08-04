@@ -1,5 +1,6 @@
 import { collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+import { MAX_NUMEROS } from './config.js';
 
 export const subscribeNumeros = (db, callback) =>
   onSnapshot(collection(db, 'numeros'), (snap) => {
@@ -56,7 +57,7 @@ export async function importarArchivo(db, file) {
   const ops = [];
   for (const [k, v] of Object.entries(obj || {})) {
     const n = Number(k);
-    if (!Number.isInteger(n) || n < 1 || n > 100) continue;
+    if (!Number.isInteger(n) || n < 1 || n > MAX_NUMEROS) continue;
     ops.push(
       setDoc(doc(collection(db, 'numeros'), String(n)), {
         palabra: typeof v?.palabra === 'string' ? v.palabra : '',

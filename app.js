@@ -187,6 +187,9 @@
         imagenUrl = await getDownloadURL(ref);
       }
       await setDoc(doc(collection(db, 'numeros'), String(n)), { palabra: palabra || '', imagenUrl: imagenUrl || null, updatedAt: Date.now() });
+      datos[n] = { palabra: palabra || '', imagenUrl: imagenUrl || null };
+      actualizarCelda(grid.children[n-1], n);
+      try { localStorage.setItem('datos', JSON.stringify(datos)); } catch {}
       return true;
     }
 

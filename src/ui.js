@@ -1,5 +1,6 @@
 import { initAuth } from './auth.js';
 import { guardarNumero, borrarNumero, exportarDatos, importarArchivo, subscribeNumeros } from './db.js';
+import { MAX_NUMEROS } from './config.js';
 
 export function initUI({ auth, db, storage, BASE_PATH }) {
   const grid = document.getElementById('grid');
@@ -116,7 +117,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
   numSel.onchange = () => {
     let v = Math.max(
       1,
-      Math.min(100, parseInt(numSel.value || '1', 10))
+      Math.min(MAX_NUMEROS, parseInt(numSel.value || '1', 10))
     );
     numSel.value = v;
     seleccionado = v;
@@ -130,7 +131,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     try {
       const n = Math.max(
         1,
-        Math.min(100, parseInt(numSel.value || '1', 10))
+        Math.min(MAX_NUMEROS, parseInt(numSel.value || '1', 10))
       );
       const palabra = (palabraInput.value || '').trim();
       const file = imagenInput.files?.[0] || null;
@@ -185,7 +186,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     mostrar(seleccionado, false);
   });
 
-  for (let i = 1; i <= 100; i++) {
+  for (let i = 1; i <= MAX_NUMEROS; i++) {
     const cell = document.createElement('button');
     cell.className = 'cell';
     cell.type = 'button';
@@ -225,7 +226,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
       editBackdrop.getAttribute('aria-hidden') === 'false' ||
       loginBackdrop.getAttribute('aria-hidden') === 'false';
     if (anySheetOpen || isTextInput(document.activeElement)) return;
-    const max = 100;
+    const max = MAX_NUMEROS;
     let handled = false;
     if (e.key === 'ArrowRight') {
       seleccionado = Math.min(max, seleccionado + 1);

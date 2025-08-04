@@ -3,18 +3,156 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://firebasestorage.googleapis.com; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://www.googleapis.com; object-src 'none'; base-uri 'self';" />
   <title>Carta Nomo · Sarria — Liquid Glass</title>
 
-  <!-- PWA local -->
-  <link rel="manifest" href="./manifest.json" />
+  <!-- PWA en GitHub Pages (/Carta-Nomo/) -->
+  <link rel="manifest" href="/Carta-Nomo/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-  <link rel="icon" href="./favicon.ico" />
+  <link rel="apple-touch-icon" href="/Carta-Nomo/iconos/icon-192.png" />
+  <link rel="icon" href="/Carta-Nomo/favicon.ico" />
 
-  <link rel="stylesheet" href="./styles.css">
+  <style>
+    /* ————————————————————————————————————————————————
+       Liquid Glass UI
+       ———————————————————————————————————————————————— */
+    :root{
+      --bg: #0a0d14;
+      --bg2: #0e1420;
+      --ink: #eaf2ff;
+      --muted: #a9b5c8;
+      --tint: #39a0ff;
+      --accent: #7cf7e6;
+      --danger: #ff4d4d;
+      --ring: 0 0 0 3px color-mix(in oklab, var(--tint) 30%, transparent);
+      --r: 18px; --r-lg: 26px; --gap: 12px;
+      --cell-min: 70px; --page-w: 1080px;
+      --shadow-lg: 0 20px 60px rgba(0,0,0,.45), 0 4px 20px rgba(0,0,0,.35);
+      --shadow: 0 12px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.28);
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#e9f0ff; --bg2:#f6f8ff; --ink:#0a1320; --muted:#5b6980;
+        --shadow-lg: 0 20px 60px rgba(10,30,60,.18), 0 4px 20px rgba(10,30,60,.16);
+        --shadow:    0 12px 30px rgba(10,30,60,.14), 0 2px 10px rgba(10,30,60,.12);
+      }
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                   "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji";
+      background:
+        radial-gradient(1200px 700px at 85% -10%, color-mix(in oklab, var(--tint) 18%, transparent), transparent 60%),
+        radial-gradient(900px 600px at -15% 110%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 60%),
+        linear-gradient(160deg, var(--bg), var(--bg2));
+    }
+
+    .page{max-width:var(--page-w); margin:0 auto; padding:clamp(14px,2.4vw,22px)}
+
+    /* Vidrio líquido reutilizable */
+    .glass{
+      position:relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      overflow:hidden;
+    }
+    .glass::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      border-radius: inherit; padding:1px; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      background: conic-gradient(from 180deg at 50% 50%,
+        #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%);
+      opacity:.45;
+    }
+    .glass::after{
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+      background: radial-gradient(120% 60% at 50% -20%, rgba(255,255,255,.45), transparent 60%);
+      mix-blend-mode: screen; opacity:.55;
+    }
+
+    header.appbar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: clamp(10px, 1.8vw, 14px) clamp(12px, 2.2vw, 18px);
+    }
+    .title{display:flex; gap:12px; align-items:center}
+    .title h1{margin:0; font-weight:800; letter-spacing:-.01em; font-size: clamp(1.25rem,3.6vw,1.9rem)}
+    .subtitle{margin:0; color:var(--muted); font-size:clamp(.9rem,2.4vw,1rem)}
+
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      border:1px solid rgba(255,255,255,.28);
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+      color:var(--ink); padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:700;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px) saturate(140%);
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px) }
+    .btn:active{ transform: translateY(0) scale(.98) }
+    .btn:focus-visible{ outline:none; box-shadow: var(--ring), var(--shadow) }
+    .btn.primary{ color:#00131f; background: linear-gradient(180deg, color-mix(in oklab, var(--tint) 85%, white), color-mix(in oklab, var(--tint) 65%, white)); }
+    .btn.danger{ color:#2b0000; background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 85%, white), color-mix(in oklab, var(--danger) 65%, white)); }
+
+    .card{ margin-top: clamp(12px, 2.2vw, 18px); padding: clamp(10px, 2.2vw, 16px) }
+
+    /* GRID */
+    .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(var(--cell-min), 1fr)); gap: var(--gap); padding: clamp(6px, 1.6vw, 10px) }
+    .cell{
+      position:relative; display:grid; place-items:center; aspect-ratio:1/1; cursor:pointer; user-select:none;
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.26);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px) saturate(140%);
+      font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:.02em;
+      font-size: clamp(1.05rem, 2.8vw, 1.25rem);
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, outline-color .2s ease;
+      color: var(--ink);
+      overflow:hidden;
+    }
+    .cell::before{
+      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+      background: radial-gradient(130% 90% at 50% -10%, rgba(255,255,255,.45), transparent 60%);
+      mix-blend-mode: screen; opacity:.6;
+    }
+    .cell::after{
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+      background: conic-gradient(from 180deg at 50% 50%, #7cf7e6 0 25%, #39a0ff 25% 50%, #caa8ff 50% 75%, #7cf7e6 75% 100%);
+      opacity:.25; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); padding:1px; -webkit-mask-composite:xor; mask-composite:exclude;
+    }
+    .cell:hover{ transform: translateY(-1px) }
+    .cell:active{ transform: translateY(0) scale(.98) }
+    .cell:focus-visible{ outline: 3px solid color-mix(in oklab, var(--tint) 55%, transparent); outline-offset: 2px }
+    .cell.selected{ outline:2px solid var(--tint); background: linear-gradient(180deg, rgba(57,160,255,.22), rgba(57,160,255,.08)); }
+    .cell.empty{ color: color-mix(in oklab, var(--tint) 90%, white); background: linear-gradient(180deg, rgba(57,160,255,.26), rgba(124,247,230,.10)); }
+
+    #output{ padding: 8px clamp(6px, 1.6vw, 10px) 12px; font-size: clamp(1rem, 2.8vw, 1.15rem) }
+    .preview{ max-width:min(220px, 50vw); width:100%; height:auto; border-radius: 14px; box-shadow: var(--shadow); margin-top:8px }
+
+    /* Modales */
+    .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:flex-end; justify-content:center; padding: clamp(10px,3vw,16px); z-index:1000 }
+    .sheet{ width:min(640px,96vw); border-radius: 24px; overflow:hidden; padding:0 }
+    .sheet header{ padding:16px 16px 8px }
+    .sheet h2{ margin:0; font-size: clamp(1.05rem,3vw,1.25rem) }
+    .sheet .body{ padding: 12px 16px 6px }
+    .row{ margin: 10px 0 }
+    .row label{ display:block; margin: 0 0 6px; font-weight:700 }
+    .row input{ width:100%; padding:12px 14px; border-radius:14px; border:1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); color:inherit; font-size:1rem; backdrop-filter: blur(10px) }
+    .row input:focus{ outline:none; box-shadow: var(--ring) }
+    .actions{ display:flex; gap:10px; justify-content:flex-end; padding: 10px 16px 16px }
+
+    @media (max-width:460px){ :root{ --cell-min: 60px } }
+    @media (min-width:1280px){ :root{ --cell-min: 86px } }
+    @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
+  </style>
 </head>
 <body>
   <div class="page">
@@ -79,9 +217,174 @@
     </div>
   </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-    <script type="module" src="./app.js"></script>
+  <!-- Firebase SDKs (ESM desde CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqqDLPFmtAPHXm5ZzpHyxRZZpW31f4Of0",
+      authDomain: "carta-nomo.firebaseapp.com",
+      projectId: "carta-nomo",
+      storageBucket: "carta-nomo.firebasestorage.app",
+      messagingSenderId: "354109744323",
+      appId: "1:354109744323:web:d7548e8cfd0a1d4a41ae76",
+      measurementId: "G-LWB4H4F6TD"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // UI refs
+    const grid = document.getElementById("grid");
+    const output = document.getElementById("output");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const editarBtn = document.getElementById("editarBtn");
+    const borrarBtn = document.getElementById("borrarBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const importBtn = document.getElementById("importBtn");
+    const userInfo = document.getElementById("userInfo");
+
+    const editBackdrop = document.getElementById("editBackdrop");
+    const numSel = document.getElementById("numSel");
+    const palabraInput = document.getElementById("palabra");
+    const imagenInput = document.getElementById("imagen");
+    const guardarBtn = document.getElementById("guardarBtn");
+    const cancelarBtn = document.getElementById("cancelarBtn");
+
+    const loginBackdrop = document.getElementById("loginBackdrop");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPass = document.getElementById("loginPass");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginCancel = document.getElementById("loginCancel");
+
+    // Estado
+    let seleccionado = 1;
+    let datos = {}; // {n: {palabra, imagenUrl}}
+
+    const hablar = (t) => { try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch{} };
+
+    const tieneDatos = (n) => { const d = datos[n]; return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl)); };
+    const refrescarCeldasVacias = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('empty', !tieneDatos(ix+1))); };
+    const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
+    const mostrar = (i, speak=true) => {
+      const d = datos[i];
+      output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? '(sin datos)'}`;
+      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer"></div>`;
+      if (speak && d?.palabra) hablar(d.palabra);
+    };
+
+    const renderAuthUI = (user) => {
+      const on = !!user;
+      editarBtn.style.display = on ? '' : 'none';
+      borrarBtn.style.display = on ? '' : 'none';
+      exportBtn.style.display = on ? '' : 'none';
+      importBtn.style.display = on ? '' : 'none';
+      logoutBtn.style.display = on ? '' : 'none';
+      loginBtn.style.display = on ? 'none' : '';
+      userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
+    };
+    onAuthStateChanged(auth, renderAuthUI);
+
+    // Login modal
+    const openLogin = () => { loginEmail.value=''; loginPass.value=''; loginBackdrop.style.display='flex'; loginBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; loginEmail.focus(); };
+    const closeLogin = () => { loginBackdrop.style.display='none'; loginBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; };
+    loginBtn.onclick = openLogin; loginCancel.onclick = closeLogin;
+    loginBackdrop.addEventListener('click', e => { if (e.target===loginBackdrop) closeLogin(); });
+    loginSubmit.onclick = async () => { try{ await signInWithEmailAndPassword(auth, (loginEmail.value||'').trim(), loginPass.value||''); closeLogin(); }catch(e){ alert('No se pudo iniciar sesión: ' + (e?.message||e)); } };
+    logoutBtn.onclick = () => signOut(auth);
+
+    // Editar
+    const openEdit = () => {
+      if (!auth.currentUser) return alert('Debes iniciar sesión para editar.');
+      const info = datos[seleccionado] || {}; numSel.value = seleccionado; palabraInput.value = info.palabra || ''; imagenInput.value = '';
+      editBackdrop.style.display='flex'; editBackdrop.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; numSel.focus();
+    };
+    const closeEdit = () => { editBackdrop.style.display='none'; editBackdrop.setAttribute('aria-hidden','true'); document.body.style.overflow=''; imagenInput.value=''; };
+    editarBtn.onclick = openEdit; cancelarBtn.onclick = closeEdit;
+    editBackdrop.addEventListener('click', e => { if (e.target===editBackdrop) closeEdit(); });
+
+    numSel.onchange = () => { let v = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10))); numSel.value=v; seleccionado=v; pintarSeleccion(); const info=datos[v]||{}; palabraInput.value = info.palabra||''; imagenInput.value=''; };
+
+    async function guardarNumero(n, palabra, file){
+      if (!auth.currentUser) throw new Error('No autenticado');
+      let imagenUrl = datos[n]?.imagenUrl || null;
+      if (file) { const ref = storageRef(storage, `imagenes/${n}`); const bytes = new Uint8Array(await file.arrayBuffer()); await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' }); imagenUrl = await getDownloadURL(ref); }
+      await setDoc(doc(collection(db, 'numeros'), String(n)), { palabra: palabra || '', imagenUrl: imagenUrl || null, updatedAt: Date.now() });
+    }
+
+    guardarBtn.onclick = async () => {
+      try{ const n = Math.max(1, Math.min(100, parseInt(numSel.value||'1',10))); const palabra=(palabraInput.value||'').trim(); const file = imagenInput.files?.[0]||null; await guardarNumero(n, palabra, file); seleccionado=n; pintarSeleccion(); closeEdit(); }
+      catch(e){ alert('Error al guardar: ' + (e?.message||e)); }
+    };
+
+    borrarBtn.onclick = async () => {
+      if (!auth.currentUser) return alert('Debes iniciar sesión para borrar.');
+      const n = seleccionado; if (!confirm(`¿Borrar el número ${n}?`)) return;
+      try { try{ await deleteObject(storageRef(storage, `imagenes/${n}`)); }catch{} await deleteDoc(doc(collection(db,'numeros'), String(n))); }
+      catch(e){ alert('No se pudo borrar: ' + (e?.message||e)); }
+    };
+
+    // Importar / Exportar
+    exportBtn.onclick = () => {
+      if (!auth.currentUser) return alert('Inicia sesión.');
+      const blob = new Blob([JSON.stringify(datos, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'palabrasNumeros.json'; a.click(); URL.revokeObjectURL(url);
+    };
+    importBtn.onclick = () => {
+      if (!auth.currentUser) return alert('Inicia sesión.');
+      const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+      inp.onchange = async () => { const f = inp.files?.[0]; if(!f) return; try{
+        const obj = JSON.parse(await f.text()); const ops=[];
+        for (const [k,v] of Object.entries(obj||{})){
+          const n = Number(k); if(!Number.isInteger(n)||n<1||n>100) continue;
+          ops.push(setDoc(doc(collection(db,'numeros'), String(n)), { palabra: typeof v?.palabra==='string'?v.palabra:'', imagenUrl: typeof v?.imagenUrl==='string'?v.imagenUrl:null, updatedAt: Date.now() }));
+        }
+        await Promise.all(ops); alert('Importación completada.');
+      }catch(e){ alert('JSON no válido: ' + (e?.message||e)); } };
+      document.body.appendChild(inp); inp.click(); inp.remove();
+    };
+
+    // Snapshot realtime
+    onSnapshot(collection(db,'numeros'), (snap) => {
+      const nuevo = {}; snap.forEach(d => { const n = parseInt(d.id,10); if(!isNaN(n)) nuevo[n] = { palabra: d.data().palabra || '', imagenUrl: d.data().imagenUrl || null }; });
+      datos = nuevo; refrescarCeldasVacias(); mostrar(seleccionado, false);
+    });
+
+    // Crear grid
+    for (let i=1;i<=100;i++){
+      const cell = document.createElement('button');
+      cell.className='cell'; cell.type='button'; cell.textContent = i;
+      cell.setAttribute('role','gridcell'); cell.setAttribute('aria-label', `Número ${i}`);
+      cell.onclick = () => { seleccionado=i; pintarSeleccion(); mostrar(i); };
+      cell.onkeydown = (e) => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); seleccionado=i; pintarSeleccion(); mostrar(i);} };
+      grid.appendChild(cell);
+    }
+    pintarSeleccion(); mostrar(seleccionado, false);
+
+    // Navegación con teclado (sin interferir inputs/modales)
+    const isTextInput = (el) => { if(!el) return false; const t = el.tagName?.toLowerCase(); return el.isContentEditable || t==='input'||t==='textarea'||t==='select'; };
+    window.addEventListener('keydown', (e) => {
+      const anySheetOpen = editBackdrop.getAttribute('aria-hidden')==='false' || loginBackdrop.getAttribute('aria-hidden')==='false';
+      if (anySheetOpen || isTextInput(document.activeElement)) return;
+      const max=100; let handled=false;
+      if (e.key==='ArrowRight'){ seleccionado=Math.min(max, seleccionado+1); handled=true; }
+      if (e.key==='ArrowLeft'){ seleccionado=Math.max(1, seleccionado-1); handled=true; }
+      if (e.key==='Enter'){ mostrar(seleccionado); handled=true; }
+      if (!handled) return; e.preventDefault(); pintarSeleccion(); const node=grid.children[seleccionado-1]; if (node) node.focus({preventScroll:true});
+    });
+
+    // Service Worker
+    if ('serviceWorker' in navigator){
+      window.addEventListener('load', () => navigator.serviceWorker.register('/Carta-Nomo/service-worker.js'));
+    }
+  </script>
 </body>
 </html>
 

@@ -4,12 +4,11 @@ const VERSION = 'v1.0.0';
 const CACHE_NAME = `carta-nomo-${VERSION}`;
 const APP_SHELL = [
   `${BASE_PATH}/`,
-  `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/styles.css`,
-  `${BASE_PATH}/manifest.json`,
   `${BASE_PATH}/icons/icon-192.png`,
   `${BASE_PATH}/icons/icon-512.png`,
-  `${BASE_PATH}/favicon.ico`
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/styles.css`
 ];
 
 self.addEventListener('install', (event) => {

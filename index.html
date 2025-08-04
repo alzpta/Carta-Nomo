@@ -135,8 +135,21 @@
     const pintarSeleccion = () => { [...grid.children].forEach((el,ix)=>el.classList.toggle('selected', ix+1===seleccionado)); };
     const mostrar = (i, speak=true) => {
       const d = datos[i];
-      output.innerHTML = `<strong>Número ${i}:</strong> ${d?.palabra ?? '(sin datos)'}`;
-      if (d?.imagenUrl) output.innerHTML += `<div><img class="preview" src="${d.imagenUrl}" alt="Imagen ${i}" loading="lazy" referrerpolicy="no-referrer"></div>`;
+      output.textContent = '';
+      const strong = document.createElement('strong');
+      strong.textContent = `Número ${i}:`;
+      output.append(strong, ' ', d?.palabra ?? '(sin datos)');
+      if (d?.imagenUrl) {
+        const imgWrapper = document.createElement('div');
+        const img = document.createElement('img');
+        img.className = 'preview';
+        img.src = d.imagenUrl;
+        img.loading = 'lazy';
+        img.referrerPolicy = 'no-referrer';
+        img.alt = d?.palabra ? `Imagen de ${d.palabra}` : `Imagen del número ${i}`;
+        imgWrapper.appendChild(img);
+        output.appendChild(imgWrapper);
+      }
       if (speak && d?.palabra) hablar(d.palabra);
     };
 

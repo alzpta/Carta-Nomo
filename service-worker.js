@@ -1,14 +1,15 @@
-/* Service Worker para Carta Nomo (scope: /Carta-Nomo/) */
+/* Service Worker para Carta Nomo (scope: BASE_PATH) */
+import { BASE_PATH } from './src/config.js';
 const VERSION = 'v1.0.0';
 const CACHE_NAME = `carta-nomo-${VERSION}`;
 const APP_SHELL = [
-  '/Carta-Nomo/',
-  '/Carta-Nomo/index.html',
-  '/Carta-Nomo/styles.css',
-  '/Carta-Nomo/manifest.json',
-  '/Carta-Nomo/icons/icon-192.png',
-  '/Carta-Nomo/icons/icon-512.png',
-  '/Carta-Nomo/favicon.ico'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/styles.css`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/icons/icon-192.png`,
+  `${BASE_PATH}/icons/icon-512.png`,
+  `${BASE_PATH}/favicon.ico`
 ];
 
 self.addEventListener('install', (event) => {
@@ -47,7 +48,7 @@ self.addEventListener('fetch', (event) => {
       fetch(request).then((res) => {
         const copy = res.clone(); if (copy.ok && copy.status === 200) caches.open(CACHE_NAME).then((c) => c.put(request, copy));
         return res;
-      }).catch(() => caches.match(request).then((r) => r || caches.match('/Carta-Nomo/index.html')))
+      }).catch(() => caches.match(request).then((r) => r || caches.match(`${BASE_PATH}/index.html`)))
     );
     return;
   }

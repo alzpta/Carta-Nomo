@@ -5,15 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Carta Nomo · Sarria — Liquid Glass</title>
 
-  <!-- PWA en GitHub Pages (/Carta-Nomo/) -->
-  <link rel="manifest" href="/Carta-Nomo/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <link rel="apple-touch-icon" href="/Carta-Nomo/icons/icon-192.png" />
-  <link rel="icon" href="/Carta-Nomo/favicon.ico" />
 
   <link rel="stylesheet" href="styles.css" />
+
+  <script type="module">
+    import { BASE_PATH } from "./src/config.js";
+    const addLink = (rel, href) => {
+      const link = document.createElement('link');
+      link.rel = rel;
+      link.href = href;
+      document.head.appendChild(link);
+    };
+    addLink('manifest', `${BASE_PATH}/manifest.json`);
+    addLink('apple-touch-icon', `${BASE_PATH}/icons/icon-192.png`);
+    addLink('icon', `${BASE_PATH}/favicon.ico`);
+  </script>
 </head>
 <body>
   <div class="page">
@@ -80,6 +89,7 @@
 
   <!-- Firebase SDKs (ESM desde CDN) -->
   <script type="module">
+    import { BASE_PATH } from "./src/config.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -256,7 +266,7 @@
 
     // Service Worker
     if ('serviceWorker' in navigator){
-      window.addEventListener('load', () => navigator.serviceWorker.register('/Carta-Nomo/service-worker.js'));
+      window.addEventListener('load', () => navigator.serviceWorker.register(`${BASE_PATH}/service-worker.js`, { type: 'module' }));
     }
   </script>
 </body>

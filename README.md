@@ -27,6 +27,17 @@ export const BASE_PATH = '/Carta-Nomo';
 
 Ajusta `BASE_PATH` según el entorno y los enlaces del manifiesto, iconos y Service Worker se actualizarán en consecuencia.
 
+## 🛠️ Generar el precache
+
+`service-worker.js` precarga archivos listados en `APP_SHELL`. Para mantener esta lista al día se incluye una tarea de build que la genera automáticamente a partir del contenido del directorio.
+
+```bash
+npm install        # solo la primera vez
+npm run build      # actualiza APP_SHELL
+```
+
+Ejecuta `npm run build` antes de desplegar para que el Service Worker contenga la lista más reciente de recursos estáticos.
+
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia [MIT](LICENSE).

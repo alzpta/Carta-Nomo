@@ -114,13 +114,13 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     imagenInput.value = '';
     descripcionInput.value = '';
   };
-  editarBtn.onclick = openEdit;
-  cancelarBtn.onclick = closeEdit;
+  editarBtn.addEventListener('click', openEdit);
+  cancelarBtn.addEventListener('click', closeEdit);
   editBackdrop.addEventListener('click', (e) => {
     if (e.target === editBackdrop) closeEdit();
   });
 
-  numSel.onchange = () => {
+  numSel.addEventListener('change', () => {
     let v = Math.max(
       1,
       Math.min(MAX_NUMEROS, parseInt(numSel.value || '1', 10))
@@ -132,9 +132,9 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     palabraInput.value = info.palabra || '';
     descripcionInput.value = info.descripcion || '';
     imagenInput.value = '';
-  };
+  });
 
-  guardarBtn.onclick = async () => {
+  guardarBtn.addEventListener('click', async () => {
     try {
       const n = Math.max(
         1,
@@ -152,9 +152,9 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
       const msg = [e?.code, e?.message].filter(Boolean).join(' - ');
       alert('Error al guardar: ' + (msg || e));
     }
-  };
+  });
 
-  borrarBtn.onclick = async () => {
+  borrarBtn.addEventListener('click', async () => {
     if (!auth.currentUser)
       return alert('Debes iniciar sesión para borrar.');
     const n = seleccionado;
@@ -164,18 +164,18 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     } catch (e) {
       alert('No se pudo borrar: ' + (e?.message || e));
     }
-  };
+  });
 
-  exportBtn.onclick = () => {
+  exportBtn.addEventListener('click', () => {
     if (!auth.currentUser) return alert('Inicia sesión.');
     exportarDatos(datos);
-  };
-  importBtn.onclick = () => {
+  });
+  importBtn.addEventListener('click', () => {
     if (!auth.currentUser) return alert('Inicia sesión.');
     const inp = document.createElement('input');
     inp.type = 'file';
     inp.accept = 'application/json';
-    inp.onchange = async () => {
+    inp.addEventListener('change', async () => {
       const f = inp.files?.[0];
       if (!f) return;
       try {
@@ -184,11 +184,11 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
       } catch (e) {
         alert('JSON no válido: ' + (e?.message || e));
       }
-    };
+    });
     document.body.appendChild(inp);
     inp.click();
     inp.remove();
-  };
+  });
 
   subscribeNumeros(db, (nuevo) => {
     datos = nuevo;
@@ -203,7 +203,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     cell.textContent = i;
     cell.setAttribute('role', 'gridcell');
     cell.setAttribute('aria-label', `Número ${i}`);
-    cell.onclick = () => {
+    cell.addEventListener('click', () => {
       seleccionado = i;
       pintarSeleccion();
       mostrar(i);
@@ -213,8 +213,8 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
         imageUrl: datos[i]?.imagenUrl,
         descripcion: datos[i]?.descripcion,
       });
-    };
-    cell.onkeydown = (e) => {
+    });
+    cell.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         seleccionado = i;
@@ -227,7 +227,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
           descripcion: datos[i]?.descripcion,
         });
       }
-    };
+    });
     grid.appendChild(cell);
   }
   pintarSeleccion();

@@ -13,6 +13,7 @@ async function loadGuardarNumero({ setDoc, getDoc }) {
   globalThis.doc = () => ({});
   globalThis.setDoc = setDoc;
   globalThis.getDoc = getDoc;
+  globalThis.serverTimestamp = () => ({}) ;
   globalThis.deleteDoc = () => {};
   globalThis.onSnapshot = () => {};
   globalThis.storageRef = () => ({});
@@ -26,7 +27,11 @@ async function loadGuardarNumero({ setDoc, getDoc }) {
 test('editar sin nueva imagen mantiene imagenUrl y descripcion existentes', async () => {
   const existente = { descripcion: 'vieja', imagenUrl: 'old.png' };
 
-  const getDocMock = async () => ({ exists: () => true, data: () => existente });
+  const getDocCalls = [];
+  const getDocMock = async (...args) => {
+    getDocCalls.push(args);
+    return { exists: () => true, data: () => existente };
+  };
   const calls = [];
   const setDocMock = async (...args) => calls.push(args);
 
@@ -34,6 +39,7 @@ test('editar sin nueva imagen mantiene imagenUrl y descripcion existentes', asyn
 
   await guardarNumero({}, {}, 5, 'cinco', undefined, null);
 
+  assert.strictEqual(getDocCalls.length, 1);
   assert.strictEqual(calls.length, 1);
   const dataArg = calls[0][1];
   assert.strictEqual(dataArg.descripcion, 'vieja');

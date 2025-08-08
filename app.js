@@ -38,8 +38,14 @@ const viewTitle    = document.getElementById('viewTitle');
 const viewDesc     = document.getElementById('viewDesc');
 
 function openView({ num, palabra, imageUrl }) {
-  viewTitle.textContent = `#${num}`;
-  viewDesc.textContent = palabra || 'Sin descripción';
+  viewTitle.textContent = palabra ? `${num}: ${palabra}` : `#${num}`;
+  if (palabra) {
+    viewDesc.style.display = 'none';
+    viewDesc.textContent = '';
+  } else {
+    viewDesc.style.display = '';
+    viewDesc.textContent = 'Sin descripción';
+  }
   if (imageUrl) {
     viewImg.src = imageUrl;
     viewImg.style.display = '';

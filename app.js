@@ -30,7 +30,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-initUI({ auth, db, storage, BASE_PATH });
 // === Popup de vista ===
 const viewBackdrop = document.getElementById('viewBackdrop');
 const viewClose    = document.getElementById('viewClose');
@@ -39,6 +38,40 @@ const viewTitle    = document.getElementById('viewTitle');
 const viewDesc     = document.getElementById('viewDesc');
 
 function openView({ num, palabra, imageUrl }) {
-  viewTitle.textContent = `#${num} · ${palabra || 'Sin descripción'}`;
-  viewDesc.textContent
+  viewTitle.textContent = `#${num}`;
+  viewDesc.textContent = palabra || 'Sin descripción';
+  if (imageUrl) {
+    viewImg.src = imageUrl;
+    viewImg.style.display = '';
+  } else {
+    viewImg.removeAttribute('src');
+    viewImg.style.display = 'none';
+  }
+  viewBackdrop.style.display = 'flex';
+  viewBackdrop.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
 
+  const close = () => {
+    viewBackdrop.style.display = 'none';
+    viewBackdrop.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    viewClose.onclick = null;
+    viewBackdrop.removeEventListener('click', onBackdrop);
+    document.removeEventListener('keydown', onEsc);
+    const grid = document.getElementById('grid');
+    const cell = grid?.children?.[num - 1];
+    if (cell) cell.focus();
+  };
+
+  const onBackdrop = (e) => {
+    if (e.target === viewBackdrop) close();
+  };
+  const onEsc = (e) => {
+    if (e.key === 'Escape') close();
+  };
+  viewClose.onclick = close;
+  viewBackdrop.addEventListener('click', onBackdrop);
+  document.addEventListener('keydown', onEsc);
+}
+
+initUI({ auth, db, storage, BASE_PATH, openView });

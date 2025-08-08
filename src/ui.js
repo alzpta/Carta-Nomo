@@ -2,7 +2,7 @@ import { initAuth } from './auth.js';
 import { guardarNumero, borrarNumero, exportarDatos, importarArchivo, subscribeNumeros } from './db.js';
 import { MAX_NUMEROS } from './config.js';
 
-export function initUI({ auth, db, storage, BASE_PATH }) {
+export function initUI({ auth, db, storage, BASE_PATH, openView }) {
   const grid = document.getElementById('grid');
   const output = document.getElementById('output');
   const loginBtn = document.getElementById('loginBtn');
@@ -197,6 +197,11 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
       seleccionado = i;
       pintarSeleccion();
       mostrar(i);
+      openView({
+        num: i,
+        palabra: datos[i]?.palabra,
+        imageUrl: datos[i]?.imagenUrl,
+      });
     };
     cell.onkeydown = (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -204,6 +209,11 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
         seleccionado = i;
         pintarSeleccion();
         mostrar(i);
+        openView({
+          num: i,
+          palabra: datos[i]?.palabra,
+          imageUrl: datos[i]?.imagenUrl,
+        });
       }
     };
     grid.appendChild(cell);
@@ -238,6 +248,11 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     }
     if (e.key === 'Enter') {
       mostrar(seleccionado);
+      openView({
+        num: seleccionado,
+        palabra: datos[seleccionado]?.palabra,
+        imageUrl: datos[seleccionado]?.imagenUrl,
+      });
       handled = true;
     }
     if (!handled) return;

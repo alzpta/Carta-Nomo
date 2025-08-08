@@ -39,7 +39,8 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     loginEmail,
     loginPass,
     loginSubmit,
-    loginCancel
+    loginCancel,
+    db
   });
 
   let seleccionado = 1;

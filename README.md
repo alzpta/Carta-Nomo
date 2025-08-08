@@ -38,6 +38,17 @@ npm run build      # actualiza APP_SHELL
 
 Ejecuta `npm run build` antes de desplegar para que el Service Worker contenga la lista más reciente de recursos estáticos.
 
+## 🔐 Inicialización de la UI
+
+La interfaz se inicializa desde `app.js` llamando a `initUI` con las referencias de Firebase:
+
+```js
+import { initUI } from './src/ui.js';
+initUI({ auth, db, storage, BASE_PATH, openView });
+```
+
+El objeto `db` se pasa a `initAuth` para que los botones de edición, borrado, exportación e importación sólo aparezcan cuando el usuario autenticado sea administrador.
+
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia [MIT](LICENSE).

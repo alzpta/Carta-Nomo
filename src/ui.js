@@ -148,7 +148,9 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
       pintarSeleccion();
       closeEdit();
     } catch (e) {
-      alert('Error al guardar: ' + (e?.message || e));
+      console.error('Error al guardar:', e?.code, e?.message);
+      const msg = [e?.code, e?.message].filter(Boolean).join(' - ');
+      alert('Error al guardar: ' + (msg || e));
     }
   };
 

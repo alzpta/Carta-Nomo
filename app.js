@@ -31,3 +31,14 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 initUI({ auth, db, storage, BASE_PATH });
+// === Popup de vista ===
+const viewBackdrop = document.getElementById('viewBackdrop');
+const viewClose    = document.getElementById('viewClose');
+const viewImg      = document.getElementById('viewImg');
+const viewTitle    = document.getElementById('viewTitle');
+const viewDesc     = document.getElementById('viewDesc');
+
+function openView({ num, palabra, imageUrl }) {
+  viewTitle.textContent = `#${num} · ${palabra || 'Sin descripción'}`;
+  viewDesc.textContent
+

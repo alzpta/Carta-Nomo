@@ -1,33 +1,62 @@
-import { BASE_PATH } from "./src/config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
-import { initUI } from "./src/ui.js";
+// Importar Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-const addLink = (rel, href) => {
-  const link = document.createElement('link');
-  link.rel = rel;
-  link.href = href;
-  document.head.appendChild(link);
-};
-addLink('manifest', `${BASE_PATH}/manifest.json`);
-addLink('apple-touch-icon', `${BASE_PATH}/icons/icon-192.png`);
-addLink('icon', `${BASE_PATH}/favicon.ico`);
-
+// Configuración Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyAqqDLPFmtAPHXm5ZzpHyxRZZpW31f4Of0",
+  apiKey: "TU_API_KEY",
   authDomain: "carta-nomo.firebaseapp.com",
   projectId: "carta-nomo",
-  storageBucket: "carta-nomo.firebasestorage.app",
+  storageBucket: "carta-nomo.appspot.com",
   messagingSenderId: "354109744323",
-  appId: "1:354109744323:web:d7548e8cfd0a1d4a41ae76",
-  measurementId: "G-LWB4H4F6TD"
+  appId: "1:354109744323:web:d7548e8cfd0aXXXXXX"
 };
 
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 const storage = getStorage(app);
 
-initUI({ auth, db, storage, BASE_PATH });
+// Datos de ejemplo de descripciones
+const descripciones = {
+  1: "Café expreso intenso y aromático.",
+  2: "Tostada con tomate y aceite de oliva.",
+  3: "Zumo de naranja recién exprimido."
+};
+
+// Función para cargar imagen desde Storage
+async function obtenerImagen(numero) {
+  try {
+    const ruta = `imagenes/${numero}.jpg`;
+    const referencia = ref(storage, ruta);
+    return await getDownloadURL(referencia);
+  } catch (error) {
+    console.error("No se pudo cargar la imagen:", error);
+    return null;
+  }
+}
+
+// Mostrar popup
+async function mostrarPopup(numero) {
+  const titulo = `Número ${numero}`;
+  const descripcion = descripciones[numero] || "Sin descripción disponible";
+  const imgUrl = await obtenerImagen(numero);
+
+  document.getElementById("popupTitle").textContent = titulo;
+  document.getElementById("popupDesc").textContent = descripcion;
+  document.getElementById("popupImg").src = imgUrl || "https://via.placeholder.com/300?text=Sin+imagen";
+
+  document.getElementById("popupBackdrop").style.display = "flex";
+}
+
+// Cerrar popup
+document.getElementById("popupClose").addEventListener("click", () => {
+  document.getElementById("popupBackdrop").style.display = "none";
+});
+
+// Detectar clic en un número
+document.getElementById("grid").addEventListener("click", (e) => {
+  if (e.target.classList.contains("numero")) {
+    const numero = e.target.dataset.num;
+    mostrarPopup(numero);
+  }
+});

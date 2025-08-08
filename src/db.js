@@ -1,4 +1,4 @@
-import { collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { collection, doc, setDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 import { MAX_NUMEROS } from './config.js';
 
@@ -18,21 +18,31 @@ export const subscribeNumeros = (db, callback) =>
   });
 
 export async function guardarNumero(db, storage, n, palabra, descripcion, file) {
-  let imagenUrl = null;
+  const dref = doc(collection(db, 'numeros'), String(n));
+  const snap = await getDoc(dref);
+  const actual = snap.exists() ? snap.data() : {};
+
+  let imagenUrl = actual.imagenUrl || null;
   if (file) {
     const ref = storageRef(storage, `imagenes/${n}`);
     const bytes = new Uint8Array(await file.arrayBuffer());
     await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
     imagenUrl = await getDownloadURL(ref);
-  } else {
-    imagenUrl = null;
   }
-  await setDoc(doc(collection(db, 'numeros'), String(n)), {
-    palabra: palabra || '',
-    descripcion: descripcion || '',
-    imagenUrl: imagenUrl || null,
-    updatedAt: Date.now(),
-  });
+
+  let desc = actual.descripcion || '';
+  if (descripcion !== undefined && descripcion !== null) desc = descripcion;
+
+  await setDoc(
+    dref,
+    {
+      palabra: palabra || '',
+      descripcion: desc,
+      imagenUrl,
+      updatedAt: Date.now(),
+    },
+    { merge: true }
+  );
 }
 
 export async function borrarNumero(db, storage, n) {

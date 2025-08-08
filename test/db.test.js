@@ -14,6 +14,7 @@ async function loadGuardarNumero({ setDoc, getDoc }) {
   globalThis.doc = () => ({});
   globalThis.setDoc = setDoc;
   globalThis.getDoc = getDoc;
+  globalThis.serverTimestamp = () => ({}) ;
   globalThis.deleteDoc = () => {};
   globalThis.onSnapshot = () => {};
   globalThis.serverTimestamp = () => ({});
@@ -25,8 +26,6 @@ async function loadGuardarNumero({ setDoc, getDoc }) {
   return module.guardarNumero;
 }
 
-test('guardarNumero sin descripcion ni imagen no incluye campos vacíos', async () => {
-  const getDocMock = async () => ({ exists: () => true, data: () => ({ descripcion: 'vieja', imagenUrl: 'old.png' }) });
   const calls = [];
   const setDocMock = async (...args) => calls.push(args);
 
@@ -34,6 +33,7 @@ test('guardarNumero sin descripcion ni imagen no incluye campos vacíos', async 
 
   await guardarNumero({}, {}, 5, 'cinco', undefined, null);
 
+  assert.strictEqual(getDocCalls.length, 1);
   assert.strictEqual(calls.length, 1);
   const dataArg = calls[0][1];
   assert.ok(!('descripcion' in dataArg));

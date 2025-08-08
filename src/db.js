@@ -26,23 +26,31 @@ export async function guardarNumero(db, storage, n, palabra, descripcion, file) 
   if (file) {
     const ref = storageRef(storage, `imagenes/${n}`);
     const bytes = new Uint8Array(await file.arrayBuffer());
-    await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
-    imagenUrl = await getDownloadURL(ref);
+    try {
+      await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
+      imagenUrl = await getDownloadURL(ref);
+    } catch (e) {
+      throw e;
+    }
   }
 
   let desc = actual.descripcion || '';
   if (descripcion !== undefined && descripcion !== null) desc = descripcion;
 
-  await setDoc(
-    dref,
-    {
-      palabra: palabra || '',
-      descripcion: desc,
-      imagenUrl,
-      updatedAt: Date.now(),
-    },
-    { merge: true }
-  );
+  try {
+    await setDoc(
+      dref,
+      {
+        palabra: palabra || '',
+        descripcion: desc,
+        imagenUrl,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
+  } catch (e) {
+    throw e;
+  }
 }
 
 export async function borrarNumero(db, storage, n) {

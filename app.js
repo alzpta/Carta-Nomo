@@ -19,7 +19,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAqqDLPFmtAPHXm5ZzpHyxRZZpW31f4Of0",
   authDomain: "carta-nomo.firebaseapp.com",
   projectId: "carta-nomo",
-  storageBucket: "carta-nomo.firebasestorage.app",
+  storageBucket: "carta-nomo.appspot.com",
   messagingSenderId: "354109744323",
   appId: "1:354109744323:web:d7548e8cfd0a1d4a41ae76",
   measurementId: "G-LWB4H4F6TD"

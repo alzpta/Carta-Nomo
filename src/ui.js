@@ -16,6 +16,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
   const editBackdrop = document.getElementById('editBackdrop');
   const numSel = document.getElementById('numSel');
   const palabraInput = document.getElementById('palabra');
+  const descripcionInput = document.getElementById('descripcion');
   const imagenInput = document.getElementById('imagen');
   const guardarBtn = document.getElementById('guardarBtn');
   const cancelarBtn = document.getElementById('cancelarBtn');
@@ -57,7 +58,10 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
 
   const tieneDatos = (n) => {
     const d = datos[n];
-    return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl));
+    return !!(
+      d &&
+      ((d.palabra && d.palabra.trim()) || d.imagenUrl || (d.descripcion && d.descripcion.trim()))
+    );
   };
   const refrescarCeldasVacias = () => {
     [...grid.children].forEach((el, ix) =>
@@ -96,6 +100,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     const info = datos[seleccionado] || {};
     numSel.value = seleccionado;
     palabraInput.value = info.palabra || '';
+    descripcionInput.value = info.descripcion || '';
     imagenInput.value = '';
     editBackdrop.style.display = 'flex';
     editBackdrop.setAttribute('aria-hidden', 'false');
@@ -107,6 +112,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     editBackdrop.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     imagenInput.value = '';
+    descripcionInput.value = '';
   };
   editarBtn.onclick = openEdit;
   cancelarBtn.onclick = closeEdit;
@@ -124,6 +130,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
     pintarSeleccion();
     const info = datos[v] || {};
     palabraInput.value = info.palabra || '';
+    descripcionInput.value = info.descripcion || '';
     imagenInput.value = '';
   };
 
@@ -134,8 +141,9 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
         Math.min(MAX_NUMEROS, parseInt(numSel.value || '1', 10))
       );
       const palabra = (palabraInput.value || '').trim();
+      const descripcion = (descripcionInput.value || '').trim();
       const file = imagenInput.files?.[0] || null;
-      await guardarNumero(db, storage, n, palabra, file);
+      await guardarNumero(db, storage, n, palabra, descripcion, file);
       seleccionado = n;
       pintarSeleccion();
       closeEdit();
@@ -201,6 +209,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
         num: i,
         palabra: datos[i]?.palabra,
         imageUrl: datos[i]?.imagenUrl,
+        descripcion: datos[i]?.descripcion,
       });
     };
     cell.onkeydown = (e) => {
@@ -213,6 +222,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
           num: i,
           palabra: datos[i]?.palabra,
           imageUrl: datos[i]?.imagenUrl,
+          descripcion: datos[i]?.descripcion,
         });
       }
     };
@@ -252,6 +262,7 @@ export function initUI({ auth, db, storage, BASE_PATH, openView }) {
         num: seleccionado,
         palabra: datos[seleccionado]?.palabra,
         imageUrl: datos[seleccionado]?.imagenUrl,
+        descripcion: datos[seleccionado]?.descripcion,
       });
       handled = true;
     }

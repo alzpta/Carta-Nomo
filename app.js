@@ -37,21 +37,23 @@ const viewImg      = document.getElementById('viewImg');
 const viewTitle    = document.getElementById('viewTitle');
 const viewDesc     = document.getElementById('viewDesc');
 
-function openView({ num, palabra, imageUrl }) {
+function openView({ num, palabra, imageUrl, descripcion }) {
   viewTitle.textContent = palabra ? `${num}: ${palabra}` : `#${num}`;
-  if (palabra) {
-    viewDesc.style.display = 'none';
-    viewDesc.textContent = '';
-  } else {
-    viewDesc.style.display = '';
-    viewDesc.textContent = 'Sin descripción';
-  }
+
   if (imageUrl) {
     viewImg.src = imageUrl;
     viewImg.style.display = '';
   } else {
     viewImg.removeAttribute('src');
     viewImg.style.display = 'none';
+  }
+
+  if (descripcion) {
+    viewDesc.textContent = descripcion;
+    viewDesc.style.display = '';
+  } else {
+    viewDesc.textContent = '';
+    viewDesc.style.display = 'none';
   }
   viewBackdrop.style.display = 'flex';
   viewBackdrop.setAttribute('aria-hidden', 'false');

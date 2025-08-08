@@ -11,12 +11,13 @@ export const subscribeNumeros = (db, callback) =>
         nuevo[n] = {
           palabra: d.data().palabra || '',
           imagenUrl: d.data().imagenUrl || null,
+          descripcion: d.data().descripcion || '',
         };
     });
     callback(nuevo);
   });
 
-export async function guardarNumero(db, storage, n, palabra, file) {
+export async function guardarNumero(db, storage, n, palabra, descripcion, file) {
   let imagenUrl = null;
   if (file) {
     const ref = storageRef(storage, `imagenes/${n}`);
@@ -28,6 +29,7 @@ export async function guardarNumero(db, storage, n, palabra, file) {
   }
   await setDoc(doc(collection(db, 'numeros'), String(n)), {
     palabra: palabra || '',
+    descripcion: descripcion || '',
     imagenUrl: imagenUrl || null,
     updatedAt: Date.now(),
   });
@@ -61,6 +63,7 @@ export async function importarArchivo(db, file) {
     ops.push(
       setDoc(doc(collection(db, 'numeros'), String(n)), {
         palabra: typeof v?.palabra === 'string' ? v.palabra : '',
+        descripcion: typeof v?.descripcion === 'string' ? v.descripcion : '',
         imagenUrl: typeof v?.imagenUrl === 'string' ? v.imagenUrl : null,
         updatedAt: Date.now(),
       })

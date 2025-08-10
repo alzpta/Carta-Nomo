@@ -35,6 +35,7 @@ body{
     linear-gradient(160deg, var(--bg), var(--bg2));
 }
 
+.hidden{display:none}
 .page{max-width:var(--page-w); margin:0 auto; padding:clamp(14px,2.4vw,22px)}
 
 /* Vidrio líquido reutilizable */
@@ -143,7 +144,7 @@ header.appbar{
 .admin-only{ display:flex; align-items:center }
 .popup-desc{ margin-top:10px }
 .popup-actions{ justify-content:space-between }
-.popup-admin{ display:none; gap:10px }
+.popup-admin{ display:flex; gap:10px }
 
 
 /* Notificaciones */

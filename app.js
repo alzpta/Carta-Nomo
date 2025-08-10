@@ -86,15 +86,15 @@ const exportCsvBtn = document.getElementById('exportCsvBtn');
 const importBtn = document.getElementById('importBtn');
 let isAdmin = false;
 
-onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, (user) => {
   isAdmin = !!user;
   // Zona admin en el popup
-  if (viewAdminActions) viewAdminActions.style.display = isAdmin ? 'flex' : 'none';
+  if (viewAdminActions) viewAdminActions.classList.toggle('hidden', !isAdmin);
   // Botones admin
-  if (exportBtn) exportBtn.style.display = isAdmin ? '' : 'none';
-  if (exportCsvBtn) exportCsvBtn.style.display = isAdmin ? '' : 'none';
-  if (importBtn) importBtn.style.display = isAdmin ? '' : 'none';
-});
+  if (exportBtn) exportBtn.classList.toggle('hidden', !isAdmin);
+  if (exportCsvBtn) exportCsvBtn.classList.toggle('hidden', !isAdmin);
+  if (importBtn) importBtn.classList.toggle('hidden', !isAdmin);
+  });
 
 // ————————————————————————————————————————————————
 // Utilidades Firestore
@@ -314,7 +314,7 @@ exportCsvBtn?.addEventListener('click', async () => {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = 'application/json';
-  fileInput.style.display = 'none';
+  fileInput.classList.add('hidden');
   document.body.appendChild(fileInput);
 
   importBtn.addEventListener('click', () => {

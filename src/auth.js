@@ -18,12 +18,12 @@ export function initAuth(auth, elements) {
 
   const renderAuthUI = (user) => {
     const on = !!user;
-    editarBtn.style.display = on ? '' : 'none';
-    borrarBtn.style.display = on ? '' : 'none';
-    exportBtn.style.display = on ? '' : 'none';
-    importBtn.style.display = on ? '' : 'none';
-    logoutBtn.style.display = on ? '' : 'none';
-    loginBtn.style.display = on ? 'none' : '';
+    editarBtn.classList.toggle('hidden', !on);
+    borrarBtn.classList.toggle('hidden', !on);
+    exportBtn.classList.toggle('hidden', !on);
+    importBtn.classList.toggle('hidden', !on);
+    logoutBtn.classList.toggle('hidden', !on);
+    loginBtn.classList.toggle('hidden', on);
     userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
   };
   onAuthStateChanged(auth, renderAuthUI);

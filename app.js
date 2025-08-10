@@ -113,12 +113,12 @@ async function upsertNumberDoc(n, { palabra, descripcion, imageURL }) {
 // Popup de vista
 // ————————————————————————————————————————————————
 function openView() {
-  viewBackdrop.style.display = 'flex';
-  viewBackdrop.setAttribute('aria-hidden', 'false');
+  viewBackdrop.classList.add('is-open');
+  viewBackdrop.removeAttribute('aria-hidden');
   viewCloseBtn?.focus();
 }
 function closeView() {
-  viewBackdrop.style.display = 'none';
+  viewBackdrop.classList.remove('is-open');
   viewBackdrop.setAttribute('aria-hidden', 'true');
   currentNumberSelected = null;
 }
@@ -166,8 +166,8 @@ viewEditBtn?.addEventListener('click', () => {
   // Extrae palabra del título "N. palabra"
   palabraInput.value = viewTitle.textContent.split('. ').slice(1).join('. ') || '';
   descInput.value = viewDesc.textContent || '';
-  editBackdrop.style.display = 'flex';
-  editBackdrop.setAttribute('aria-hidden', 'false');
+  editBackdrop.classList.add('is-open');
+  editBackdrop.removeAttribute('aria-hidden');
 });
 
 // Borrar desde popup
@@ -210,11 +210,11 @@ guardarBtn?.addEventListener('click', async () => {
     await upsertNumberDoc(n, { palabra, descripcion, imageURL });
 
     alert('Guardado con éxito');
-    editBackdrop.style.display = 'none';
+    editBackdrop.classList.remove('is-open');
     editBackdrop.setAttribute('aria-hidden', 'true');
 
     // Si el popup mostraba este número, refrescar su contenido
-    if (currentNumberSelected === Number(n) && viewBackdrop.style.display === 'flex') {
+    if (currentNumberSelected === Number(n) && viewBackdrop.classList.contains('is-open')) {
       renderView({ n: Number(n), palabra, descripcion, imageURL });
     }
   } catch (err) {

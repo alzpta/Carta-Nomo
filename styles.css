@@ -123,6 +123,7 @@ header.appbar{
 
 /* Modales */
 .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:flex-end; justify-content:center; padding: clamp(10px,3vw,16px); z-index:1000 }
+.backdrop.is-open{ display:flex }
 .sheet{ width:min(640px,96vw); border-radius: 24px; overflow:hidden; padding:0 }
 .sheet header{ padding:16px 16px 8px }
 .sheet h2{ margin:0; font-size: clamp(1.05rem,3vw,1.25rem) }

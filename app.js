@@ -1,51 +1,22 @@
-// Importar Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { subscribeNumeros } from "./src/db.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+import { initUI } from "./src/ui.js";
+import { BASE_PATH } from "./src/config.js";
 
-// Configuración Firebase
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
   authDomain: "carta-nomo.firebaseapp.com",
   projectId: "carta-nomo",
   storageBucket: "carta-nomo.appspot.com",
   messagingSenderId: "354109744323",
-  appId: "1:354109744323:web:d7548e8cfd0aXXXXXX"
+  appId: "1:354109744323:web:d7548e8cfd0aXXXXXX",
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-let datos = {};
-subscribeNumeros(db, (nuevo) => {
-  datos = nuevo;
-});
-
-// Mostrar popup
-function mostrarPopup(numero) {
-  const titulo = `Número ${numero}`;
-  const info = datos[numero] || {};
-  const descripcion = info.palabra || "Sin descripción disponible";
-  const imgUrl =
-    info.imagenUrl || "https://via.placeholder.com/300?text=Sin+imagen";
-
-  document.getElementById("popupTitle").textContent = titulo;
-  document.getElementById("popupDesc").textContent = descripcion;
-  document.getElementById("popupImg").src = imgUrl;
-
-  document.getElementById("popupBackdrop").style.display = "flex";
-}
-
-// Cerrar popup
-document.getElementById("popupClose").addEventListener("click", () => {
-  document.getElementById("popupBackdrop").style.display = "none";
-});
-
-// Detectar clic en un número
-document.getElementById("grid").addEventListener("click", (e) => {
-  if (e.target.classList.contains("numero")) {
-    const numero = e.target.dataset.num;
-    mostrarPopup(numero);
-  }
-});
+initUI({ auth, db, storage, BASE_PATH });

@@ -74,6 +74,17 @@ export async function fetchNumberDoc(n) {
   return { id: ref.id, ...snap.data() };
 }
 
+export function speak(text) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-ES';
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  synth.speak(utterance);
+}
+
 // Click en celdas -> abrir popup
 grid?.addEventListener('click', async (e) => {
   const cell = e.target.closest('.cell');
@@ -89,4 +100,5 @@ grid?.addEventListener('click', async (e) => {
     imageURL: docData?.imageURL || ''
   });
   openView();
+  if (docData?.palabra) speak(docData.palabra);
 });

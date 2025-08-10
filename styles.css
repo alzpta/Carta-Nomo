@@ -140,4 +140,7 @@ header.appbar{
 /* ——— Ajustes popup vista ——— */
 #viewImage{ max-width:min(320px, 70vw); width:100%; height:auto }
 .admin-only{ display:flex; align-items:center }
+.popup-desc{ margin-top:10px }
+.popup-actions{ justify-content:space-between }
+.popup-admin{ display:none; gap:10px }
 

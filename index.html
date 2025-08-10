@@ -26,13 +26,13 @@
       <div class="toolbar" role="toolbar" aria-label="Acciones">
         <span id="userInfo" class="subtitle" aria-live="polite">Sesión: invitado</span>
         <button id="loginBtn" class="btn">Iniciar sesión</button>
-        <button id="logoutBtn" class="btn" style="display:none">Salir</button>
-        <button id="editarBtn" class="btn primary" style="display:none">Editar</button>
-        <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
+        <button id="logoutBtn" class="btn hidden">Salir</button>
+        <button id="editarBtn" class="btn primary hidden">Editar</button>
+        <button id="borrarBtn" class="btn danger hidden">Borrar</button>
         <!-- Botones admin -->
-        <button id="exportBtn" class="btn" style="display:none">Exportar JSON</button>
-        <button id="exportCsvBtn" class="btn" style="display:none">Exportar CSV</button>
-        <button id="importBtn" class="btn" style="display:none">Importar</button>
+        <button id="exportBtn" class="btn hidden">Exportar JSON</button>
+        <button id="exportCsvBtn" class="btn hidden">Exportar CSV</button>
+        <button id="importBtn" class="btn hidden">Importar</button>
       </div>
     </header>
 
@@ -91,7 +91,7 @@
       <div class="actions popup-actions">
         <button id="viewCloseBtn" class="btn">Cerrar</button>
         <!-- Zona admin: visible solo con sesión -->
-        <div id="viewAdminActions" class="admin-only popup-admin">
+        <div id="viewAdminActions" class="admin-only popup-admin hidden">
           <button id="viewEditBtn" class="btn primary">Editar</button>
           <button id="viewDeleteBtn" class="btn danger">Borrar</button>
         </div>

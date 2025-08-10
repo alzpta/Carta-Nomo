@@ -145,3 +145,47 @@ header.appbar{
 .popup-actions{ justify-content:space-between }
 .popup-admin{ display:none; gap:10px }
 
+
+/* Notificaciones */
+#toast-container{
+  position:fixed;
+  top:1rem;
+  right:1rem;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:2000;
+}
+.toast{
+  padding:10px 14px;
+  border-radius:var(--r);
+  border:1px solid rgba(255,255,255,.28);
+  background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+  color:var(--ink);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(16px) saturate(140%);
+  opacity:0;
+  transition:opacity .3s ease;
+  white-space:pre-wrap;
+}
+.toast.visible{opacity:1;}
+.toast.success{color:#00131f;background:linear-gradient(180deg, color-mix(in oklab, var(--tint) 85%, white), color-mix(in oklab, var(--tint) 65%, white));}
+.toast.error{color:#2b0000;background:linear-gradient(180deg, color-mix(in oklab, var(--danger) 85%, white), color-mix(in oklab, var(--danger) 65%, white));}
+
+/* Confirmación */
+.confirm-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+.confirm-modal{
+  padding:16px;
+  border-radius:var(--r-lg);
+  max-width:90vw;
+  width:320px;
+}
+.confirm-actions{padding-top:10px;}

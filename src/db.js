@@ -7,6 +7,7 @@ import {
   getDocs,
   updateDoc,
   deleteField,
+  getDoc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 import { MAX_NUMEROS } from './config.js';
@@ -33,7 +34,9 @@ export async function guardarNumero(db, storage, n, palabra, file) {
     await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
     imageURL = await getDownloadURL(ref);
   } else {
-    imageURL = null;
+    const docRef = doc(collection(db, 'numeros'), String(n));
+    const snap = await getDoc(docRef);
+    imageURL = snap.exists() ? snap.data().imageURL || null : null;
   }
   await setDoc(doc(collection(db, 'numeros'), String(n)), {
     palabra: palabra || '',

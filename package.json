@@ -6,6 +6,7 @@
   "scripts": {
     "build-sw": "node scripts/generate-app-shell.mjs",
     "build": "npm run build-sw",
-    "migrate-image-field": "node scripts/migrate-imagen-url-field.mjs"
+    "migrate-image-field": "node scripts/migrate-imagen-url-field.mjs",
+    "test": "node --test"
   }
 }

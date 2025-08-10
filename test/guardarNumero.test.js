@@ -37,11 +37,12 @@ const { guardarNumero } = context;
 test('mantiene imagen existente si no se proporciona archivo', async () => {
   const db = {};
   const storage = {};
-  store.set('1', { palabra: 'vieja', imageURL: 'existente.png', updatedAt: 0 });
+  store.set('1', { palabra: 'vieja', descripcion: 'desc vieja', imageURL: 'existente.png', updatedAt: 0 });
 
-  await guardarNumero(db, storage, 1, 'nueva', null);
+  await guardarNumero(db, storage, 1, 'nueva', 'desc nueva', null);
 
   const saved = store.get('1');
   assert.equal(saved.imageURL, 'existente.png');
   assert.equal(saved.palabra, 'nueva');
+  assert.equal(saved.descripcion, 'desc nueva');
 });

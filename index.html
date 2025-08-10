@@ -4,16 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Carta Nomo · Sarria</title>
- <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <link rel="stylesheet" href="styles.css" />
-
 </head>
 <body>
   <div class="page">
@@ -53,6 +52,8 @@
       <div class="body">
         <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" inputmode="numeric" /></div>
         <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
+        <!-- NUEVO: descripción -->
+        <div class="row"><label for="descripcion">Descripción</label><input type="text" id="descripcion" placeholder="Añade una descripción…" /></div>
         <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
       </div>
       <div class="actions">
@@ -62,18 +63,25 @@
     </div>
   </div>
 
-  <!-- Sheet login -->
-  <div id="loginBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- NUEVO: Popup de vista (detalle número) -->
+  <div id="viewBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="glass sheet" role="document">
-      <header><h2>Acceso administrador</h2></header>
+      <header>
+        <h2 id="viewTitle">—</h2>
+      </header>
+
       <div class="body">
-        <div class="row"><label for="loginEmail">Email</label><input type="email" id="loginEmail" placeholder="tu@correo.com" autocomplete="username" /></div>
-        <div class="row"><label for="loginPass">Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" /></div>
-        <p class="subtitle">La edición requiere sesión. La visualización es pública.</p>
+        <img id="viewImage" class="preview" alt="" />
+        <p id="viewDesc" class="subtitle" style="margin-top:10px"></p>
       </div>
-      <div class="actions">
-        <button id="loginCancel" class="btn">Cancelar</button>
-        <button id="loginSubmit" class="btn primary">Entrar</button>
+
+      <div class="actions" style="justify-content:space-between">
+        <button id="viewCloseBtn" class="btn">Cerrar</button>
+        <!-- Zona admin: visible solo con sesión -->
+        <div id="viewAdminActions" class="admin-only" style="display:none; gap:10px">
+          <button id="viewEditBtn" class="btn primary">Editar</button>
+          <button id="viewDeleteBtn" class="btn danger">Borrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -81,4 +89,5 @@
   <script type="module" src="app.js"></script>
 </body>
 </html>
+
 

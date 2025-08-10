@@ -136,7 +136,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
   //     );
   //     const palabra = (palabraInput.value || '').trim();
   //     const file = imagenInput.files?.[0] || null;
-  //     await guardarNumero(db, storage, n, palabra, file);
+  //     await guardarNumero(db, storage, n, palabra, descripcion, file);
   //     seleccionado = n;
   //     pintarSeleccion();
   //     closeEdit();

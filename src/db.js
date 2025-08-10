@@ -20,13 +20,14 @@ export const subscribeNumeros = (db, callback) =>
       if (!isNaN(n))
         nuevo[n] = {
           palabra: d.data().palabra || '',
+          descripcion: d.data().descripcion || '',
           imageURL: d.data().imageURL || null,
         };
     });
     callback(nuevo);
   });
 
-export async function guardarNumero(db, storage, n, palabra, file) {
+export async function guardarNumero(db, storage, n, palabra, descripcion, file) {
   let imageURL = null;
   if (file) {
     const ref = storageRef(storage, `imagenes/${n}`);
@@ -40,6 +41,7 @@ export async function guardarNumero(db, storage, n, palabra, file) {
   }
   await setDoc(doc(collection(db, 'numeros'), String(n)), {
     palabra: palabra || '',
+    descripcion: descripcion || '',
     imageURL: imageURL || null,
     updatedAt: Date.now(),
   });
@@ -73,6 +75,7 @@ export async function importarArchivo(db, file) {
     ops.push(
       setDoc(doc(collection(db, 'numeros'), String(n)), {
         palabra: typeof v?.palabra === 'string' ? v.palabra : '',
+        descripcion: typeof v?.descripcion === 'string' ? v.descripcion : '',
         imageURL: typeof v?.imageURL === 'string' ? v.imageURL : null,
         updatedAt: Date.now(),
       })

@@ -38,6 +38,11 @@
       <div id="grid" class="grid" role="grid" aria-describedby="gridHelp"></div>
       <p id="gridHelp" class="subtitle" style="padding: 6px 6px 0">Consejo: usa ← → para moverte, Enter para escuchar.</p>
       <div id="output" aria-live="polite" aria-atomic="true"></div>
+      <div id="importProgress" class="hidden">
+        <progress id="importProgressBar" value="0" max="100" style="width:100%"></progress>
+        <p id="importProgressText" class="subtitle" style="text-align:center">0%</p>
+      </div>
+      <p id="importSummary" class="subtitle" aria-live="polite"></p>
     </section>
   </div>
 

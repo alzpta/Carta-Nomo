@@ -32,7 +32,9 @@
         <button id="logoutBtn" class="btn" style="display:none">Salir</button>
         <button id="editarBtn" class="btn primary" style="display:none">Editar</button>
         <button id="borrarBtn" class="btn danger" style="display:none">Borrar</button>
-        <button id="exportBtn" class="btn" style="display:none">Exportar</button>
+        <!-- Botones admin -->
+        <button id="exportBtn" class="btn" style="display:none">Exportar JSON</button>
+        <button id="exportCsvBtn" class="btn" style="display:none">Exportar CSV</button>
         <button id="importBtn" class="btn" style="display:none">Importar</button>
       </div>
     </header>
@@ -52,7 +54,6 @@
       <div class="body">
         <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" inputmode="numeric" /></div>
         <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
-        <!-- NUEVO: descripción -->
         <div class="row"><label for="descripcion">Descripción</label><input type="text" id="descripcion" placeholder="Añade una descripción…" /></div>
         <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
       </div>
@@ -63,7 +64,7 @@
     </div>
   </div>
 
-  <!-- NUEVO: Popup de vista (detalle número) -->
+  <!-- Popup de vista (detalle número) -->
   <div id="viewBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="glass sheet" role="document">
       <header>

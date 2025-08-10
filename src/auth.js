@@ -31,13 +31,13 @@ export function initAuth(auth, elements) {
 
   const renderAuthUI = (user) => {
     const on = !!user;
-    editarBtn.classList.toggle('hidden', !on);
-    borrarBtn.classList.toggle('hidden', !on);
-    exportBtn.classList.toggle('hidden', !on);
-    importBtn.classList.toggle('hidden', !on);
-    logoutBtn.classList.toggle('hidden', !on);
-    loginBtn.classList.toggle('hidden', on);
-    userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
+    editarBtn?.classList.toggle('hidden', !on);
+    borrarBtn?.classList.toggle('hidden', !on);
+    exportBtn?.classList.toggle('hidden', !on);
+    importBtn?.classList.toggle('hidden', !on);
+    logoutBtn?.classList.toggle('hidden', !on);
+    loginBtn?.classList.toggle('hidden', on);
+    if (userInfo) userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
   };
   onAuthStateChanged(auth, renderAuthUI);
 
@@ -57,12 +57,12 @@ export function initAuth(auth, elements) {
     document.body.style.overflow = '';
   };
 
-  loginBtn.onclick = openLogin;
-  loginCancel.onclick = closeLogin;
-  loginBackdrop.addEventListener('click', (e) => {
+  loginBtn?.addEventListener('click', openLogin);
+  loginCancel?.addEventListener('click', closeLogin);
+  loginBackdrop?.addEventListener('click', (e) => {
     if (e.target === loginBackdrop) closeLogin();
   });
-  loginSubmit.onclick = async () => {
+  loginSubmit?.addEventListener('click', async () => {
     clearErrors();
 
     const email = (loginEmail.value || '').trim();
@@ -87,7 +87,7 @@ export function initAuth(auth, elements) {
     loginSubmit.disabled = true;
     try {
       await signInWithEmailAndPassword(auth, email, pass);
-      closeLogin();
+      window.location.href = 'admin.html';
     } catch (e) {
       const code = e?.code || '';
       if (code === 'auth/invalid-email' || code === 'auth/user-not-found' || code === 'auth/user-disabled') {
@@ -100,8 +100,8 @@ export function initAuth(auth, elements) {
     } finally {
       loginSubmit.disabled = false;
     }
-  };
-  logoutBtn.onclick = () => signOut(auth);
+  });
+  logoutBtn?.addEventListener('click', () => signOut(auth));
 
   return { openLogin, closeLogin };
 }

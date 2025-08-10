@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Carta Nomo · Sarria</title>
+  <title>Admin · Carta Nomo</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -19,13 +19,17 @@
           <path d="M12 2c-2.5 0-4.5 2-4.5 4.5S9.5 11 12 11s4.5-2 4.5-4.5S14.5 2 12 2Zm0 10c-4.4 0-8 2.2-8 5v1.5c0 .8.7 1.5 1.5 1.5h13c.8 0 1.5-.7 1.5-1.5V17c0-2.8-3.6-5-8-5Z" fill="currentColor" opacity=".9"/>
         </svg>
         <div>
-          <h1>Carta Nomo · Sarria</h1>
-          <p class="subtitle">Toca un número para ver y escuchar. Azul = libre/no existe en menú.</p>
+          <h1>Administración</h1>
+          <p class="subtitle">Gestiona números y contenidos.</p>
         </div>
       </div>
       <div class="toolbar" role="toolbar" aria-label="Acciones">
-        <span id="userInfo" class="subtitle" aria-live="polite">Sesión: invitado</span>
-        <button id="loginBtn" class="btn">Iniciar sesión</button>
+        <span id="userInfo" class="subtitle" aria-live="polite">Sesión: —</span>
+        <a href="index.html" class="btn">Vista pública</a>
+        <button id="logoutBtn" class="btn">Salir</button>
+        <button id="exportBtn" class="btn">Exportar JSON</button>
+        <button id="exportCsvBtn" class="btn">Exportar CSV</button>
+        <button id="importBtn" class="btn">Importar</button>
       </div>
     </header>
 
@@ -37,25 +41,19 @@
     </section>
   </div>
 
-  <!-- Modal inicio de sesión -->
-  <div id="loginBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- Sheet edición -->
+  <div id="editBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="glass sheet" role="document">
-      <header><h2>Iniciar sesión</h2></header>
+      <header><h2>Editar número</h2></header>
       <div class="body">
-        <div class="row">
-          <label for="loginEmail">Correo</label>
-          <input type="email" id="loginEmail" required aria-invalid="false" />
-          <div id="loginEmailError" class="error" aria-live="polite"></div>
-        </div>
-        <div class="row">
-          <label for="loginPass">Contraseña</label>
-          <input type="password" id="loginPass" required aria-invalid="false" />
-          <div id="loginPassError" class="error" aria-live="polite"></div>
-        </div>
+        <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" inputmode="numeric" /></div>
+        <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
+        <div class="row"><label for="descripcion">Descripción</label><input type="text" id="descripcion" placeholder="Añade una descripción…" /></div>
+        <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
       </div>
       <div class="actions">
-        <button id="loginCancel" class="btn">Cancelar</button>
-        <button id="loginSubmit" class="btn primary">Entrar</button>
+        <button id="cancelarBtn" class="btn">Cancelar</button>
+        <button id="guardarBtn" class="btn primary">Guardar</button>
       </div>
     </div>
   </div>
@@ -74,12 +72,15 @@
 
       <div class="actions popup-actions">
         <button id="viewCloseBtn" class="btn">Cerrar</button>
+        <div id="viewAdminActions" class="admin-only popup-admin">
+          <button id="viewEditBtn" class="btn primary">Editar</button>
+          <button id="viewDeleteBtn" class="btn danger">Borrar</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script type="module" src="app.js"></script>
+  <script type="module" src="src/admin.js"></script>
 </body>
 </html>
-
-

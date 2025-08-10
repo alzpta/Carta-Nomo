@@ -40,7 +40,12 @@ export async function borrarNumero(db, storage, n) {
     console.error(e);
     throw e;
   }
-  await deleteDoc(doc(collection(db, 'numeros'), String(n)));
+  try {
+    await deleteDoc(doc(collection(db, 'numeros'), String(n)));
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 }
 
 export function exportarDatos(datos) {

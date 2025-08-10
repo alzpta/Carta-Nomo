@@ -11,6 +11,7 @@ let viewTitle = document.getElementById('viewTitle');
 const viewImage = document.getElementById('viewImage');
 let viewDesc = document.getElementById('viewDesc');
 const viewCloseBtn = document.getElementById('viewCloseBtn');
+const viewSpeakBtn = document.getElementById('viewSpeakBtn');
 
 function ensureViewNodes() {
   if (!viewTitle) {
@@ -77,11 +78,26 @@ function getCurrentData() {
   };
 }
 
+function speakDesc() {
+  if (!currentDescripcion) return;
+  try {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(currentDescripcion);
+    u.lang = 'es-ES';
+    u.rate = 1;
+    u.pitch = 1;
+    synth.speak(u);
+  } catch {}
+}
+
 // Eventos internos de cierre
 viewBackdrop?.addEventListener('click', (e) => {
   if (e.target === viewBackdrop) closeView();
 });
 viewCloseBtn?.addEventListener('click', closeView);
+viewSpeakBtn?.addEventListener('click', speakDesc);
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeView();
 });

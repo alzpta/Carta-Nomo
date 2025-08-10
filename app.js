@@ -32,9 +32,8 @@ const addLink = (rel, href) => {
   link.href = href;
   document.head.appendChild(link);
 };
-addLink('manifest', `${BASE_PATH}/manifest.json`);
-addLink('apple-touch-icon', `${BASE_PATH}/icons/icon-192.png`);
-addLink('icon', `${BASE_PATH}/favicon.ico`);
+addLink('apple-touch-icon', `${BASE_PATH}/icons/apple-touch-icon.png`);
+addLink('icon', `${BASE_PATH}/icons/favicon-32x32.png`);
 
 // Firebase
 const firebaseConfig = {

@@ -57,7 +57,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
 
   const tieneDatos = (n) => {
     const d = datos[n];
-    return !!(d && ((d.palabra && d.palabra.trim()) || d.imagenUrl));
+    return !!(d && ((d.palabra && d.palabra.trim()) || d.imageURL));
   };
   const refrescarCeldasVacias = () => {
     [...grid.children].forEach((el, ix) =>
@@ -75,11 +75,11 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     const strong = document.createElement('strong');
     strong.textContent = `Número ${i}:`;
     output.append(strong, ' ', d?.palabra ?? '(sin datos)');
-    if (d?.imagenUrl) {
+    if (d?.imageURL) {
       const imgWrapper = document.createElement('div');
       const img = document.createElement('img');
       img.className = 'preview';
-      img.src = d.imagenUrl;
+      img.src = d.imageURL;
       img.loading = 'lazy';
       img.referrerPolicy = 'no-referrer';
       img.alt = d?.palabra

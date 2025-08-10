@@ -1,4 +1,13 @@
-import { collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import {
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+  getDocs,
+  updateDoc,
+  deleteField,
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 import { MAX_NUMEROS } from './config.js';
 
@@ -10,25 +19,25 @@ export const subscribeNumeros = (db, callback) =>
       if (!isNaN(n))
         nuevo[n] = {
           palabra: d.data().palabra || '',
-          imagenUrl: d.data().imagenUrl || null,
+          imageURL: d.data().imageURL || null,
         };
     });
     callback(nuevo);
   });
 
 export async function guardarNumero(db, storage, n, palabra, file) {
-  let imagenUrl = null;
+  let imageURL = null;
   if (file) {
     const ref = storageRef(storage, `imagenes/${n}`);
     const bytes = new Uint8Array(await file.arrayBuffer());
     await uploadBytes(ref, bytes, { contentType: file.type || 'image/png' });
-    imagenUrl = await getDownloadURL(ref);
+    imageURL = await getDownloadURL(ref);
   } else {
-    imagenUrl = null;
+    imageURL = null;
   }
   await setDoc(doc(collection(db, 'numeros'), String(n)), {
     palabra: palabra || '',
-    imagenUrl: imagenUrl || null,
+    imageURL: imageURL || null,
     updatedAt: Date.now(),
   });
 }
@@ -61,10 +70,27 @@ export async function importarArchivo(db, file) {
     ops.push(
       setDoc(doc(collection(db, 'numeros'), String(n)), {
         palabra: typeof v?.palabra === 'string' ? v.palabra : '',
-        imagenUrl: typeof v?.imagenUrl === 'string' ? v.imagenUrl : null,
+        imageURL: typeof v?.imageURL === 'string' ? v.imageURL : null,
         updatedAt: Date.now(),
       })
     );
   }
+  await Promise.all(ops);
+}
+
+export async function migrateImagenUrlField(db) {
+  const snap = await getDocs(collection(db, 'numeros'));
+  const ops = [];
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    if (typeof data.imagenUrl === 'string' && !data.imageURL) {
+      ops.push(
+        updateDoc(d.ref, {
+          imageURL: data.imagenUrl,
+          imagenUrl: deleteField(),
+        })
+      );
+    }
+  });
   await Promise.all(ops);
 }

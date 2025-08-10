@@ -5,6 +5,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 import { initAuth } from "./src/auth.js";
 import { renderView, openView } from "./src/viewPopup.js";
+import { subscribeNumeros } from "./src/db.js";
 
 // Helpers para manifest/iconos según BASE_PATH
 const addLink = (rel, href) => {
@@ -57,6 +58,13 @@ if (grid) {
     btn.textContent = String(i);
     grid.appendChild(btn);
   }
+
+  subscribeNumeros(db, (datos) => {
+    for (let i = 1; i <= MAX_NUMEROS; i++) {
+      const btn = grid.children[i - 1];
+      if (btn) btn.classList.toggle('empty', !datos[i]);
+    }
+  });
 }
 
 export async function fetchNumberDoc(n) {

@@ -16,6 +16,19 @@ export function initAuth(auth, elements) {
     loginCancel
   } = elements;
 
+  const loginEmailError = document.getElementById('loginEmailError');
+  const loginPassError = document.getElementById('loginPassError');
+
+  const setError = (input, errorEl, message) => {
+    if (errorEl) errorEl.textContent = message || '';
+    if (input) input.setAttribute('aria-invalid', message ? 'true' : 'false');
+  };
+
+  const clearErrors = () => {
+    setError(loginEmail, loginEmailError, '');
+    setError(loginPass, loginPassError, '');
+  };
+
   const renderAuthUI = (user) => {
     const on = !!user;
     editarBtn.classList.toggle('hidden', !on);
@@ -31,6 +44,8 @@ export function initAuth(auth, elements) {
   const openLogin = () => {
     loginEmail.value = '';
     loginPass.value = '';
+    clearErrors();
+    loginSubmit.disabled = false;
     loginBackdrop.style.display = 'flex';
     loginBackdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -48,11 +63,42 @@ export function initAuth(auth, elements) {
     if (e.target === loginBackdrop) closeLogin();
   });
   loginSubmit.onclick = async () => {
+    clearErrors();
+
+    const email = (loginEmail.value || '').trim();
+    const pass = loginPass.value || '';
+    let hasError = false;
+
+    if (!email) {
+      setError(loginEmail, loginEmailError, 'El correo es obligatorio.');
+      hasError = true;
+    } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      setError(loginEmail, loginEmailError, 'Correo no válido.');
+      hasError = true;
+    }
+
+    if (!pass) {
+      setError(loginPass, loginPassError, 'La contraseña es obligatoria.');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    loginSubmit.disabled = true;
     try {
-      await signInWithEmailAndPassword(auth, (loginEmail.value || '').trim(), loginPass.value || '');
+      await signInWithEmailAndPassword(auth, email, pass);
       closeLogin();
     } catch (e) {
-      alert('No se pudo iniciar sesión: ' + (e?.message || e));
+      const code = e?.code || '';
+      if (code === 'auth/invalid-email' || code === 'auth/user-not-found' || code === 'auth/user-disabled') {
+        setError(loginEmail, loginEmailError, 'Correo no válido o usuario inexistente.');
+      } else if (code === 'auth/wrong-password') {
+        setError(loginPass, loginPassError, 'Contraseña incorrecta.');
+      } else {
+        setError(loginPass, loginPassError, e?.message || 'Error al iniciar sesión.');
+      }
+    } finally {
+      loginSubmit.disabled = false;
     }
   };
   logoutBtn.onclick = () => signOut(auth);

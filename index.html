@@ -49,8 +49,16 @@
     <div class="glass sheet" role="document">
       <header><h2>Iniciar sesión</h2></header>
       <div class="body">
-        <div class="row"><label for="loginEmail">Correo</label><input type="email" id="loginEmail" /></div>
-        <div class="row"><label for="loginPass">Contraseña</label><input type="password" id="loginPass" /></div>
+        <div class="row">
+          <label for="loginEmail">Correo</label>
+          <input type="email" id="loginEmail" required aria-invalid="false" />
+          <div id="loginEmailError" class="error" aria-live="polite"></div>
+        </div>
+        <div class="row">
+          <label for="loginPass">Contraseña</label>
+          <input type="password" id="loginPass" required aria-invalid="false" />
+          <div id="loginPassError" class="error" aria-live="polite"></div>
+        </div>
       </div>
       <div class="actions">
         <button id="loginCancel" class="btn">Cancelar</button>

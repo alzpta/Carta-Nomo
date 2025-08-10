@@ -80,6 +80,7 @@ const imagenInput = document.getElementById('imagen');
 
 // Botones toolbar (export/import)
 const exportBtn = document.getElementById('exportBtn');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
 const importBtn = document.getElementById('importBtn');
 
 let currentNumberSelected = null;
@@ -89,8 +90,9 @@ onAuthStateChanged(auth, (user) => {
   isAdmin = !!user;
   // Zona admin en el popup
   if (viewAdminActions) viewAdminActions.style.display = isAdmin ? 'flex' : 'none';
-  // Export/Import visibles solo para admin
+  // Botones admin
   if (exportBtn) exportBtn.style.display = isAdmin ? '' : 'none';
+  if (exportCsvBtn) exportCsvBtn.style.display = isAdmin ? '' : 'none';
   if (importBtn) importBtn.style.display = isAdmin ? '' : 'none';
 });
 
@@ -223,7 +225,7 @@ guardarBtn?.addEventListener('click', async () => {
 });
 
 // ————————————————————————————————————————————————
-// EXPORTAR (JSON con palabra, descripcion, imageURL)
+// EXPORTAR JSON
 // ————————————————————————————————————————————————
 exportBtn?.addEventListener('click', async () => {
   try {
@@ -263,12 +265,62 @@ exportBtn?.addEventListener('click', async () => {
 });
 
 // ————————————————————————————————————————————————
-// IMPORTAR (desde JSON con items[])
+// EXPORTAR CSV (id;palabra;descripcion;imageURL) con BOM para Excel
+// ————————————————————————————————————————————————
+exportCsvBtn?.addEventListener('click', async () => {
+  try {
+    if (!isAdmin) return alert('Solo disponible para administradores.');
+
+    const q = query(collection(db, 'numeros'), orderBy('__name__'));
+    const snap = await getDocs(q);
+
+    const sep = ';';
+    const esc = (v) => {
+      const s = (v ?? '').toString();
+      if (/[;\n\r"]/u.test(s)) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
+
+    const rows = [['id','palabra','descripcion','imageURL']];
+    snap.forEach(d => {
+      const data = d.data() || {};
+      rows.push([
+        d.id,
+        data.palabra || '',
+        data.descripcion || '',
+        data.imageURL || ''
+      ]);
+    });
+
+    const csv = rows.map(r => r.map(esc).join(sep)).join('\r\n');
+    const blob = new Blob(
+      [new Uint8Array([0xEF,0xBB,0xBF]), csv], // BOM UTF-8
+      { type: 'text/csv;charset=utf-8' }
+    );
+
+    const pad2 = (x) => String(x).padStart(2,'0');
+    const now = new Date();
+    const fname = `carta-nomo-export-${now.getFullYear()}${pad2(now.getMonth()+1)}${pad2(now.getDate())}-${pad2(now.getHours())}${pad2(now.getMinutes())}.csv`;
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    console.error(err);
+    alert('Error al exportar CSV. Revisa la consola.');
+  }
+});
+
+// ————————————————————————————————————————————————
+// IMPORTAR JSON
 // ————————————————————————————————————————————————
 (function setupImport() {
   if (!importBtn) return;
 
-  // input de archivo oculto
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = 'application/json';
@@ -277,7 +329,7 @@ exportBtn?.addEventListener('click', async () => {
 
   importBtn.addEventListener('click', () => {
     if (!isAdmin) return alert('Solo disponible para administradores.');
-    fileInput.value = ''; // reset
+    fileInput.value = '';
     fileInput.click();
   });
 
@@ -314,7 +366,6 @@ exportBtn?.addEventListener('click', async () => {
 
       alert(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`);
 
-      // Si el popup está abierto sobre un id importado, refrescar
       if (currentNumberSelected) {
         const refreshed = await fetchNumberDoc(currentNumberSelected);
         if (refreshed) {

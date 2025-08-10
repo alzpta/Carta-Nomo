@@ -7,12 +7,27 @@ let currentDescripcion = '';
 let currentImageURL = '';
 
 const viewBackdrop = document.getElementById('viewBackdrop');
-const viewTitle = document.getElementById('viewTitle');
+let viewTitle = document.getElementById('viewTitle');
 const viewImage = document.getElementById('viewImage');
-const viewDesc = document.getElementById('viewDesc');
+let viewDesc = document.getElementById('viewDesc');
 const viewCloseBtn = document.getElementById('viewCloseBtn');
 
+function ensureViewNodes() {
+  if (!viewTitle) {
+    viewTitle = document.createElement('h2');
+    viewTitle.id = 'viewTitle';
+    viewBackdrop.querySelector('header')?.appendChild(viewTitle);
+  }
+  if (!viewDesc) {
+    viewDesc = document.createElement('p');
+    viewDesc.id = 'viewDesc';
+    viewDesc.className = 'subtitle popup-desc';
+    viewBackdrop.querySelector('.body')?.appendChild(viewDesc);
+  }
+}
+
 function openView() {
+  ensureViewNodes();
   viewBackdrop.classList.add('is-open');
   viewBackdrop.removeAttribute('aria-hidden');
   viewCloseBtn?.focus();
@@ -25,6 +40,7 @@ function closeView() {
 }
 
 function renderView({ n, palabra, descripcion, imageURL }) {
+  ensureViewNodes();
   currentNumber = n;
   currentPalabra = palabra || '';
   currentDescripcion = descripcion || '';

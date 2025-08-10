@@ -27,6 +27,40 @@ export const BASE_PATH = '/Carta-Nomo';
 
 Ajusta `BASE_PATH` según el entorno y los enlaces del manifiesto, iconos y Service Worker se actualizarán en consecuencia.
 
+## 🔑 Configuración de Firebase
+
+Las credenciales de Firebase no se incluyen en el repositorio. En producción debes proporcionarlas mediante variables de entorno o un archivo `firebaseConfig.json` ubicado junto a `index.html`.
+
+### Variables de entorno
+
+Antes de construir o ejecutar la app define estas variables:
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
+- `FIREBASE_MEASUREMENT_ID`
+
+### Archivo `firebaseConfig.json`
+
+Si no usas variables de entorno, crea un archivo con la misma estructura que el objeto de configuración de Firebase y colócalo en la raíz pública del despliegue (mismo directorio que `index.html`). Ejemplo:
+
+```json
+{
+  "apiKey": "...",
+  "authDomain": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "...",
+  "measurementId": "..."
+}
+```
+
+No añadas este archivo al control de versiones.
+
 ## 🛠️ Generar el precache
 
 `service-worker.js` precarga archivos listados en `APP_SHELL`. Para mantener esta lista al día se incluye una tarea de build que la genera automáticamente a partir del contenido del directorio.

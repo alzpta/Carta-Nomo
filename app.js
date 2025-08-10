@@ -24,6 +24,14 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 import { initUI } from "./src/ui.js";
+import {
+  renderView,
+  openView,
+  closeView,
+  getCurrentNumber,
+  isViewOpen,
+  getCurrentData
+} from "./src/viewPopup.js";
 
 // Helpers para manifest/iconos según BASE_PATH
 const addLink = (rel, href) => {
@@ -59,12 +67,6 @@ initUI({ auth, db, storage, BASE_PATH });
 // ————————————————————————————————————————————————
 const grid = document.getElementById('grid');
 
-// Popup de Vista (detalle)
-const viewBackdrop = document.getElementById('viewBackdrop');
-const viewTitle = document.getElementById('viewTitle');
-const viewImage = document.getElementById('viewImage');
-const viewDesc  = document.getElementById('viewDesc');
-const viewCloseBtn = document.getElementById('viewCloseBtn');
 const viewAdminActions = document.getElementById('viewAdminActions');
 const viewEditBtn = document.getElementById('viewEditBtn');
 const viewDeleteBtn = document.getElementById('viewDeleteBtn');
@@ -81,8 +83,6 @@ const imagenInput = document.getElementById('imagen');
 const exportBtn = document.getElementById('exportBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const importBtn = document.getElementById('importBtn');
-
-let currentNumberSelected = null;
 let isAdmin = false;
 
 onAuthStateChanged(auth, (user) => {
@@ -110,40 +110,8 @@ async function upsertNumberDoc(n, { palabra, descripcion, imageURL }) {
 }
 
 // ————————————————————————————————————————————————
-// Popup de vista
-// ————————————————————————————————————————————————
-function openView() {
-  viewBackdrop.classList.add('is-open');
-  viewBackdrop.removeAttribute('aria-hidden');
-  viewCloseBtn?.focus();
-}
-function closeView() {
-  viewBackdrop.classList.remove('is-open');
-  viewBackdrop.setAttribute('aria-hidden', 'true');
-  currentNumberSelected = null;
-}
-viewBackdrop?.addEventListener('click', (e) => { if (e.target === viewBackdrop) closeView(); });
-viewCloseBtn?.addEventListener('click', closeView);
-window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeView(); });
-
-function renderView({ n, palabra, descripcion, imageURL }) {
-  currentNumberSelected = n;
-  viewTitle.textContent = `${n}. ${palabra || '—'}`;
-  viewDesc.textContent = descripcion || '—';
-
-  if (imageURL) {
-    viewImage.src = imageURL;
-    viewImage.alt = palabra ? `Imagen de ${palabra}` : `Imagen del número ${n}`;
-    viewImage.style.display = '';
-  } else {
-    viewImage.removeAttribute('src');
-    viewImage.alt = '';
-    viewImage.style.display = 'none';
-  }
-  openView();
-}
-
 // Click en celdas -> abrir popup
+// ————————————————————————————————————————————————
 grid?.addEventListener('click', async (e) => {
   const cell = e.target.closest('.cell');
   if (!cell) return;
@@ -157,23 +125,25 @@ grid?.addEventListener('click', async (e) => {
     descripcion: docData?.descripcion || '',
     imageURL: docData?.imageURL || ''
   });
+  openView();
 });
 
 // Editar desde popup -> abre sheet con datos actuales
 viewEditBtn?.addEventListener('click', () => {
-  if (!isAdmin || !currentNumberSelected) return;
-  numSelInput.value = currentNumberSelected;
-  // Extrae palabra del título "N. palabra"
-  palabraInput.value = viewTitle.textContent.split('. ').slice(1).join('. ') || '';
-  descInput.value = viewDesc.textContent || '';
+  const current = getCurrentNumber();
+  if (!isAdmin || !current) return;
+  const { palabra, descripcion } = getCurrentData();
+  numSelInput.value = current;
+  palabraInput.value = palabra || '';
+  descInput.value = descripcion || '';
   editBackdrop.classList.add('is-open');
   editBackdrop.removeAttribute('aria-hidden');
 });
 
 // Borrar desde popup
 viewDeleteBtn?.addEventListener('click', async () => {
-  if (!isAdmin || !currentNumberSelected) return;
-  const n = currentNumberSelected;
+  const n = getCurrentNumber();
+  if (!isAdmin || !n) return;
   if (!confirm(`¿Borrar el número ${n}? Esta acción no se puede deshacer.`)) return;
   await deleteDoc(doc(db, 'numeros', String(n)));
   closeView();
@@ -214,8 +184,9 @@ guardarBtn?.addEventListener('click', async () => {
     editBackdrop.setAttribute('aria-hidden', 'true');
 
     // Si el popup mostraba este número, refrescar su contenido
-    if (currentNumberSelected === Number(n) && viewBackdrop.classList.contains('is-open')) {
+    if (isViewOpen() && getCurrentNumber() === Number(n)) {
       renderView({ n: Number(n), palabra, descripcion, imageURL });
+      openView();
     }
   } catch (err) {
     console.error(err);
@@ -365,8 +336,8 @@ exportCsvBtn?.addEventListener('click', async () => {
 
       alert(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`);
 
-      if (currentNumberSelected) {
-        const refreshed = await fetchNumberDoc(currentNumberSelected);
+      if (getCurrentNumber()) {
+        const refreshed = await fetchNumberDoc(getCurrentNumber());
         if (refreshed) {
           renderView({
             n: Number(refreshed.id),
@@ -374,6 +345,7 @@ exportCsvBtn?.addEventListener('click', async () => {
             descripcion: refreshed.descripcion || '',
             imageURL: refreshed.imageURL || ''
           });
+          openView();
         }
       }
     } catch (err) {

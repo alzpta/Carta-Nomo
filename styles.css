@@ -137,6 +137,7 @@ header.appbar{
 @media (min-width:1280px){ :root{ --cell-min: 86px } }
 @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
 
-/* ——— NUEVO: ajuste popup vista ——— */
+/* ——— Ajustes popup vista ——— */
 #viewImage{ max-width:min(320px, 70vw); width:100%; height:auto }
 .admin-only{ display:flex; align-items:center }
+

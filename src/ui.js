@@ -152,6 +152,7 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     try {
       await borrarNumero(db, storage, n);
     } catch (e) {
+      console.error(e);
       alert('No se pudo borrar: ' + (e?.message || e));
     }
   };

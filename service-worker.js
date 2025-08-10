@@ -4,6 +4,13 @@ const VERSION = 'v1.0.0';
 const CACHE_NAME = `carta-nomo-${VERSION}`;
 const APP_SHELL = [
   `${BASE_PATH}/`,
+  `${BASE_PATH}/app.js`,
+  `${BASE_PATH}/icons/android-chrome-192x192.png`,
+  `${BASE_PATH}/icons/android-chrome-512x512.png`,
+  `${BASE_PATH}/icons/apple-touch-icon.png`,
+  `${BASE_PATH}/icons/favicon-16x16.png`,
+  `${BASE_PATH}/icons/favicon-32x32.png`,
+  `${BASE_PATH}/icons/gitkeep.txt`,
   `${BASE_PATH}/icons/icon-192.png`,
   `${BASE_PATH}/icons/icon-512.png`,
   `${BASE_PATH}/index.html`,

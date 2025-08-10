@@ -1,5 +1,5 @@
 import { initAuth } from './auth.js';
-import { guardarNumero, borrarNumero, exportarDatos, importarArchivo, subscribeNumeros } from './db.js';
+import { borrarNumero, subscribeNumeros } from './db.js';
 import { MAX_NUMEROS } from './config.js';
 
 export function initUI({ auth, db, storage, BASE_PATH }) {
@@ -127,22 +127,23 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     imagenInput.value = '';
   };
 
-  guardarBtn.onclick = async () => {
-    try {
-      const n = Math.max(
-        1,
-        Math.min(MAX_NUMEROS, parseInt(numSel.value || '1', 10))
-      );
-      const palabra = (palabraInput.value || '').trim();
-      const file = imagenInput.files?.[0] || null;
-      await guardarNumero(db, storage, n, palabra, file);
-      seleccionado = n;
-      pintarSeleccion();
-      closeEdit();
-    } catch (e) {
-      alert('Error al guardar: ' + (e?.message || e));
-    }
-  };
+  // Handler de guardado desactivado: la lógica se gestiona ahora en app.js
+  // guardarBtn.onclick = async () => {
+  //   try {
+  //     const n = Math.max(
+  //       1,
+  //       Math.min(MAX_NUMEROS, parseInt(numSel.value || '1', 10))
+  //     );
+  //     const palabra = (palabraInput.value || '').trim();
+  //     const file = imagenInput.files?.[0] || null;
+  //     await guardarNumero(db, storage, n, palabra, file);
+  //     seleccionado = n;
+  //     pintarSeleccion();
+  //     closeEdit();
+  //   } catch (e) {
+  //     alert('Error al guardar: ' + (e?.message || e));
+  //   }
+  // };
 
   borrarBtn.onclick = async () => {
     if (!auth.currentUser)
@@ -156,29 +157,30 @@ export function initUI({ auth, db, storage, BASE_PATH }) {
     }
   };
 
-  exportBtn.onclick = () => {
-    if (!auth.currentUser) return alert('Inicia sesión.');
-    exportarDatos(datos);
-  };
-  importBtn.onclick = () => {
-    if (!auth.currentUser) return alert('Inicia sesión.');
-    const inp = document.createElement('input');
-    inp.type = 'file';
-    inp.accept = 'application/json';
-    inp.onchange = async () => {
-      const f = inp.files?.[0];
-      if (!f) return;
-      try {
-        await importarArchivo(db, f);
-        alert('Importación completada.');
-      } catch (e) {
-        alert('JSON no válido: ' + (e?.message || e));
-      }
-    };
-    document.body.appendChild(inp);
-    inp.click();
-    inp.remove();
-  };
+  // Handlers de exportación e importación movidos a app.js
+  // exportBtn.onclick = () => {
+  //   if (!auth.currentUser) return alert('Inicia sesión.');
+  //   exportarDatos(datos);
+  // };
+  // importBtn.onclick = () => {
+  //   if (!auth.currentUser) return alert('Inicia sesión.');
+  //   const inp = document.createElement('input');
+  //   inp.type = 'file';
+  //   inp.accept = 'application/json';
+  //   inp.onchange = async () => {
+  //     const f = inp.files?.[0];
+  //     if (!f) return;
+  //     try {
+  //       await importarArchivo(db, f);
+  //       alert('Importación completada.');
+  //     } catch (e) {
+  //       alert('JSON no válido: ' + (e?.message || e));
+  //     }
+  //   };
+  //   document.body.appendChild(inp);
+  //   inp.click();
+  //   inp.remove();
+  // };
 
   subscribeNumeros(db, (nuevo) => {
     datos = nuevo;

@@ -1,4 +1,4 @@
-import { BASE_PATH } from "./src/config.js";
+import { BASE_PATH, MAX_NUMEROS } from "./src/config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -48,6 +48,16 @@ initAuth(auth, {
 });
 
 const grid = document.getElementById('grid');
+
+if (grid) {
+  for (let i = 1; i <= MAX_NUMEROS; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'cell';
+    btn.dataset.n = String(i);
+    btn.textContent = String(i);
+    grid.appendChild(btn);
+  }
+}
 
 export async function fetchNumberDoc(n) {
   const ref = doc(db, 'numeros', String(n));

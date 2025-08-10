@@ -37,6 +37,10 @@ const cancelarBtn = document.getElementById('cancelarBtn');
 const exportBtn = document.getElementById('exportBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const importBtn = document.getElementById('importBtn');
+const importProgress = document.getElementById('importProgress');
+const importProgressBar = document.getElementById('importProgressBar');
+const importProgressText = document.getElementById('importProgressText');
+const importSummary = document.getElementById('importSummary');
 let isAdmin = false;
 
 onAuthStateChanged(auth, (user) => {
@@ -269,8 +273,17 @@ exportCsvBtn?.addEventListener('click', async () => {
         return;
       }
 
+      importSummary.textContent = '';
+      if (importProgress) {
+        importProgress.classList.remove('hidden');
+        importProgressBar.value = 0;
+        importProgressBar.max = data.items.length || 1;
+        importProgressText.textContent = '0%';
+      }
+
       let ok = 0, fail = 0;
-      for (const item of data.items) {
+      for (let i = 0; i < data.items.length; i++) {
+        const item = data.items[i];
         try {
           const id = String(item.id || '').trim();
           if (!id) { fail++; continue; }
@@ -286,8 +299,15 @@ exportCsvBtn?.addEventListener('click', async () => {
           console.error('Error importando item', item, e);
           fail++;
         }
+        if (importProgress) {
+          importProgressBar.value = i + 1;
+          const pct = Math.round(((i + 1) / data.items.length) * 100);
+          importProgressText.textContent = `${pct}%`;
+        }
       }
 
+      if (importProgress) importProgress.classList.add('hidden');
+      importSummary.textContent = `Importación completada. Correctos: ${ok} Fallidos: ${fail}`;
       showToast(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`, 'success');
 
       if (getCurrentNumber()) {
@@ -305,6 +325,8 @@ exportCsvBtn?.addEventListener('click', async () => {
     } catch (err) {
       console.error(err);
       showToast('Error al importar. Asegúrate de seleccionar un JSON válido.', 'error');
+    } finally {
+      if (importProgress) importProgress.classList.add('hidden');
     }
   });
 })();

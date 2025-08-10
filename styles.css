@@ -190,3 +190,24 @@ header.appbar{
   width:320px;
 }
 .confirm-actions{padding-top:10px;}
+
+/* ——— Zona de administración ——— */
+.admin-bar{
+  background: color-mix(in oklab, var(--danger) 25%, var(--bg2));
+  color:var(--ink);
+}
+
+.admin-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.admin-actions .btn{
+  font-size:clamp(.85rem,2.2vw,.95rem);
+  padding:8px 12px;
+}
+.admin-actions .btn:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px color-mix(in oklab, var(--danger) 55%, transparent), var(--shadow);
+}

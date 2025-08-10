@@ -32,6 +32,7 @@ import {
   isViewOpen,
   getCurrentData
 } from "./src/viewPopup.js";
+import { showToast, showConfirm } from "./src/notifications.js";
 
 // Helpers para manifest/iconos según BASE_PATH
 const addLink = (rel, href) => {
@@ -144,7 +145,11 @@ viewEditBtn?.addEventListener('click', () => {
 viewDeleteBtn?.addEventListener('click', async () => {
   const n = getCurrentNumber();
   if (!isAdmin || !n) return;
-  if (!confirm(`¿Borrar el número ${n}? Esta acción no se puede deshacer.`)) return;
+  const ok = await showConfirm(
+    `¿Borrar el número ${n}? Esta acción no se puede deshacer.`,
+    { okText: 'Borrar', okClass: 'danger' }
+  );
+  if (!ok) return;
   await deleteDoc(doc(db, 'numeros', String(n)));
   closeView();
   const cell = grid.querySelector(`.cell[data-n="${n}"]`);
@@ -156,15 +161,24 @@ viewDeleteBtn?.addEventListener('click', async () => {
 // ————————————————————————————————————————————————
 guardarBtn?.addEventListener('click', async () => {
   try {
-    if (!isAdmin) return alert('No tienes permisos para guardar');
+    if (!isAdmin) {
+      showToast('No tienes permisos para guardar', 'error');
+      return;
+    }
 
     const n = numSelInput.value.trim();
     const palabra = palabraInput.value.trim();
     const descripcion = descInput.value.trim();
     const imagenFile = imagenInput.files[0];
 
-    if (!n) return alert('Número requerido');
-    if (!palabra) return alert('Palabra requerida');
+    if (!n) {
+      showToast('Número requerido', 'error');
+      return;
+    }
+    if (!palabra) {
+      showToast('Palabra requerida', 'error');
+      return;
+    }
 
     let imageURL = '';
     if (imagenFile) {
@@ -179,7 +193,7 @@ guardarBtn?.addEventListener('click', async () => {
 
     await upsertNumberDoc(n, { palabra, descripcion, imageURL });
 
-    alert('Guardado con éxito');
+    showToast('Guardado con éxito', 'success');
     editBackdrop.classList.remove('is-open');
     editBackdrop.setAttribute('aria-hidden', 'true');
 
@@ -190,7 +204,7 @@ guardarBtn?.addEventListener('click', async () => {
     }
   } catch (err) {
     console.error(err);
-    alert('Error al guardar. Revisa la consola.');
+    showToast('Error al guardar. Revisa la consola.', 'error');
   }
 });
 
@@ -199,7 +213,10 @@ guardarBtn?.addEventListener('click', async () => {
 // ————————————————————————————————————————————————
 exportBtn?.addEventListener('click', async () => {
   try {
-    if (!isAdmin) return alert('Solo disponible para administradores.');
+    if (!isAdmin) {
+      showToast('Solo disponible para administradores.', 'error');
+      return;
+    }
     const q = query(collection(db, 'numeros'), orderBy('__name__')); // ids "1".."100"
     const snap = await getDocs(q);
     const items = [];
@@ -230,7 +247,7 @@ exportBtn?.addEventListener('click', async () => {
     URL.revokeObjectURL(a.href);
   } catch (err) {
     console.error(err);
-    alert('Error al exportar. Revisa la consola.');
+    showToast('Error al exportar. Revisa la consola.', 'error');
   }
 });
 
@@ -239,7 +256,10 @@ exportBtn?.addEventListener('click', async () => {
 // ————————————————————————————————————————————————
 exportCsvBtn?.addEventListener('click', async () => {
   try {
-    if (!isAdmin) return alert('Solo disponible para administradores.');
+    if (!isAdmin) {
+      showToast('Solo disponible para administradores.', 'error');
+      return;
+    }
 
     const q = query(collection(db, 'numeros'), orderBy('__name__'));
     const snap = await getDocs(q);
@@ -281,7 +301,7 @@ exportCsvBtn?.addEventListener('click', async () => {
     URL.revokeObjectURL(a.href);
   } catch (err) {
     console.error(err);
-    alert('Error al exportar CSV. Revisa la consola.');
+    showToast('Error al exportar CSV. Revisa la consola.', 'error');
   }
 });
 
@@ -298,7 +318,10 @@ exportCsvBtn?.addEventListener('click', async () => {
   document.body.appendChild(fileInput);
 
   importBtn.addEventListener('click', () => {
-    if (!isAdmin) return alert('Solo disponible para administradores.');
+    if (!isAdmin) {
+      showToast('Solo disponible para administradores.', 'error');
+      return;
+    }
     fileInput.value = '';
     fileInput.click();
   });
@@ -312,7 +335,8 @@ exportCsvBtn?.addEventListener('click', async () => {
       const data = JSON.parse(text);
 
       if (!data || !Array.isArray(data.items)) {
-        return alert('Formato inválido. Debe contener { items: [...] }');
+        showToast('Formato inválido. Debe contener { items: [...] }', 'error');
+        return;
       }
 
       let ok = 0, fail = 0;
@@ -334,7 +358,7 @@ exportCsvBtn?.addEventListener('click', async () => {
         }
       }
 
-      alert(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`);
+      showToast(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`, 'success');
 
       if (getCurrentNumber()) {
         const refreshed = await fetchNumberDoc(getCurrentNumber());
@@ -350,7 +374,7 @@ exportCsvBtn?.addEventListener('click', async () => {
       }
     } catch (err) {
       console.error(err);
-      alert('Error al importar. Asegúrate de seleccionar un JSON válido.');
+      showToast('Error al importar. Asegúrate de seleccionar un JSON válido.', 'error');
     }
   });
 })();

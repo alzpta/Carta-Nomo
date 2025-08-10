@@ -36,7 +36,10 @@ export async function guardarNumero(db, storage, n, palabra, file) {
 export async function borrarNumero(db, storage, n) {
   try {
     await deleteObject(storageRef(storage, `imagenes/${n}`));
-  } catch {}
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
   await deleteDoc(doc(collection(db, 'numeros'), String(n)));
 }
 

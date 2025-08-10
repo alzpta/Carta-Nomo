@@ -1,38 +1,10 @@
 import { BASE_PATH } from "./src/config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  deleteDoc,
-  collection,
-  getDocs,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
-import { initUI } from "./src/ui.js";
-import {
-  renderView,
-  openView,
-  closeView,
-  getCurrentNumber,
-  isViewOpen,
-  getCurrentData
-} from "./src/viewPopup.js";
-import { showToast, showConfirm } from "./src/notifications.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+import { initAuth } from "./src/auth.js";
+import { renderView, openView } from "./src/viewPopup.js";
 
 // Helpers para manifest/iconos según BASE_PATH
 const addLink = (rel, href) => {
@@ -55,64 +27,36 @@ const firebaseConfig = {
   measurementId: "G-LWB4H4F6TD"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
-// Tu UI existente
-initUI({ auth, db, storage, BASE_PATH });
+initAuth(auth, {
+  loginBtn: document.getElementById('loginBtn'),
+  logoutBtn: document.getElementById('logoutBtn'),
+  editarBtn: null,
+  borrarBtn: null,
+  exportBtn: null,
+  importBtn: null,
+  userInfo: document.getElementById('userInfo'),
+  loginBackdrop: document.getElementById('loginBackdrop'),
+  loginEmail: document.getElementById('loginEmail'),
+  loginPass: document.getElementById('loginPass'),
+  loginSubmit: document.getElementById('loginSubmit'),
+  loginCancel: document.getElementById('loginCancel')
+});
 
-// ————————————————————————————————————————————————
-// Referencias UI
-// ————————————————————————————————————————————————
 const grid = document.getElementById('grid');
 
-const viewAdminActions = document.getElementById('viewAdminActions');
-const viewEditBtn = document.getElementById('viewEditBtn');
-const viewDeleteBtn = document.getElementById('viewDeleteBtn');
-
-// Modal edición
-const guardarBtn = document.getElementById('guardarBtn');
-const editBackdrop = document.getElementById('editBackdrop');
-const numSelInput = document.getElementById('numSel');
-const palabraInput = document.getElementById('palabra');
-const descInput = document.getElementById('descripcion');
-const imagenInput = document.getElementById('imagen');
-
-// Botones toolbar (export/import)
-const exportBtn = document.getElementById('exportBtn');
-const exportCsvBtn = document.getElementById('exportCsvBtn');
-const importBtn = document.getElementById('importBtn');
-let isAdmin = false;
-
-  onAuthStateChanged(auth, (user) => {
-  isAdmin = !!user;
-  // Zona admin en el popup
-  if (viewAdminActions) viewAdminActions.classList.toggle('hidden', !isAdmin);
-  // Botones admin
-  if (exportBtn) exportBtn.classList.toggle('hidden', !isAdmin);
-  if (exportCsvBtn) exportCsvBtn.classList.toggle('hidden', !isAdmin);
-  if (importBtn) importBtn.classList.toggle('hidden', !isAdmin);
-  });
-
-// ————————————————————————————————————————————————
-// Utilidades Firestore
-// ————————————————————————————————————————————————
-async function fetchNumberDoc(n) {
+export async function fetchNumberDoc(n) {
   const ref = doc(db, 'numeros', String(n));
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
   return { id: ref.id, ...snap.data() };
 }
 
-async function upsertNumberDoc(n, { palabra, descripcion, imageURL }) {
-  await setDoc(doc(db, 'numeros', String(n)), { palabra, descripcion, imageURL }, { merge: true });
-}
-
-// ————————————————————————————————————————————————
 // Click en celdas -> abrir popup
-// ————————————————————————————————————————————————
 grid?.addEventListener('click', async (e) => {
   const cell = e.target.closest('.cell');
   if (!cell) return;
@@ -128,254 +72,3 @@ grid?.addEventListener('click', async (e) => {
   });
   openView();
 });
-
-// Editar desde popup -> abre sheet con datos actuales
-viewEditBtn?.addEventListener('click', () => {
-  const current = getCurrentNumber();
-  if (!isAdmin || !current) return;
-  const { palabra, descripcion } = getCurrentData();
-  numSelInput.value = current;
-  palabraInput.value = palabra || '';
-  descInput.value = descripcion || '';
-  editBackdrop.classList.add('is-open');
-  editBackdrop.removeAttribute('aria-hidden');
-});
-
-// Borrar desde popup
-viewDeleteBtn?.addEventListener('click', async () => {
-  const n = getCurrentNumber();
-  if (!isAdmin || !n) return;
-  const ok = await showConfirm(
-    `¿Borrar el número ${n}? Esta acción no se puede deshacer.`,
-    { okText: 'Borrar', okClass: 'danger' }
-  );
-  if (!ok) return;
-  await deleteDoc(doc(db, 'numeros', String(n)));
-  closeView();
-  const cell = grid.querySelector(`.cell[data-n="${n}"]`);
-  if (cell) cell.classList.add('empty');
-});
-
-// ————————————————————————————————————————————————
-// Guardar (incluye descripcion y subida de imagen)
-// ————————————————————————————————————————————————
-guardarBtn?.addEventListener('click', async () => {
-  try {
-    if (!isAdmin) {
-      showToast('No tienes permisos para guardar', 'error');
-      return;
-    }
-
-    const n = numSelInput.value.trim();
-    const palabra = palabraInput.value.trim();
-    const descripcion = descInput.value.trim();
-    const imagenFile = imagenInput.files[0];
-
-    if (!n) {
-      showToast('Número requerido', 'error');
-      return;
-    }
-    if (!palabra) {
-      showToast('Palabra requerida', 'error');
-      return;
-    }
-
-    let imageURL = '';
-    if (imagenFile) {
-      const imgRef = ref(storage, `numeros/${n}/${imagenFile.name}`);
-      await uploadBytes(imgRef, imagenFile);
-      imageURL = await getDownloadURL(imgRef);
-    } else {
-      // conservar la existente
-      const existing = await fetchNumberDoc(n);
-      if (existing?.imageURL) imageURL = existing.imageURL;
-    }
-
-    await upsertNumberDoc(n, { palabra, descripcion, imageURL });
-
-    showToast('Guardado con éxito', 'success');
-    editBackdrop.classList.remove('is-open');
-    editBackdrop.setAttribute('aria-hidden', 'true');
-
-    // Si el popup mostraba este número, refrescar su contenido
-    if (isViewOpen() && getCurrentNumber() === Number(n)) {
-      renderView({ n: Number(n), palabra, descripcion, imageURL });
-      openView();
-    }
-  } catch (err) {
-    console.error(err);
-    showToast('Error al guardar. Revisa la consola.', 'error');
-  }
-});
-
-// ————————————————————————————————————————————————
-// EXPORTAR JSON
-// ————————————————————————————————————————————————
-exportBtn?.addEventListener('click', async () => {
-  try {
-    if (!isAdmin) {
-      showToast('Solo disponible para administradores.', 'error');
-      return;
-    }
-    const q = query(collection(db, 'numeros'), orderBy('__name__')); // ids "1".."100"
-    const snap = await getDocs(q);
-    const items = [];
-    snap.forEach(d => {
-      const data = d.data() || {};
-      items.push({
-        id: d.id,
-        palabra: data.palabra || '',
-        descripcion: data.descripcion || '',
-        imageURL: data.imageURL || ''
-      });
-    });
-
-    const payload = { updatedAt: new Date().toISOString(), items };
-    const json = JSON.stringify(payload, null, 2);
-    const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
-
-    const pad2 = (x) => String(x).padStart(2,'0');
-    const now = new Date();
-    const fname = `carta-nomo-export-${now.getFullYear()}${pad2(now.getMonth()+1)}${pad2(now.getDate())}-${pad2(now.getHours())}${pad2(now.getMinutes())}.json`;
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = fname;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-  } catch (err) {
-    console.error(err);
-    showToast('Error al exportar. Revisa la consola.', 'error');
-  }
-});
-
-// ————————————————————————————————————————————————
-// EXPORTAR CSV (id;palabra;descripcion;imageURL) con BOM para Excel
-// ————————————————————————————————————————————————
-exportCsvBtn?.addEventListener('click', async () => {
-  try {
-    if (!isAdmin) {
-      showToast('Solo disponible para administradores.', 'error');
-      return;
-    }
-
-    const q = query(collection(db, 'numeros'), orderBy('__name__'));
-    const snap = await getDocs(q);
-
-    const sep = ';';
-    const esc = (v) => {
-      const s = (v ?? '').toString();
-      if (/[;\n\r"]/u.test(s)) return `"${s.replace(/"/g, '""')}"`;
-      return s;
-    };
-
-    const rows = [['id','palabra','descripcion','imageURL']];
-    snap.forEach(d => {
-      const data = d.data() || {};
-      rows.push([
-        d.id,
-        data.palabra || '',
-        data.descripcion || '',
-        data.imageURL || ''
-      ]);
-    });
-
-    const csv = rows.map(r => r.map(esc).join(sep)).join('\r\n');
-    const blob = new Blob(
-      [new Uint8Array([0xEF,0xBB,0xBF]), csv], // BOM UTF-8
-      { type: 'text/csv;charset=utf-8' }
-    );
-
-    const pad2 = (x) => String(x).padStart(2,'0');
-    const now = new Date();
-    const fname = `carta-nomo-export-${now.getFullYear()}${pad2(now.getMonth()+1)}${pad2(now.getDate())}-${pad2(now.getHours())}${pad2(now.getMinutes())}.csv`;
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = fname;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-  } catch (err) {
-    console.error(err);
-    showToast('Error al exportar CSV. Revisa la consola.', 'error');
-  }
-});
-
-// ————————————————————————————————————————————————
-// IMPORTAR JSON
-// ————————————————————————————————————————————————
-(function setupImport() {
-  if (!importBtn) return;
-
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = 'application/json';
-  fileInput.classList.add('hidden');
-  document.body.appendChild(fileInput);
-
-  importBtn.addEventListener('click', () => {
-    if (!isAdmin) {
-      showToast('Solo disponible para administradores.', 'error');
-      return;
-    }
-    fileInput.value = '';
-    fileInput.click();
-  });
-
-  fileInput.addEventListener('change', async () => {
-    const file = fileInput.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-
-      if (!data || !Array.isArray(data.items)) {
-        showToast('Formato inválido. Debe contener { items: [...] }', 'error');
-        return;
-      }
-
-      let ok = 0, fail = 0;
-      for (const item of data.items) {
-        try {
-          const id = String(item.id || '').trim();
-          if (!id) { fail++; continue; }
-
-          const payload = {
-            palabra: item.palabra ?? '',
-            descripcion: item.descripcion ?? '',
-            imageURL: item.imageURL ?? ''
-          };
-          await setDoc(doc(db, 'numeros', id), payload, { merge: true });
-          ok++;
-        } catch (e) {
-          console.error('Error importando item', item, e);
-          fail++;
-        }
-      }
-
-      showToast(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`, 'success');
-
-      if (getCurrentNumber()) {
-        const refreshed = await fetchNumberDoc(getCurrentNumber());
-        if (refreshed) {
-          renderView({
-            n: Number(refreshed.id),
-            palabra: refreshed.palabra || '',
-            descripcion: refreshed.descripcion || '',
-            imageURL: refreshed.imageURL || ''
-          });
-          openView();
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('Error al importar. Asegúrate de seleccionar un JSON válido.', 'error');
-    }
-  });
-})();
-

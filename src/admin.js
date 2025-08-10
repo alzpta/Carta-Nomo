@@ -37,6 +37,7 @@ const cancelarBtn = document.getElementById('cancelarBtn');
 const exportBtn = document.getElementById('exportBtn');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const importBtn = document.getElementById('importBtn');
+const importCsvBtn = document.getElementById('importCsvBtn');
 const importProgress = document.getElementById('importProgress');
 const importProgressBar = document.getElementById('importProgressBar');
 const importProgressText = document.getElementById('importProgressText');
@@ -54,6 +55,7 @@ onAuthStateChanged(auth, (user) => {
   exportBtn?.classList.toggle('hidden', !isAdmin);
   exportCsvBtn?.classList.toggle('hidden', !isAdmin);
   importBtn?.classList.toggle('hidden', !isAdmin);
+  importCsvBtn?.classList.toggle('hidden', !isAdmin);
 });
 
 
@@ -325,6 +327,89 @@ exportCsvBtn?.addEventListener('click', async () => {
     } catch (err) {
       console.error(err);
       showToast('Error al importar. Asegúrate de seleccionar un JSON válido.', 'error');
+    } finally {
+      if (importProgress) importProgress.classList.add('hidden');
+    }
+  });
+})();
+
+// IMPORTAR CSV (id;palabra;descripcion;imageURL)
+(function setupImportCsv() {
+  if (!importCsvBtn) return;
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.csv,text/csv';
+  fileInput.classList.add('hidden');
+  document.body.appendChild(fileInput);
+
+  importCsvBtn.addEventListener('click', () => {
+    if (!isAdmin) {
+      showToast('Solo disponible para administradores.', 'error');
+      return;
+    }
+    fileInput.value = '';
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/u).filter(l => l.trim().length);
+      const rows = lines
+        .map(l => l.split(';').map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"')))
+        .filter(r => r[0] && r[0].trim() && r[0].trim().toLowerCase() !== 'id');
+
+      importSummary.textContent = '';
+      if (importProgress) {
+        importProgress.classList.remove('hidden');
+        importProgressBar.value = 0;
+        importProgressBar.max = rows.length || 1;
+        importProgressText.textContent = '0%';
+      }
+
+      let ok = 0, fail = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const [idRaw, palabra = '', descripcion = '', imageURL = ''] = rows[i];
+        const id = String(idRaw).trim();
+        if (!id) { fail++; continue; }
+        try {
+          const payload = { palabra, descripcion, imageURL };
+          await setDoc(doc(db, 'numeros', id), payload, { merge: true });
+          ok++;
+        } catch (e) {
+          console.error('Error importando fila', rows[i], e);
+          fail++;
+        }
+        if (importProgress) {
+          importProgressBar.value = i + 1;
+          const pct = Math.round(((i + 1) / rows.length) * 100);
+          importProgressText.textContent = `${pct}%`;
+        }
+      }
+
+      if (importProgress) importProgress.classList.add('hidden');
+      importSummary.textContent = `Importación completada. Correctos: ${ok} Fallidos: ${fail}`;
+      showToast(`Importación completada.\nCorrectos: ${ok}\nFallidos: ${fail}`, 'success');
+
+      if (getCurrentNumber()) {
+        const refreshed = await fetchNumberDoc(getCurrentNumber());
+        if (refreshed) {
+          renderView({
+            n: Number(refreshed.id),
+            palabra: refreshed.palabra || '',
+            descripcion: refreshed.descripcion || '',
+            imageURL: refreshed.imageURL || ''
+          });
+          openView();
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Error al importar CSV. Asegúrate de seleccionar un CSV válido.', 'error');
     } finally {
       if (importProgress) importProgress.classList.add('hidden');
     }

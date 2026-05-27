@@ -97,7 +97,8 @@ grid?.addEventListener('click', async (e) => {
     n,
     palabra: docData?.palabra || '',
     descripcion: docData?.descripcion || '',
-    imageURL: docData?.imageURL || ''
+    imageURL: docData?.imageURL || '',
+    alergenos: docData?.alergenos || {}
   });
   openView();
   if (docData?.palabra) speak(docData.palabra);

@@ -5,6 +5,7 @@ let currentNumber = null;
 let currentPalabra = '';
 let currentDescripcion = '';
 let currentImageURL = '';
+let currentAlergenos = {};
 
 const viewBackdrop = document.getElementById('viewBackdrop');
 let viewTitle = document.getElementById('viewTitle');
@@ -12,6 +13,7 @@ const viewImage = document.getElementById('viewImage');
 let viewDesc = document.getElementById('viewDesc');
 const viewCloseBtn = document.getElementById('viewCloseBtn');
 const viewSpeakBtn = document.getElementById('viewSpeakBtn');
+const viewAlergenosSection = document.getElementById('viewAlergenos');
 
 function ensureViewNodes() {
   if (!viewTitle) {
@@ -40,12 +42,13 @@ function closeView() {
   currentNumber = null;
 }
 
-function renderView({ n, palabra, descripcion, imageURL }) {
+function renderView({ n, palabra, descripcion, imageURL, alergenos }) {
   ensureViewNodes();
   currentNumber = n;
   currentPalabra = palabra || '';
   currentDescripcion = descripcion || '';
   currentImageURL = imageURL || '';
+  currentAlergenos = alergenos || {};
 
   viewTitle.textContent = `${n}. ${currentPalabra || '—'}`;
   viewDesc.textContent = currentDescripcion || '—';
@@ -58,6 +61,28 @@ function renderView({ n, palabra, descripcion, imageURL }) {
     viewImage.removeAttribute('src');
     viewImage.alt = '';
     viewImage.style.display = 'none';
+  }
+
+  renderAlergenosSection(currentAlergenos);
+}
+
+function renderAlergenosSection(alergenos) {
+  if (!viewAlergenosSection) return;
+  const chips = viewAlergenosSection.querySelector('.alergenos-chips');
+  if (!chips) return;
+  chips.innerHTML = '';
+  const entries = Object.entries(alergenos || {});
+  if (entries.length === 0) {
+    viewAlergenosSection.classList.add('hidden');
+    return;
+  }
+  viewAlergenosSection.classList.remove('hidden');
+  for (const [name, val] of entries) {
+    const chip = document.createElement('span');
+    chip.className = `alergeno-chip ${val === 'T' ? 'traza' : 'presente'}`;
+    chip.textContent = val === 'T' ? `${name} (T)` : name;
+    chip.title = val === 'T' ? `${name}: trazas` : `${name}: presente`;
+    chips.appendChild(chip);
   }
 }
 
@@ -74,7 +99,8 @@ function getCurrentData() {
     n: currentNumber,
     palabra: currentPalabra,
     descripcion: currentDescripcion,
-    imageURL: currentImageURL
+    imageURL: currentImageURL,
+    alergenos: currentAlergenos
   };
 }
 

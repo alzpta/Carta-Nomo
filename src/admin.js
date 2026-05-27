@@ -132,6 +132,7 @@ guardarBtn?.addEventListener('click', async () => {
       if (existing?.imageURL) imageURL = existing.imageURL;
     }
 
+    const currentData = getCurrentData();
     await upsertNumberDoc(n, { palabra, descripcion, imageURL });
 
     showToast('Guardado con éxito', 'success');
@@ -139,7 +140,7 @@ guardarBtn?.addEventListener('click', async () => {
     editBackdrop.setAttribute('aria-hidden', 'true');
 
     if (isViewOpen() && getCurrentNumber() === Number(n)) {
-      renderView({ n: Number(n), palabra, descripcion, imageURL });
+      renderView({ n: Number(n), palabra, descripcion, imageURL, alergenos: currentData.alergenos || {} });
       openView();
     }
   } catch (err) {
@@ -293,7 +294,8 @@ exportCsvBtn?.addEventListener('click', async () => {
           const payload = {
             palabra: item.palabra ?? '',
             descripcion: item.descripcion ?? '',
-            imageURL: item.imageURL ?? ''
+            imageURL: item.imageURL ?? '',
+            alergenos: item.alergenos ?? {}
           };
           await setDoc(doc(db, 'numeros', id), payload, { merge: true });
           ok++;
@@ -319,7 +321,8 @@ exportCsvBtn?.addEventListener('click', async () => {
             n: Number(refreshed.id),
             palabra: refreshed.palabra || '',
             descripcion: refreshed.descripcion || '',
-            imageURL: refreshed.imageURL || ''
+            imageURL: refreshed.imageURL || '',
+            alergenos: refreshed.alergenos || {}
           });
           openView();
         }
@@ -402,7 +405,8 @@ exportCsvBtn?.addEventListener('click', async () => {
             n: Number(refreshed.id),
             palabra: refreshed.palabra || '',
             descripcion: refreshed.descripcion || '',
-            imageURL: refreshed.imageURL || ''
+            imageURL: refreshed.imageURL || '',
+            alergenos: refreshed.alergenos || {}
           });
           openView();
         }

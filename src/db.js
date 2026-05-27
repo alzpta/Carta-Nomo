@@ -22,6 +22,7 @@ export const subscribeNumeros = (db, callback) =>
           palabra: d.data().palabra || '',
           descripcion: d.data().descripcion || '',
           imageURL: d.data().imageURL || null,
+          alergenos: d.data().alergenos || {},
         };
     });
     callback(nuevo);

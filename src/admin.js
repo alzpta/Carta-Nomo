@@ -1,5 +1,5 @@
 import { auth, db, storage, fetchNumberDoc } from '../app.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import {
   doc,
   setDoc,
@@ -31,6 +31,7 @@ const editBackdrop = document.getElementById('editBackdrop');
 const numSelInput = document.getElementById('numSel');
 const palabraInput = document.getElementById('palabra');
 const descInput = document.getElementById('descripcion');
+const ingredientesInput = document.getElementById('ingredientes');
 const imagenInput = document.getElementById('imagen');
 const cancelarBtn = document.getElementById('cancelarBtn');
 
@@ -59,18 +60,19 @@ onAuthStateChanged(auth, (user) => {
 });
 
 
-async function upsertNumberDoc(n, { palabra, descripcion, imageURL }) {
-  await setDoc(doc(db, 'numeros', String(n)), { palabra, descripcion, imageURL }, { merge: true });
+async function upsertNumberDoc(n, { palabra, descripcion, imageURL, ingredientes }) {
+  await setDoc(doc(db, 'numeros', String(n)), { palabra, descripcion, imageURL, ingredientes }, { merge: true });
 }
 
 // Editar desde popup -> abre sheet con datos actuales
 viewEditBtn?.addEventListener('click', () => {
   const current = getCurrentNumber();
   if (!isAdmin || !current) return;
-  const { palabra, descripcion } = getCurrentData();
+  const { palabra, descripcion, ingredientes } = getCurrentData();
   numSelInput.value = current;
   palabraInput.value = palabra || '';
   descInput.value = descripcion || '';
+  if (ingredientesInput) ingredientesInput.value = (ingredientes || []).join('\n');
   editBackdrop.classList.add('is-open');
   editBackdrop.removeAttribute('aria-hidden');
 });
@@ -109,12 +111,15 @@ guardarBtn?.addEventListener('click', async () => {
     }
 
     const n = numSelInput.value.trim();
+    const nNum = Number(n);
     const palabra = palabraInput.value.trim();
     const descripcion = descInput.value.trim();
+    const ingredientes = (ingredientesInput?.value || '')
+      .split('\n').map(s => s.trim()).filter(Boolean);
     const imagenFile = imagenInput.files[0];
 
-    if (!n) {
-      showToast('Número requerido', 'error');
+    if (!n || isNaN(nNum) || nNum < 1 || nNum > 100 || !Number.isInteger(nNum)) {
+      showToast('Número debe estar entre 1 y 100', 'error');
       return;
     }
     if (!palabra) {
@@ -133,14 +138,14 @@ guardarBtn?.addEventListener('click', async () => {
     }
 
     const currentData = getCurrentData();
-    await upsertNumberDoc(n, { palabra, descripcion, imageURL });
+    await upsertNumberDoc(n, { palabra, descripcion, imageURL, ingredientes });
 
     showToast('Guardado con éxito', 'success');
     editBackdrop.classList.remove('is-open');
     editBackdrop.setAttribute('aria-hidden', 'true');
 
     if (isViewOpen() && getCurrentNumber() === Number(n)) {
-      renderView({ n: Number(n), palabra, descripcion, imageURL, alergenos: currentData.alergenos || {} });
+      renderView({ n: Number(n), palabra, descripcion, imageURL, alergenos: currentData.alergenos || {}, ingredientes });
       openView();
     }
   } catch (err) {
@@ -165,7 +170,9 @@ exportBtn?.addEventListener('click', async () => {
         id: d.id,
         palabra: data.palabra || '',
         descripcion: data.descripcion || '',
-        imageURL: data.imageURL || ''
+        imageURL: data.imageURL || '',
+        alergenos: data.alergenos || {},
+        ingredientes: data.ingredientes || []
       });
     });
 
@@ -191,7 +198,7 @@ exportBtn?.addEventListener('click', async () => {
   }
 });
 
-// EXPORTAR CSV (id;palabra;descripcion;imageURL)
+// EXPORTAR CSV
 exportCsvBtn?.addEventListener('click', async () => {
   try {
     if (!isAdmin) {
@@ -209,14 +216,16 @@ exportCsvBtn?.addEventListener('click', async () => {
       return s;
     };
 
-    const rows = [['id','palabra','descripcion','imageURL']];
+    const rows = [['id','palabra','descripcion','imageURL','alergenos','ingredientes']];
     snap.forEach(d => {
       const data = d.data() || {};
       rows.push([
         d.id,
         data.palabra || '',
         data.descripcion || '',
-        data.imageURL || ''
+        data.imageURL || '',
+        JSON.stringify(data.alergenos || {}),
+        (data.ingredientes || []).join('|')
       ]);
     });
 
@@ -295,7 +304,8 @@ exportCsvBtn?.addEventListener('click', async () => {
             palabra: item.palabra ?? '',
             descripcion: item.descripcion ?? '',
             imageURL: item.imageURL ?? '',
-            alergenos: item.alergenos ?? {}
+            alergenos: item.alergenos ?? {},
+            ingredientes: item.ingredientes ?? []
           };
           await setDoc(doc(db, 'numeros', id), payload, { merge: true });
           ok++;
@@ -322,7 +332,8 @@ exportCsvBtn?.addEventListener('click', async () => {
             palabra: refreshed.palabra || '',
             descripcion: refreshed.descripcion || '',
             imageURL: refreshed.imageURL || '',
-            alergenos: refreshed.alergenos || {}
+            alergenos: refreshed.alergenos || {},
+            ingredientes: refreshed.ingredientes || []
           });
           openView();
         }
@@ -336,7 +347,34 @@ exportCsvBtn?.addEventListener('click', async () => {
   });
 })();
 
-// IMPORTAR CSV (id;palabra;descripcion;imageURL)
+function parseCsvLine(line, sep = ';') {
+  const fields = [];
+  let i = 0;
+  while (i <= line.length) {
+    if (line[i] === '"') {
+      let field = '';
+      i++;
+      while (i < line.length) {
+        if (line[i] === '"') {
+          if (line[i + 1] === '"') { field += '"'; i += 2; }
+          else { i++; break; }
+        } else {
+          field += line[i++];
+        }
+      }
+      fields.push(field);
+      if (line[i] === sep) i++;
+    } else {
+      const end = line.indexOf(sep, i);
+      if (end === -1) { fields.push(line.slice(i)); break; }
+      fields.push(line.slice(i, end));
+      i = end + 1;
+    }
+  }
+  return fields;
+}
+
+// IMPORTAR CSV
 (function setupImportCsv() {
   if (!importCsvBtn) return;
 
@@ -363,7 +401,7 @@ exportCsvBtn?.addEventListener('click', async () => {
       const text = await file.text();
       const lines = text.split(/\r?\n/u).filter(l => l.trim().length);
       const rows = lines
-        .map(l => l.split(';').map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"')))
+        .map(l => parseCsvLine(l))
         .filter(r => r[0] && r[0].trim() && r[0].trim().toLowerCase() !== 'id');
 
       importSummary.textContent = '';
@@ -376,11 +414,14 @@ exportCsvBtn?.addEventListener('click', async () => {
 
       let ok = 0, fail = 0;
       for (let i = 0; i < rows.length; i++) {
-        const [idRaw, palabra = '', descripcion = '', imageURL = ''] = rows[i];
+        const [idRaw, palabra = '', descripcion = '', imageURL = '', alergenosRaw = '', ingredientesRaw = ''] = rows[i];
         const id = String(idRaw).trim();
         if (!id) { fail++; continue; }
         try {
-          const payload = { palabra, descripcion, imageURL };
+          let alergenos = {};
+          try { alergenos = alergenosRaw ? JSON.parse(alergenosRaw) : {}; } catch {}
+          const ingredientes = ingredientesRaw ? ingredientesRaw.split('|').map(s => s.trim()).filter(Boolean) : [];
+          const payload = { palabra, descripcion, imageURL, alergenos, ingredientes };
           await setDoc(doc(db, 'numeros', id), payload, { merge: true });
           ok++;
         } catch (e) {
@@ -406,7 +447,8 @@ exportCsvBtn?.addEventListener('click', async () => {
             palabra: refreshed.palabra || '',
             descripcion: refreshed.descripcion || '',
             imageURL: refreshed.imageURL || '',
-            alergenos: refreshed.alergenos || {}
+            alergenos: refreshed.alergenos || {},
+            ingredientes: refreshed.ingredientes || []
           });
           openView();
         }

@@ -28,7 +28,7 @@ const firebaseConfig = {
   measurementId: "G-LWB4H4F6TD"
 };
 
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
@@ -36,10 +36,6 @@ export const storage = getStorage(app);
 initAuth(auth, {
   loginBtn: document.getElementById('loginBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
-  editarBtn: null,
-  borrarBtn: null,
-  exportBtn: null,
-  importBtn: null,
   userInfo: document.getElementById('userInfo'),
   loginBackdrop: document.getElementById('loginBackdrop'),
   loginEmail: document.getElementById('loginEmail'),
@@ -146,6 +142,11 @@ filterBackdrop?.addEventListener('click', (e) => {
   if (e.target === filterBackdrop) filterBackdrop.classList.remove('is-open');
 });
 filterDone?.addEventListener('click', () => filterBackdrop?.classList.remove('is-open'));
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && filterBackdrop?.classList.contains('is-open')) {
+    filterBackdrop.classList.remove('is-open');
+  }
+});
 filterClear?.addEventListener('click', () => {
   hiddenAllergens.clear();
   buildFilterList();
@@ -176,7 +177,7 @@ export async function fetchNumberDoc(n) {
   return { id: ref.id, ...snap.data() };
 }
 
-export function speak(text) {
+function speak(text) {
   const synth = window.speechSynthesis;
   if (!synth) return;
   synth.cancel();
@@ -186,6 +187,23 @@ export function speak(text) {
   utterance.pitch = 1;
   synth.speak(utterance);
 }
+
+// Navegación con teclado en el grid
+grid?.addEventListener('keydown', (e) => {
+  const cells = [...grid.children];
+  const idx = cells.indexOf(document.activeElement);
+  if (idx === -1) return;
+  let delta = 0;
+  if (e.key === 'ArrowRight') delta = 1;
+  else if (e.key === 'ArrowLeft') delta = -1;
+  else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+    delta = e.key === 'ArrowDown' ? cols : -cols;
+  } else return;
+  e.preventDefault();
+  const next = idx + delta;
+  if (next >= 0 && next < cells.length) cells[next].focus();
+});
 
 // Click en celdas -> abrir popup
 grid?.addEventListener('click', async (e) => {
@@ -201,7 +219,8 @@ grid?.addEventListener('click', async (e) => {
     palabra: docData?.palabra || '',
     descripcion: docData?.descripcion || '',
     imageURL: docData?.imageURL || '',
-    alergenos: docData?.alergenos || {}
+    alergenos: docData?.alergenos || {},
+    ingredientes: docData?.ingredientes || []
   });
   openView();
   if (docData?.palabra) speak(docData.palabra);

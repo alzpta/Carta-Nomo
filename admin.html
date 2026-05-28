@@ -35,13 +35,13 @@
     </header>
 
     <section class="glass card" aria-labelledby="gridLabel">
-      <h2 id="gridLabel" class="subtitle" style="position:absolute;left:-9999px">Selección de números</h2>
+      <h2 id="gridLabel" class="subtitle visually-hidden">Selección de números</h2>
       <div id="grid" class="grid" role="grid" aria-describedby="gridHelp"></div>
       <p id="gridHelp" class="subtitle" style="padding: 6px 6px 0">Consejo: usa ← → para moverte, Enter para escuchar.</p>
       <div id="output" aria-live="polite" aria-atomic="true"></div>
       <div id="importProgress" class="hidden">
-        <progress id="importProgressBar" value="0" max="100" style="width:100%"></progress>
-        <p id="importProgressText" class="subtitle" style="text-align:center">0%</p>
+        <progress id="importProgressBar" value="0" max="100"></progress>
+        <p id="importProgressText" class="subtitle">0%</p>
       </div>
       <p id="importSummary" class="subtitle" aria-live="polite"></p>
     </section>
@@ -55,6 +55,7 @@
         <div class="row"><label for="numSel">Número</label><input type="number" id="numSel" min="1" max="100" inputmode="numeric" /></div>
         <div class="row"><label for="palabra">Palabra</label><input type="text" id="palabra" placeholder="Escribe la palabra…" /></div>
         <div class="row"><label for="descripcion">Descripción</label><input type="text" id="descripcion" placeholder="Añade una descripción…" /></div>
+        <div class="row"><label for="ingredientes">Ingredientes</label><textarea id="ingredientes" rows="4" placeholder="Un ingrediente por línea…"></textarea></div>
         <div class="row"><label for="imagen">Imagen (opcional)</label><input type="file" id="imagen" accept="image/*" /></div>
       </div>
       <div class="actions">
@@ -85,6 +86,10 @@
         <div class="atl-body">
           <h2 id="viewTitle" class="atl-name">—</h2>
           <p id="viewDesc" class="atl-desc">—</p>
+          <div id="viewIngredientes" class="ing-atelier hidden">
+            <div class="ing-atelier-label">ingredientes</div>
+            <ul class="ing-list"></ul>
+          </div>
           <div id="viewAlergenos" class="alg-atelier hidden">
             <div class="alg-atelier-label">alérgenos</div>
             <div class="alg-atelier-chips"></div>

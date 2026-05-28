@@ -5,28 +5,56 @@ let currentPalabra = '';
 let currentDescripcion = '';
 let currentImageURL = '';
 let currentAlergenos = {};
+let currentIngredientes = [];
 
 const viewBackdrop = document.getElementById('viewBackdrop');
 const viewShell = document.getElementById('viewShell');
 const viewCloseBtn = document.getElementById('viewCloseBtn');
 const viewSpeakBtn = document.getElementById('viewSpeakBtn');
 const viewAlergenosSection = document.getElementById('viewAlergenos');
+const viewIngredientesSection = document.getElementById('viewIngredientes');
 
 // ── Dish 3D state ────────────────────────────────────────────────────
 let dish3dRotY = 0;
-let dish3dRotX = 56;
+let dish3dRotX = 42;
 const dish3dDrag = { active: false, x: 0, y: 0, rotY: 0, rotX: 0 };
+let dish3dInnerEl = null;
+
+let autoRotateRaf = null;
+let autoRotateResumeTimer = null;
+let autoRotatePaused = false;
+
+function stopAutoRotate() {
+  cancelAnimationFrame(autoRotateRaf);
+  autoRotateRaf = null;
+}
+
+function startAutoRotate() {
+  stopAutoRotate();
+  let last = null;
+  function tick(ts) {
+    if (!autoRotatePaused) {
+      const dt = last ? ts - last : 16;
+      dish3dRotY += dt * 0.022;
+      updateDish3DTransform();
+    }
+    last = ts;
+    autoRotateRaf = requestAnimationFrame(tick);
+  }
+  autoRotateRaf = requestAnimationFrame(tick);
+}
 
 function updateDish3DTransform() {
-  const inner = document.getElementById('dish3dInner');
-  if (inner) {
-    inner.style.transform = `rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY}deg)`;
+  if (dish3dInnerEl) {
+    dish3dInnerEl.style.transform = `rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY}deg)`;
   }
 }
 
 function onDish3DDown(e) {
   const p = e.touches ? e.touches[0] : e;
   dish3dDrag.active = true;
+  autoRotatePaused = true;
+  clearTimeout(autoRotateResumeTimer);
   dish3dDrag.x = p.clientX;
   dish3dDrag.y = p.clientY;
   dish3dDrag.rotY = dish3dRotY;
@@ -38,15 +66,18 @@ function onDish3DMove(e) {
   if (!dish3dDrag.active) return;
   const p = e.touches ? e.touches[0] : e;
   dish3dRotY = dish3dDrag.rotY + (p.clientX - dish3dDrag.x) * 0.6;
-  dish3dRotX = Math.max(28, Math.min(78, dish3dDrag.rotX - (p.clientY - dish3dDrag.y) * 0.3));
+  dish3dRotX = Math.max(18, Math.min(72, dish3dDrag.rotX - (p.clientY - dish3dDrag.y) * 0.3));
   updateDish3DTransform();
 }
 
-function onDish3DUp() { dish3dDrag.active = false; }
+function onDish3DUp() {
+  dish3dDrag.active = false;
+  autoRotateResumeTimer = setTimeout(() => { autoRotatePaused = false; }, 2000);
+}
 
 window.addEventListener('mousemove', onDish3DMove);
 window.addEventListener('mouseup', onDish3DUp);
-window.addEventListener('touchmove', onDish3DMove, { passive: false });
+window.addEventListener('touchmove', onDish3DMove, { passive: true });
 window.addEventListener('touchend', onDish3DUp);
 
 // ── Dish visual ──────────────────────────────────────────────────────
@@ -71,14 +102,17 @@ function buildAndMountDish3D(imageURL) {
   const stage = document.getElementById('viewDish3DStage');
   if (!stage) return;
 
-  dish3dRotY = 0;
-  dish3dRotX = 56;
+  stopAutoRotate();
+  clearTimeout(autoRotateResumeTimer);
+  autoRotatePaused = false;
+  dish3dRotY = -30;
+  dish3dRotX = 42;
 
   stage.innerHTML = `
     <div class="dish3d dish3d--atelier" id="dish3dEl">
       <div class="dish3d-tableshadow"></div>
       <div class="dish3d-inner" id="dish3dInner"
-           style="transform:rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY - 180}deg) scale(0.6);opacity:0;">
+           style="transform:rotateX(80deg) rotateY(-200deg) scale(0.5);opacity:0;">
         <div class="dish3d-plate">
           <div class="dish3d-plate-rim"></div>
           <div class="dish3d-plate-well">${buildDishWellContent(imageURL)}</div>
@@ -88,6 +122,7 @@ function buildAndMountDish3D(imageURL) {
       <div class="dish3d-hint">↺ arrastra para girar</div>
     </div>`;
 
+  dish3dInnerEl = document.getElementById('dish3dInner');
   const el = document.getElementById('dish3dEl');
   if (el) {
     el.addEventListener('mousedown', onDish3DDown);
@@ -95,12 +130,34 @@ function buildAndMountDish3D(imageURL) {
   }
 
   requestAnimationFrame(() => {
-    const inner = document.getElementById('dish3dInner');
-    if (!inner) return;
-    inner.style.transition = 'transform 0.9s cubic-bezier(.18,.9,.2,1), opacity 0.6s';
-    inner.style.transform = `rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY}deg)`;
-    inner.style.opacity = '1';
+    if (!dish3dInnerEl) return;
+    dish3dInnerEl.style.transition = 'transform 1.1s cubic-bezier(.16,.9,.18,1), opacity 0.7s ease';
+    dish3dInnerEl.style.transform = `rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY}deg)`;
+    dish3dInnerEl.style.opacity = '1';
+    setTimeout(() => {
+      if (!dish3dInnerEl) return;
+      dish3dInnerEl.style.transition = '';
+      startAutoRotate();
+    }, 1150);
   });
+}
+
+// ── Ingredients ──────────────────────────────────────────────────────
+function renderIngredientesSection(ingredientes) {
+  if (!viewIngredientesSection) return;
+  const list = viewIngredientesSection.querySelector('.ing-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!ingredientes || ingredientes.length === 0) {
+    viewIngredientesSection.classList.add('hidden');
+    return;
+  }
+  viewIngredientesSection.classList.remove('hidden');
+  for (const ing of ingredientes) {
+    const li = document.createElement('li');
+    li.textContent = ing;
+    list.appendChild(li);
+  }
 }
 
 // ── Allergens ────────────────────────────────────────────────────────
@@ -120,22 +177,24 @@ function renderAlergenosSection(alergenos) {
     const isTrace = val === 'T';
     chip.className = `alg-atelier-chip${isTrace ? ' is-trace' : ''}`;
     chip.title = isTrace ? `${name}: trazas` : `${name}: presente`;
+    chip.textContent = name;
     if (isTrace) {
-      chip.innerHTML = `${name}<em> · trazas</em>`;
-    } else {
-      chip.textContent = name;
+      const em = document.createElement('em');
+      em.textContent = ' · trazas';
+      chip.appendChild(em);
     }
     chips.appendChild(chip);
   }
 }
 
 // ── Public API ───────────────────────────────────────────────────────
-function renderView({ n, palabra, descripcion, imageURL, alergenos }) {
+function renderView({ n, palabra, descripcion, imageURL, alergenos, ingredientes }) {
   currentNumber = n;
   currentPalabra = palabra || '';
   currentDescripcion = descripcion || '';
   currentImageURL = imageURL || '';
   currentAlergenos = alergenos || {};
+  currentIngredientes = ingredientes || [];
 
   const numEl = document.getElementById('viewNumber');
   const titleEl = document.getElementById('viewTitle');
@@ -146,6 +205,7 @@ function renderView({ n, palabra, descripcion, imageURL, alergenos }) {
   if (descEl) descEl.textContent = currentDescripcion || '—';
 
   buildAndMountDish3D(imageURL);
+  renderIngredientesSection(currentIngredientes);
   renderAlergenosSection(currentAlergenos);
 }
 
@@ -159,11 +219,13 @@ function openView() {
 }
 
 function closeView() {
+  stopAutoRotate();
+  clearTimeout(autoRotateResumeTimer);
   viewShell?.classList.remove('is-mounted');
   setTimeout(() => {
     viewBackdrop.classList.remove('is-open');
+    viewBackdrop.setAttribute('aria-hidden', 'true');
   }, 320);
-  viewBackdrop.setAttribute('aria-hidden', 'true');
   currentNumber = null;
 }
 
@@ -175,7 +237,8 @@ function getCurrentData() {
     palabra: currentPalabra,
     descripcion: currentDescripcion,
     imageURL: currentImageURL,
-    alergenos: currentAlergenos
+    alergenos: currentAlergenos,
+    ingredientes: currentIngredientes
   };
 }
 

@@ -15,14 +15,15 @@ export function showToast(message, type = 'info', timeout = 3000) {
   });
   setTimeout(() => {
     toast.classList.remove('visible');
-    toast.addEventListener(
-      'transitionend',
-      () => {
-        toast.remove();
-        if (!container.childElementCount) container.remove();
-      },
-      { once: true }
-    );
+    let done = false;
+    const remove = () => {
+      if (done) return;
+      done = true;
+      toast.remove();
+      if (!container.childElementCount) container.remove();
+    };
+    toast.addEventListener('transitionend', remove, { once: true });
+    setTimeout(remove, 400);
   }, timeout);
 }
 
@@ -36,6 +37,9 @@ export function showConfirm(message, {
     backdrop.className = 'confirm-backdrop';
     const modal = document.createElement('div');
     modal.className = 'confirm-modal glass';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Confirmación');
 
     const body = document.createElement('div');
     body.className = 'body';
@@ -57,6 +61,7 @@ export function showConfirm(message, {
     backdrop.appendChild(modal);
     document.body.appendChild(backdrop);
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => cancelBtn.focus());
 
     const cleanup = (result) => {
       backdrop.remove();
@@ -68,6 +73,14 @@ export function showConfirm(message, {
     okBtn.addEventListener('click', () => cleanup(true));
     backdrop.addEventListener('click', (e) => {
       if (e.target === backdrop) cleanup(false);
+    });
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { cleanup(false); return; }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (document.activeElement === cancelBtn) okBtn.focus();
+        else cancelBtn.focus();
+      }
     });
   });
 }

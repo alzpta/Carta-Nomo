@@ -1,910 +1,589 @@
 {
-  "updatedAt": "2026-05-27T00:00:00.000Z",
+  "updatedAt": "2026-05-28T00:00:00.000Z",
   "items": [
     {
       "id": "1",
       "palabra": "Edamame",
       "descripcion": "Judías de soja al vapor · 5,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_edamame.jpg",
-      "alergenos": {
-        "Soja": "A"
-      }
+      "alergenos": { "Soja": "A" },
+      "ingredientes": ["Edamame Congelado", "Sal Fina"]
     },
     {
       "id": "2",
       "palabra": "Spicy Edamame",
       "descripcion": "Edamame frito al aroma de sésamo picante · 6,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_spicyedamame.jpg",
-      "alergenos": {
-        "Soja": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Soja": "A", "Sésamo": "A" },
+      "ingredientes": ["Edamame Congelado", "Spicy Oil", "Sal Fina", "Shichimi Togarashi", "Ito Tougarashi"]
     },
     {
       "id": "3",
       "palabra": "Age Edamame Truffle",
       "descripcion": "Edamame frito al aroma de trufa blanca · 7,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_edamametrufado.jpg",
-      "alergenos": {
-        "Soja": "A"
-      }
+      "alergenos": { "Soja": "A" },
+      "ingredientes": ["Edamame Congelado", "Aceite De Trufa Blanca", "Sal Fina"]
     },
     {
       "id": "4",
       "palabra": "Sukiyaki Croquette",
       "descripcion": "Croqueta japonesa de rabo de toro rebozada en panko · 3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-sukiyaki-croquette_1644227004.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Leche": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Soja": "A", "Leche": "A", "Sulfitos": "A" },
+      "ingredientes": ["Croqueta De Rabo De Ternera", "Mayonesa De Kimuchi"]
     },
     {
       "id": "5",
       "palabra": "Takoyaki Croquette",
       "descripcion": "Croqueta de pulpo con salsa takoyaki, mayonesa japonesa y bonito seco · 3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_5_1675846184.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "T",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Cacahuete": "T",
-        "Soja": "A",
-        "Leche": "A",
-        "F. cáscara": "T",
-        "Apio": "A",
-        "Mostaza": "A",
-        "Sésamo": "T",
-        "Sulfitos": "T",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "T", "Huevos": "A", "Pescado": "A", "Cacahuete": "T", "Soja": "A", "Leche": "A", "F. cáscara": "T", "Apio": "A", "Mostaza": "A", "Sésamo": "T", "Sulfitos": "T", "Moluscos": "A" },
+      "ingredientes": ["Croqueta De Pulpo", "Salsa Okonomiyaki", "Mayonesa Japonesa", "Aonoriko", "Katsuo Bushi"]
     },
     {
       "id": "6",
       "palabra": "Kaki furai",
       "descripcion": "Ostra frita con panko, salsa mayonesa cítrica y salsa tonkatsu · 3,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_ostra-frita---baja-resolucion_1779351569.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Apio": "A",
-        "Sésamo": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Soja": "A", "Apio": "A", "Sésamo": "A", "Moluscos": "A" },
+      "ingredientes": ["Kaki Furai", "Mayonesa Cítrica", "Salsa Okonomiyaki", "Alga Codium", "Lima"]
     },
     {
       "id": "7",
       "palabra": "Nasu miso",
       "descripcion": "Berenjena con salsa miso · 8,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_berenjenamiso--baja-resolucion_1779352605.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Cacahuete": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Cacahuete": "A", "Soja": "A" },
+      "ingredientes": ["Berenjena China", "Salsa Miso Verde", "Tempurako", "Cacahuete", "Col Kale"]
     },
     {
       "id": "8",
       "palabra": "Yaki hotate to foie",
       "descripcion": "Pincho de vieira a la plancha con foie del Empordà, espinacas y salsa teriyaki · 5,7€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-hotate-to-foie-gra_1644227500.jpg",
-      "alergenos": {
-        "Leche": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Leche": "A", "Moluscos": "A" },
+      "ingredientes": ["Vieira Japón", "Foie", "Mantequilla", "Espinaca Escaldada", "Nitsume"]
     },
     {
       "id": "9",
       "palabra": "Chili crab roll",
       "descripcion": "Hand roll de cangrejo azul y soft shell crab crujiente, envuelto en hoja de soja con matcha y salsa chili · 11,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_chili-crab-hand-roll-baja-resolucion_1779353037.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A" },
+      "ingredientes": ["Mame Nori San Green", "Salsa Chili", "Arroz De Sushi", "Carne De Cangrejo Azul", "Tenkasu", "Cebolla Tierna Japonesa", "Soft Shell Crab"]
     },
     {
       "id": "12",
       "palabra": "Ebi gyoza",
       "descripcion": "Empanadillas de langostinos y verduras (4 unidades) · 10€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_ebigyoza.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Soja": "A",
-        "F. cáscara": "T",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Soja": "A", "F. cáscara": "T", "Sésamo": "A" },
+      "ingredientes": ["Ebi Nira Gyoza", "Salsa Ponzu"]
     },
     {
       "id": "13",
       "palabra": "Gyu Niku Gyoza",
       "descripcion": "Empanadillas de vaca vieja con cebolla caramelizada y crema de yuzu (4 unidades) · 10€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_10_1675847031.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Leche": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "Leche": "A", "Sulfitos": "A" },
+      "ingredientes": ["Gyoza De Vaca", "Salsa Crema De Yuzu"]
     },
     {
       "id": "14",
       "palabra": "Buta gyoza",
       "descripcion": "Empanadillas de butifarra de perol con verduras y salsa demi glace japonesa (4 unidades) · 11,8€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_buta-gyoza_1712727345.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Soja": "A",
-        "Leche": "A",
-        "Apio": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Soja": "A", "Leche": "A", "Apio": "A", "Sulfitos": "A" },
+      "ingredientes": ["Gyoza De Butifarra De Perol", "Menta Fresca", "Salsa Demi Glace De Jabalí Con Mantequilla"]
     },
     {
       "id": "15",
       "palabra": "Miso Shiru",
       "descripcion": "Sopa de miso con tofu y alga wakame · 5,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-sopademiso_1779859449.jpg",
-      "alergenos": {
-        "Pescado": "A",
-        "Soja": "A",
-        "Mostaza": "A"
-      }
+      "alergenos": { "Pescado": "A", "Soja": "A", "Mostaza": "A" },
+      "ingredientes": ["Sopa De Miso", "Tofu Kinu", "Cut Wakame", "Cebollino", "Micro Mezclum"]
     },
     {
       "id": "16",
       "palabra": "Ebi chilli",
       "descripcion": "Langostinos picantes sobre base de fideos kataifi crujientes y huevo frito · 16€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-ebi-chili-1644230516_1713424298.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Cola De Langostino Vanamei", "Salsa Ebi Chili", "Huevo Fresco", "Pasta Kataifi Frito", "Ito Tougarashi", "Lima"]
     },
     {
       "id": "17",
       "palabra": "Okonomi Omelette",
       "descripcion": "Tortilla abierta con pulpo y salsa okonomiyaki · 14,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_productos-okonomi-omelette_1644230352.jpg",
-      "alergenos": {
-        "Crustáceos": "T",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Apio": "A",
-        "Mostaza": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Crustáceos": "T", "Huevos": "A", "Pescado": "A", "Soja": "A", "Apio": "A", "Mostaza": "A", "Moluscos": "A" },
+      "ingredientes": ["Huevo Fresco", "Pata De Pulpo Cocido", "Salsa Okonomiyaki", "Cebolla Tierna Japonesa", "Katsuo Bushi", "Mayonesa Mostaza", "Dashinomoto"]
     },
     {
       "id": "18",
       "palabra": "Ebi to wasabi no salada",
       "descripcion": "Lechuga romana a la brasa con gamba de cristal frita, codium y vinagreta de wasabi · 9,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_chili-crab-hand-roll---baja-resolucion_1779353389.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Vinagreta De Wasabi", "Lechuga Romana", "Alga Codium", "Aceite Ahumado", "Gamba Blanca De Cristal", "Tempurako", "Lima"]
     },
     {
       "id": "22",
       "palabra": "Tori no Kara-Age",
       "descripcion": "Pollo rebozado en kara-age · 7,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_tori-kara-age_1712741130.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Mostaza": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Soja": "A", "Mostaza": "A" },
+      "ingredientes": ["Pollo Marinado Para Kara-Age", "Mayonesa Mostaza", "Tempurako", "Perejil Frances"]
     },
     {
       "id": "23",
       "palabra": "Ebi no tempura",
       "descripcion": "Tempura de langostinos con salsa kimuchi · 15,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-ebi-tempura_1644234643.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Cola De Langostino Vanamei", "Masa De Tempura", "Mayonesa De Kimuchi", "Lima", "Perejil Frances"]
     },
     {
       "id": "24",
       "palabra": "Foie kaki age",
       "descripcion": "Tempura de verduras con huevo y foie del Empordà · 16,7€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto--fu-kaki-age_1644235255.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Apio": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Soja": "A", "Apio": "A" },
+      "ingredientes": ["Masa De Tempura", "Salsa Okonomiyaki", "Zanahoria", "Cebolla Seca", "Calabacín", "Gari Pink", "Huevo Fresco", "Foie", "Cebolla Tierna Japonesa"]
     },
     {
       "id": "25",
       "palabra": "Ika no isobe kara-age",
       "descripcion": "Calamar en kara-age con alga lechuga de mar y mayonesa cítrica · 14,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_ika-no-isobe-kara-age-baja-resolucion_1779354786.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Sésamo": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Soja": "A", "Sésamo": "A", "Moluscos": "A" },
+      "ingredientes": ["Calamar Marinado Para Karaage", "Aonoriko", "Mayonesa Cítrica", "Shichimi Togarashi", "Lima"]
     },
     {
       "id": "29",
       "palabra": "Tako yaki",
       "descripcion": "Pata de pulpo a la brasa con mochis de patata y mayonesa picante · 16,8€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_productos-tako-yaki_1644231745.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "T",
-        "Huevos": "A",
-        "Pescado": "T",
-        "Soja": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "T", "Huevos": "A", "Pescado": "T", "Soja": "A", "Moluscos": "A" },
+      "ingredientes": ["Pata De Pulpo Cocido", "Mochi De Patata", "Mayonesa De Kimuchi", "Aceite De Oliva Suave", "Sal Maldon"]
     },
     {
       "id": "30",
       "palabra": "Tori no miso yaki",
       "descripcion": "Pollo marinado con miso de cebada a la brasa · 12,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_tori-no-miso-yaki-baja-resolucion_1779355311.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Soja": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Gluten": "A", "Soja": "A", "Sésamo": "A" },
+      "ingredientes": ["Pollo Marinado Con Miso", "Raíz De Loto Entera", "Lima"]
     },
     {
       "id": "31",
       "palabra": "Gyu niku no tataki",
       "descripcion": "Tataki de vaca con setas confitadas y salsa de miso · 23,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-gyu-niku-no-tataki_1644232074.jpg",
-      "alergenos": {
-        "Soja": "A"
-      }
+      "alergenos": { "Soja": "A" },
+      "ingredientes": ["Tataki De Vaca", "Setas Variadas Confitadas", "Salsa Miso Verde", "Aceite De Oliva Suave", "Sal Maldon", "Espárrago Escaldado"]
     },
     {
       "id": "32",
       "palabra": "Maguro hoho niku yu-an yaki",
       "descripcion": "Carrillera de atún a la brasa, crema de apionabo y pak choy al wok · 15,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_maguro-hoho-niku-baja-resolucion_1779355920.jpg",
-      "alergenos": {
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Pescado": "A", "Soja": "A", "Sésamo": "A" },
+      "ingredientes": ["Carrillera Marinada Yūan Yaki", "Pak Choi", "Puré De Apionabo", "Nitsume"]
     },
     {
       "id": "33",
       "palabra": "Yakimeshi",
       "descripcion": "Arroz frito con ternera y tortilla · 12,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_arrozyakimeshi.jpg",
-      "alergenos": {
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Huevos": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Yakimeshi Pre Cocinado", "Soboro", "Cebolla Tierna Japonesa", "Sésamo Blanco", "Pimienta Negra Molida"]
     },
     {
       "id": "34",
       "palabra": "Unagi Yakimeshi",
       "descripcion": "Arroz frito con anguila, ceps y trompetas de la muerte · 16,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_31_1689175112.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Yakimeshi Pre Cocinado", "Trompeta De La Muerte Congelada", "Cep Deshidratado", "Nitsume", "Cebolla Tierna Japonesa", "Unagi Kabayaki", "Sansho"]
     },
     {
       "id": "35",
       "palabra": "Omu Yakisoba",
       "descripcion": "Fideos a la plancha con ternera y verduras en saco de tortilla · 14,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_fideosomuyakisoba.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Soja": "A",
-        "Apio": "A",
-        "Mostaza": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Soja": "A", "Apio": "A", "Mostaza": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Fideo Yakisoba A La Plancha", "Salsa Yakisoba", "Col", "Soboro", "Tortilla Para Omu Yakisoba", "Zanahoria", "Calabacín", "Cebolla Tierna Japonesa", "Sésamo Blanco", "Mayonesa Mostaza"]
     },
     {
       "id": "36",
       "palabra": "Aka ebi yakisoba",
       "descripcion": "Fideos con gamba roja, shiitake y huevo frito · 24,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-aka-ebi-yakisoba_1644232039.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Pescado": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Fideo Yakisoba A La Plancha", "Salsa Garlic", "Shiitake", "Tirabeque", "Gamba Roja", "Kizami Nori", "Cebolla Tierna Japonesa", "Huevo Fresco", "Cebolla Tierna Blanca"]
     },
     {
       "id": "39",
       "palabra": "Maguro taco",
       "descripcion": "Mini taco de tartar de atún, hoja de wasabi marinada y shiso sobre una oblea artesanal · 5,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-maguro-taco_1644332688.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "T",
-        "Pescado": "A",
-        "Cacahuete": "T",
-        "Soja": "A",
-        "Leche": "T",
-        "F. cáscara": "T",
-        "Apio": "T",
-        "Mostaza": "T",
-        "Sésamo": "T"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "T", "Pescado": "A", "Cacahuete": "T", "Soja": "A", "Leche": "T", "F. cáscara": "T", "Apio": "T", "Mostaza": "T", "Sésamo": "T" },
+      "ingredientes": ["Hoja De Mini Taco", "Atún Bluefin Akami", "Salsa Yukke Ponzu", "Kizami Wasabi", "Hoja De Shiso Verde", "Cebollino"]
     },
     {
       "id": "40",
       "palabra": "Hiramasa taco",
       "descripcion": "Mini taco de tartar de pez limón con salsa de yuzu y maracuyá sobre una oblea artesanal · 6,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_hiramasa-taco-baja-resolucion_1779357305.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "T",
-        "Pescado": "A",
-        "Cacahuete": "T",
-        "Soja": "T",
-        "Leche": "T",
-        "F. cáscara": "T",
-        "Apio": "T",
-        "Mostaza": "T",
-        "Sésamo": "T"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "T", "Pescado": "A", "Cacahuete": "T", "Soja": "T", "Leche": "T", "F. cáscara": "T", "Apio": "T", "Mostaza": "T", "Sésamo": "T" },
+      "ingredientes": ["Hiramasa", "Hoja De Mini Taco", "Salsa Yuzu Ceviche", "Lima"]
     },
     {
       "id": "41",
       "palabra": "Toro taco",
       "descripcion": "Mini taco de tartar de ventresca de atún, huevas de trucha sobre una oblea artesanal · 6,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-mini-taco-toro_1644230831.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "T",
-        "Pescado": "A",
-        "Cacahuete": "T",
-        "Soja": "A",
-        "Leche": "T",
-        "F. cáscara": "T",
-        "Apio": "T",
-        "Mostaza": "T",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "T", "Pescado": "A", "Cacahuete": "T", "Soja": "A", "Leche": "T", "F. cáscara": "T", "Apio": "T", "Mostaza": "T", "Sésamo": "A" },
+      "ingredientes": ["Hoja De Mini Taco", "Atún Bluefin O-Toro", "Huevas De Trucha", "Salsa Yukke Ponzu", "Sésamo Tostado", "Cebollino"]
     },
     {
       "id": "42",
       "palabra": "Salmon taco",
       "descripcion": "Mini taco de tartar de salmón noruego y huevas de salmón, sobre una oblea artesanal · 4,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_salmon-taco--baja-resolucion_1779855048.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "T",
-        "Pescado": "A",
-        "Cacahuete": "T",
-        "Soja": "A",
-        "Leche": "T",
-        "F. cáscara": "T",
-        "Apio": "T",
-        "Mostaza": "T",
-        "Sésamo": "T",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "T", "Pescado": "A", "Cacahuete": "T", "Soja": "A", "Leche": "T", "F. cáscara": "T", "Apio": "T", "Mostaza": "T", "Sésamo": "T", "Sulfitos": "A" },
+      "ingredientes": ["Hoja De Mini Taco", "Salmón Fileteado Saku Congelado", "Ikura Rosado", "Ponzu Blanco", "Cebolla Perla"]
     },
     {
       "id": "43",
       "palabra": "Salmonete no tataki",
       "descripcion": "Tataki de salmonete con tirabeques al wok, salsa ponzu y hojas de wasabi fresco · 23,7€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-salmonete_1644408306.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Salmonete Lomo Limpio", "Espina Y Cabeza De Salmonete", "Aceite De Oliva Suave", "Salsa Ponzu", "Kizami Wasabi", "Tirabeque", "Sal Fina"]
     },
     {
       "id": "44",
       "palabra": "Toro no caneloni",
       "descripcion": "Canelón de medio graso de atún con aguacate, huevas de trucha y hoja de wasabi fresco · 22,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_canelondetoro.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Mostaza": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A", "Mostaza": "A" },
+      "ingredientes": ["Atún Bluefin O-Toro", "Crema De Aguacate", "Micro Mezclum", "Kizami Wasabi", "Huevas De Trucha", "Salsa Canelón"]
     },
     {
       "id": "45",
       "palabra": "Maguro Tataki",
       "descripcion": "Tataki de atún con crema de aguacate · 15,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_tatakiatun.jpg",
-      "alergenos": {
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Pescado": "A", "Soja": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Atún Lomo Yellowfin", "Crema De Aguacate", "Salsa Tataki", "Sésamo Blanco", "Aceite De Oliva Suave", "Cebollino"]
     },
     {
       "id": "46",
       "palabra": "Maguro pizza japonesa",
       "descripcion": "Tártar de atún bluefin con mayonesa de anchoa sobre hojaldre crujiente · 13,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_maguro-pizza-japonesa--baja-resolucion_1779358273.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Leche": "T",
-        "Mostaza": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "Leche": "T", "Mostaza": "A" },
+      "ingredientes": ["Pan M-Semen", "Atún Bluefin Akami", "Salsa Yukke Ponzu", "Kizami Wasabi", "Mayonesa De Anchoa", "Hoja De Shiso Verde", "Kizami Nori"]
     },
     {
       "id": "47",
       "palabra": "Toro no gilda",
       "descripcion": "Gilda de sashimi de ventresca de atún con salsa ponzu · 6,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_toro-no-gilda---baja-resolucion_1779358756.jpg",
-      "alergenos": {
-        "Pescado": "A",
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Pescado": "A", "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Piparras En Vinagre", "Oliva Gordal", "Atún Bluefin O-Toro", "Salsa Canelón", "Cebolla Tierna Japonesa", "Anchoas En Aceite"]
     },
     {
       "id": "48",
       "palabra": "Toro taku sando",
       "descripcion": "Sándwich de ventresca de atún con cebolla tierna japonesa, nabo marinado, piparras, hoja de wasabi marinado y botarga rallada · 12,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_toro-taku-sando--baja-resolucion_1779359330.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Leche": "A",
-        "F. cáscara": "T",
-        "Sésamo": "A",
-        "Altramuces": "T",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "Leche": "A", "F. cáscara": "T", "Sésamo": "A", "Altramuces": "T", "Sulfitos": "A" },
+      "ingredientes": ["Pan De Molde Brioche", "Atún Bluefin Chu-Toro", "Cebolla Tierna Japonesa", "Takuan Ipponzuke", "Piparras En Vinagre", "Sésamo Blanco", "Salsa Yukke", "Kizami Wasabi", "Botarga", "Mantequilla"]
     },
     {
       "id": "50",
       "palabra": "Salmon sashimi",
       "descripcion": "Sashimi de salmón de Noruega (3 unidades) · 8,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_sashimisalmonnoruego.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Salmón Fileteado Saku Congelado"]
     },
     {
       "id": "51",
       "palabra": "Maguro sashimi",
       "descripcion": "Sashimi de atún bluefin (3 unidades) · 9,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_sashimituna.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Atún Bluefin Akami"]
     },
     {
       "id": "52",
       "palabra": "Toro sashimi",
       "descripcion": "Sashimi de ventresca de atún bluefin (3 unidades) · 11,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_sashimitoro.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Atún Bluefin O-Toro"]
     },
     {
       "id": "53",
       "palabra": "Hiramasa no sashimi",
       "descripcion": "Sashimi de pez limón · 9,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_pez-limon---baja-resolucion_1779359654.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Hiramasa"]
     },
     {
       "id": "54",
       "palabra": "Salmon Hosomaki",
       "descripcion": "Hosomaki de Salmón de Noruega (6 unidades) · 8,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto-salmonmaki-1713421705_1772448635.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Arroz De Sushi", "Yakinori", "Salmón Fileteado Saku Congelado"]
     },
     {
       "id": "55",
       "palabra": "Spicy Tuna maki",
       "descripcion": "Futomaki de atún con salsa picante (5 unidades) · 12,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_chatgpt-image-2-mar-2026-11-33-06_1772447631.png",
-      "alergenos": {
-        "Huevos": "A",
-        "Pescado": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Huevos": "A", "Pescado": "A", "Sésamo": "A" },
+      "ingredientes": ["Yakinori", "Arroz De Sushi", "Atún Bluefin Akami", "Lollo Rosa", "Spicy Mayonesa"]
     },
     {
       "id": "56",
       "palabra": "Unagi to foie maki",
       "descripcion": "Futomaki de anguila con foie y salsa miso (5 unidades) · 12,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_chatgpt-image-21-may-2026-13-59-02_1779364756.png",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Yakinori", "Arroz De Sushi", "Unagi Kabayaki", "Foie", "Salsa Miso Verde"]
     },
     {
       "id": "58",
       "palabra": "Salmon to avocado roll",
       "descripcion": "Uramaki de salmón noruego con aguacate y mayonesa (8 unidades) · 12,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_salamontoavocado.jpg",
-      "alergenos": {
-        "Huevos": "A",
-        "Pescado": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Huevos": "A", "Pescado": "A", "Sésamo": "A" },
+      "ingredientes": ["Yakinori", "Arroz De Sushi", "Salmón Fileteado Saku Congelado", "Aguacate Extra", "Sésamo Negro", "Mayonesa Heinz"]
     },
     {
       "id": "59",
       "palabra": "Ebi tama roll",
       "descripcion": "Uramaki de langostino en tempura con salsa tártara japonesa, sala rosa, tobiko y cebolleta japonesa · 14,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_4-ebi-tama-roll--baja-resolucion-copia_1779363482.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "F. cáscara": "T",
-        "Apio": "T",
-        "Mostaza": "A",
-        "Sésamo": "T",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "F. cáscara": "T", "Apio": "T", "Mostaza": "A", "Sésamo": "T", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Yakinori", "Tobiko Orange", "Huevo Duro Con Mayonesa", "Cola De Langostino Vanamei", "Tempurako", "Salsa Rosa", "Cebolla Tierna Japonesa"]
     },
     {
       "id": "60",
       "palabra": "Hokkai Pepper roll",
       "descripcion": "Uramaki de tempura de aguacate, vieira y salmón de Noruega aderezado con salsa picante y cebolla crujiente (8 unidades) · 15,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_hokkai-pepper_1698925933.png",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "T",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "T", "Huevos": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A", "Moluscos": "A" },
+      "ingredientes": ["Yakinori", "Arroz De Sushi", "Tempura De Aguacate", "Vieira Japón", "Salmón Fileteado Saku Congelado", "Salsa Hokkai", "Tenkasu", "Ito Tougarashi"]
     },
     {
       "id": "62",
       "palabra": "Smoke fish roll",
       "descripcion": "Uramaki de langostino rebozado en panko con salmón noruego y pez mantequilla flambeado, salsa tártara y cebolla caramelizada (8 unidades) · 16,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_48_1675849637.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Yakinori", "Arroz De Sushi", "Salmón Fileteado Saku Congelado", "Ebifurai 3L", "Salsa Tartara", "Pez Mantequilla", "Cebolla Caramelizada", "Aceite Ahumado", "Cebollino"]
     },
     {
       "id": "63",
       "palabra": "Maguro tataki kimuchi roll",
       "descripcion": "Uramaki de tataki de atún con pepino, kimuchi, mayonesa japonesa y cebolla tierna (8 unidades) · 13,8€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_11_1712744321.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "T",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Mostaza": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "T", "Huevos": "A", "Pescado": "A", "Soja": "A", "Mostaza": "A", "Sésamo": "A" },
+      "ingredientes": ["Arroz De Sushi", "Yakinori", "Atún Lomo Yellowfin", "Kimuchi", "Mayonesa Japonesa", "Spicy Oil", "Pepino Holandés", "Tenkasu", "Cebolla Tierna Japonesa"]
     },
     {
       "id": "64",
       "palabra": "Rainbow Tuna roll",
       "descripcion": "Uramaki de tempura de aguacate, ventresca de atún flambeada, cebolla caramelizada y salsa de trufa (8 unidades) · 20,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_rainbowtunauramaki.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Yakinori", "Arroz De Sushi", "Tempura De Aguacate", "Atún Bluefin Akami", "Cebolla Caramelizada", "Tobiko Orange", "Hoja De Shiso Verde", "Salsa Trufada"]
     },
     {
       "id": "70",
       "palabra": "Salmon Noruega Nigiri",
       "descripcion": "Nigiri de salmón de Noruega · 3,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_nigirisalmonnoruego.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Arroz De Sushi", "Salmón Fileteado Saku Congelado"]
     },
     {
       "id": "71",
       "palabra": "Maguro Nigiri",
       "descripcion": "Nigiri de atún · 3,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_nigirituna.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Arroz De Sushi", "Atún Bluefin Akami"]
     },
     {
       "id": "72",
       "palabra": "Toro Nigiri",
       "descripcion": "Nigiri de ventresca de atún · 4,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_toronigiri.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Arroz De Sushi", "Atún Bluefin O-Toro"]
     },
     {
       "id": "73",
       "palabra": "Unagi Nigiri",
       "descripcion": "Nigiri de anguila flambeada · 4,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_unaguinigiri.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Arroz De Sushi", "Unagi Kabayaki", "Sansho", "Nitsume"]
     },
     {
       "id": "74",
       "palabra": "Aburi salmon nigiri",
       "descripcion": "Nigiri de salmón de Noruega flambeado con mayonesa japonesa, huevas de salmón y cebolla perla · 4,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_54_1703062399.jpg",
-      "alergenos": {
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Mostaza": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Huevos": "A", "Pescado": "A", "Soja": "A", "Mostaza": "A", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Salmón Fileteado Saku Congelado", "Ikura Rosado", "Cebolla Perla", "Mayonesa Japonesa"]
     },
     {
       "id": "75",
       "palabra": "Maguro tataki no nigiri trufa",
       "descripcion": "Nigiri de tataki de atún marinado con soja y salsa crema de trufa negra · 4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_55_1703062625.jpg",
-      "alergenos": {
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Arroz De Sushi", "Atún Bluefin Akami", "Salsa Trufada", "Salsa Yukke"]
     },
     {
       "id": "76",
       "palabra": "Aburi toro nigiri",
       "descripcion": "Ventresca de atún flambeada con cebolla caramelizada · 4,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_56_1703062453.jpg",
-      "alergenos": {
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Arroz De Sushi", "Atún Bluefin O-Toro", "Cebolla Caramelizada", "Aceite Ahumado"]
     },
     {
       "id": "77",
       "palabra": "Butter fish nigiri",
       "descripcion": "Nigiri de pez mantequilla con salsa kimuchi y piparras en vinagre · 3,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_57_1703062497.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Pez Mantequilla", "Mayonesa De Kimuchi", "Piparras En Vinagre"]
     },
     {
       "id": "78",
       "palabra": "Aburi salmonete no nigiri",
       "descripcion": "Nigiri de tataki de salmonete con salsa picante · 4,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_chatgpt-image-27-may-2026-07-35-55_1779860171.png",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A" },
+      "ingredientes": ["Arroz De Sushi", "Salmonete Lomo Limpio", "La-Yu Nomo"]
     },
     {
       "id": "79",
       "palabra": "Foie Nigiri",
       "descripcion": "Nigiri de foie a la plancha con salsa teriyaki · 4,3€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_nigirifoie.jpg",
-      "alergenos": {
-        "Soja": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Soja": "A", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Foie", "Salsa Tataki", "Cebollino"]
     },
     {
       "id": "80",
       "palabra": "Brie Nigiri",
       "descripcion": "Nigiri de brie flambeado con miel y nueces · 3,7€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_nigiribrie.jpg",
-      "alergenos": {
-        "Soja": "A",
-        "Leche": "A",
-        "F. cáscara": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Soja": "A", "Leche": "A", "F. cáscara": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Queso Brie", "Salsa Tataki", "Sésamo Blanco", "Nuez", "Miel"]
     },
     {
       "id": "81",
       "palabra": "Uzura no tamago nigiri",
       "descripcion": "Nigiri de huevo frito de codorniz con jamón ibérico y salsa de alga nori · 4,1€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_61_1675850942.jpg",
-      "alergenos": {
-        "Huevos": "A",
-        "Soja": "A",
-        "Mostaza": "A"
-      }
+      "alergenos": { "Huevos": "A", "Soja": "A", "Mostaza": "A" },
+      "ingredientes": ["Arroz De Sushi", "Huevos De Codorniz", "Paleta Jamón Ibérico Cortada", "Mayonesa De Alga Nori"]
     },
     {
       "id": "82",
       "palabra": "Ikura No Gunkan",
       "descripcion": "Gunkan de huevas de salmón · 4,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_producto_ikuragunkan.jpg",
-      "alergenos": {
-        "Pescado": "A"
-      }
+      "alergenos": { "Pescado": "A" },
+      "ingredientes": ["Arroz De Sushi", "Ikura Rosado", "Yakinori"]
     },
     {
       "id": "83",
       "palabra": "Toro tartar no nigiri",
       "descripcion": "Nigiri de tartar de ventresca de atún con cebolla tierna japonesa, nabo marinado, piparras, hoja de wasabi marinado y botarga rallada · 4,5€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_nomo-6-05--toro-tartal-nigiri_1779785623.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Toro Tartar Para Nigiri", "Botarga"]
     },
     {
       "id": "84",
       "palabra": "Hiramasa no nigiri",
       "descripcion": "Nigiri de pez limón con salsa de yuzu y jalapeño marinado · 4,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_nomo-6-05--hiramasa-nigiri_1779360900.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Hiramasa", "Arroz De Sushi", "Jalapeño Marinado", "Salsa Yuzu Ceviche"]
     },
     {
       "id": "85",
       "palabra": "Nasu no nigiri",
       "descripcion": "Nigiri de berenjena frita con salsa miso y shiso · 3,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_nigiriberenjena-baja-resolucion_1779361178.jpg",
-      "alergenos": {
-        "Soja": "A"
-      }
+      "alergenos": { "Soja": "A" },
+      "ingredientes": ["Arroz De Sushi", "Berenjena China", "Salsa Miso Verde", "Hoja De Shiso Verde"]
     },
     {
       "id": "86",
       "palabra": "Aguacate no nigiri",
       "descripcion": "Nigiri de aguacate con salsa de queso Philadelphia con wasabi · 2,9€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_nigiri-de-aguacate-acoplado_1779362129.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Soja": "A",
-        "Leche": "A"
-      }
+      "alergenos": { "Gluten": "A", "Soja": "A", "Leche": "A" },
+      "ingredientes": ["Arroz De Sushi", "Aguacate Extra", "Salsa Philadelphia Wasabi"]
     },
     {
       "id": "90",
       "palabra": "Maguro tartar no temaki",
       "descripcion": "Temaki de tartar de atún con huevo frito y cebolla tierna japonesa (4 unidades) · 14,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_maguro-tartar-no-temaki_1712734269.jpg",
-      "alergenos": {
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A"
-      }
+      "alergenos": { "Huevos": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A" },
+      "ingredientes": ["Arroz De Sushi", "Atún Bluefin Akami", "Cebolla Tierna Japonesa", "Yakinori", "Sésamo Blanco", "Salsa Yukke Ponzu", "Huevo De Codorniz"]
     },
     {
       "id": "91",
       "palabra": "Toro tartar no temaki",
       "descripcion": "Temaki de tartar de ventresca de atún con cebolla tierna japonesa, nabo marinado, piparras y hoja de wasabi marinado (4 unidades) · 15,4€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_toro-tartar-no-temaki_1712734408.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Arroz De Sushi", "Atún Bluefin O-Toro", "Yakinori", "Cebolla Tierna Japonesa", "Takuan Ipponzuke", "Sésamo Blanco", "Piparras En Vinagre", "Salsa Yukke", "Kizami Wasabi"]
     },
     {
       "id": "93",
       "palabra": "Kama toro no temaki",
       "descripcion": "Temaki de parpatana de atún marinado a la brasa (4 unidades) · 15,2€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_kama-toro-no-temaki_1712735066.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Pescado": "A",
-        "Soja": "A"
-      }
+      "alergenos": { "Gluten": "A", "Pescado": "A", "Soja": "A" },
+      "ingredientes": ["Arroz De Sushi", "Parpatana Marinada Con Miso", "Kizami Wasabi", "Yakinori"]
     },
     {
       "id": "95",
       "palabra": "Sushi 15p",
       "descripcion": "8 Makis y 7 Nigiris · 29€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_71_1696927665.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "Mostaza": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "Mostaza": "A", "Sésamo": "A", "Sulfitos": "A" },
+      "ingredientes": ["Salmon To Avocado Roll (4 Pzas)", "Spicy Tuna Roll (4 Pzas)", "Nigiri De Salmón", "Nigiri De Anguila", "Butter Fish Nigiri", "Aburi Salmon Nigiri", "Aburi Toro Nigiri", "Maguro Tataki No Nigiri Trufa", "Hiramasa No Nigiri"]
     },
     {
       "id": "96",
       "palabra": "Bandeja especial 35p",
       "descripcion": "Selección especial del chef de makis y nigiris variados (35 unidades) · 77,6€",
       "imageURL": "https://cartas.gruponomo.com/upload/productos/md_72_1675852310.jpg",
-      "alergenos": {
-        "Gluten": "A",
-        "Crustáceos": "A",
-        "Huevos": "A",
-        "Pescado": "A",
-        "Soja": "A",
-        "F. cáscara": "T",
-        "Apio": "T",
-        "Mostaza": "A",
-        "Sésamo": "A",
-        "Sulfitos": "A",
-        "Moluscos": "A"
-      }
+      "alergenos": { "Gluten": "A", "Crustáceos": "A", "Huevos": "A", "Pescado": "A", "Soja": "A", "F. cáscara": "T", "Apio": "T", "Mostaza": "A", "Sésamo": "A", "Sulfitos": "A", "Moluscos": "A" },
+      "ingredientes": ["Hokkai Pepper Roll (8 Pzas)", "Ebi Tama Roll (8 Pzas)", "Spicy Tuna Roll (5 Pzas)", "Hiramasa No Nigiri (2 Pzas)", "Nigiri De Salmón (2 Pzas)", "Aburi Salmon Nigiri (2 Pzas)", "Aburi Toro Nigiri (2 Pzas)", "Maguro Tataki No Nigiri Trufa (2 Pzas)", "Butter Fish Nigiri (2 Pzas)", "Toro Tartar No Nigiri (2 Pzas)"]
     }
   ]
 }

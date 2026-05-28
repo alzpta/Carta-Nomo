@@ -4,10 +4,6 @@ export function initAuth(auth, elements) {
   const {
     loginBtn,
     logoutBtn,
-    editarBtn,
-    borrarBtn,
-    exportBtn,
-    importBtn,
     userInfo,
     loginBackdrop,
     loginEmail,
@@ -31,10 +27,6 @@ export function initAuth(auth, elements) {
 
   const renderAuthUI = (user) => {
     const on = !!user;
-    editarBtn?.classList.toggle('hidden', !on);
-    borrarBtn?.classList.toggle('hidden', !on);
-    exportBtn?.classList.toggle('hidden', !on);
-    importBtn?.classList.toggle('hidden', !on);
     logoutBtn?.classList.toggle('hidden', !on);
     loginBtn?.classList.toggle('hidden', on);
     if (userInfo) userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
@@ -46,13 +38,13 @@ export function initAuth(auth, elements) {
     loginPass.value = '';
     clearErrors();
     loginSubmit.disabled = false;
-    loginBackdrop.style.display = 'flex';
-    loginBackdrop.setAttribute('aria-hidden', 'false');
+    loginBackdrop.classList.add('is-open');
+    loginBackdrop.removeAttribute('aria-hidden');
     document.body.style.overflow = 'hidden';
     loginEmail.focus();
   };
   const closeLogin = () => {
-    loginBackdrop.style.display = 'none';
+    loginBackdrop.classList.remove('is-open');
     loginBackdrop.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   };

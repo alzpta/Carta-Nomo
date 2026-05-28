@@ -50,6 +50,110 @@ initAuth(auth, {
 
 const grid = document.getElementById('grid');
 
+// ── Búsqueda y filtro ────────────────────────────────────────────────
+let allDatos = {};
+let searchQuery = '';
+const hiddenAllergens = new Set();
+
+const ALLERGEN_KEYS = [
+  'Gluten', 'Crustáceos', 'Huevos', 'Pescado', 'Cacahuete',
+  'Soja', 'Leche', 'F. cáscara', 'Apio', 'Mostaza',
+  'Sésamo', 'Altramuces', 'Sulfitos', 'Moluscos'
+];
+
+function updateGridVisibility() {
+  if (!grid) return;
+  const q = searchQuery.trim().toLowerCase();
+  for (let i = 1; i <= MAX_NUMEROS; i++) {
+    const btn = grid.children[i - 1];
+    if (!btn) continue;
+    const d = allDatos[i];
+    btn.classList.toggle('empty', !d);
+    if (!d) { btn.classList.remove('is-hidden'); continue; }
+
+    const passSearch = !q ||
+      d.palabra.toLowerCase().includes(q) ||
+      d.descripcion.toLowerCase().includes(q) ||
+      String(i) === q;
+
+    const passAllergen = [...hiddenAllergens].every(alg => !d.alergenos[alg]);
+
+    btn.classList.toggle('is-hidden', !passSearch || !passAllergen);
+  }
+}
+
+// Barra de búsqueda
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+searchInput?.addEventListener('input', (e) => {
+  searchQuery = e.target.value;
+  searchClear?.classList.toggle('hidden', !searchQuery);
+  updateGridVisibility();
+});
+searchClear?.addEventListener('click', () => {
+  searchQuery = '';
+  if (searchInput) searchInput.value = '';
+  searchClear.classList.add('hidden');
+  updateGridVisibility();
+});
+
+// Filter sheet
+const filterBtn = document.getElementById('filterBtn');
+const filterBackdrop = document.getElementById('filterBackdrop');
+const filterClear = document.getElementById('filterClear');
+const filterDone = document.getElementById('filterDone');
+const filterList = document.getElementById('filterList');
+
+function updateFilterBadge() {
+  const count = hiddenAllergens.size;
+  filterBtn?.classList.toggle('is-on', count > 0);
+  let badge = filterBtn?.querySelector('.carta-filter-badge');
+  if (!badge && filterBtn) {
+    badge = document.createElement('span');
+    badge.className = 'carta-filter-badge hidden';
+    filterBtn.appendChild(badge);
+  }
+  if (badge) {
+    badge.textContent = String(count);
+    badge.classList.toggle('hidden', count === 0);
+  }
+}
+
+function buildFilterList() {
+  if (!filterList) return;
+  filterList.innerHTML = '';
+  ALLERGEN_KEYS.forEach(name => {
+    const row = document.createElement('button');
+    const on = hiddenAllergens.has(name);
+    row.className = `filter-row${on ? ' is-on' : ''}`;
+    row.innerHTML = `<span>${name}</span><span class="filter-toggle"><span class="filter-toggle-knob"></span></span>`;
+    row.addEventListener('click', () => {
+      if (hiddenAllergens.has(name)) hiddenAllergens.delete(name);
+      else hiddenAllergens.add(name);
+      row.classList.toggle('is-on', hiddenAllergens.has(name));
+      updateFilterBadge();
+      updateGridVisibility();
+    });
+    filterList.appendChild(row);
+  });
+}
+
+filterBtn?.addEventListener('click', () => {
+  buildFilterList();
+  filterBackdrop?.classList.add('is-open');
+});
+filterBackdrop?.addEventListener('click', (e) => {
+  if (e.target === filterBackdrop) filterBackdrop.classList.remove('is-open');
+});
+filterDone?.addEventListener('click', () => filterBackdrop?.classList.remove('is-open'));
+filterClear?.addEventListener('click', () => {
+  hiddenAllergens.clear();
+  buildFilterList();
+  updateFilterBadge();
+  updateGridVisibility();
+});
+
+// ── Grid ─────────────────────────────────────────────────────────────
 if (grid) {
   for (let i = 1; i <= MAX_NUMEROS; i++) {
     const btn = document.createElement('button');
@@ -60,10 +164,8 @@ if (grid) {
   }
 
   subscribeNumeros(db, (datos) => {
-    for (let i = 1; i <= MAX_NUMEROS; i++) {
-      const btn = grid.children[i - 1];
-      if (btn) btn.classList.toggle('empty', !datos[i]);
-    }
+    allDatos = datos;
+    updateGridVisibility();
   });
 }
 
@@ -89,6 +191,7 @@ export function speak(text) {
 grid?.addEventListener('click', async (e) => {
   const cell = e.target.closest('.cell');
   if (!cell) return;
+  if (cell.classList.contains('empty') || cell.classList.contains('is-hidden')) return;
   const n = Number(cell.dataset.n || cell.textContent?.trim());
   if (!n) return;
 

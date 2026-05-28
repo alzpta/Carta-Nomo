@@ -1,5 +1,4 @@
-// Popup de vista (detalle)
-// Maneja la apertura, cierre y renderizado del popup de detalle.
+// Popup de vista — Atelier design con plato 3D girable
 
 let currentNumber = null;
 let currentPalabra = '';
@@ -8,67 +7,106 @@ let currentImageURL = '';
 let currentAlergenos = {};
 
 const viewBackdrop = document.getElementById('viewBackdrop');
-let viewTitle = document.getElementById('viewTitle');
-const viewImage = document.getElementById('viewImage');
-let viewDesc = document.getElementById('viewDesc');
+const viewShell = document.getElementById('viewShell');
 const viewCloseBtn = document.getElementById('viewCloseBtn');
 const viewSpeakBtn = document.getElementById('viewSpeakBtn');
 const viewAlergenosSection = document.getElementById('viewAlergenos');
 
-function ensureViewNodes() {
-  if (!viewTitle) {
-    viewTitle = document.createElement('h2');
-    viewTitle.id = 'viewTitle';
-    viewBackdrop.querySelector('header')?.appendChild(viewTitle);
-  }
-  if (!viewDesc) {
-    viewDesc = document.createElement('p');
-    viewDesc.id = 'viewDesc';
-    viewDesc.className = 'subtitle popup-desc';
-    viewBackdrop.querySelector('.body')?.appendChild(viewDesc);
+// ── Dish 3D state ────────────────────────────────────────────────────
+let dish3dRotY = 0;
+let dish3dRotX = 56;
+const dish3dDrag = { active: false, x: 0, y: 0, rotY: 0, rotX: 0 };
+
+function updateDish3DTransform() {
+  const inner = document.getElementById('dish3dInner');
+  if (inner) {
+    inner.style.transform = `rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY}deg)`;
   }
 }
 
-function openView() {
-  ensureViewNodes();
-  viewBackdrop.classList.add('is-open');
-  viewBackdrop.removeAttribute('aria-hidden');
-  viewCloseBtn?.focus();
+function onDish3DDown(e) {
+  const p = e.touches ? e.touches[0] : e;
+  dish3dDrag.active = true;
+  dish3dDrag.x = p.clientX;
+  dish3dDrag.y = p.clientY;
+  dish3dDrag.rotY = dish3dRotY;
+  dish3dDrag.rotX = dish3dRotX;
+  e.preventDefault?.();
 }
 
-function closeView() {
-  viewBackdrop.classList.remove('is-open');
-  viewBackdrop.setAttribute('aria-hidden', 'true');
-  currentNumber = null;
+function onDish3DMove(e) {
+  if (!dish3dDrag.active) return;
+  const p = e.touches ? e.touches[0] : e;
+  dish3dRotY = dish3dDrag.rotY + (p.clientX - dish3dDrag.x) * 0.6;
+  dish3dRotX = Math.max(28, Math.min(78, dish3dDrag.rotX - (p.clientY - dish3dDrag.y) * 0.3));
+  updateDish3DTransform();
 }
 
-function renderView({ n, palabra, descripcion, imageURL, alergenos }) {
-  ensureViewNodes();
-  currentNumber = n;
-  currentPalabra = palabra || '';
-  currentDescripcion = descripcion || '';
-  currentImageURL = imageURL || '';
-  currentAlergenos = alergenos || {};
+function onDish3DUp() { dish3dDrag.active = false; }
 
-  viewTitle.textContent = `${n}. ${currentPalabra || '—'}`;
-  viewDesc.textContent = currentDescripcion || '—';
+window.addEventListener('mousemove', onDish3DMove);
+window.addEventListener('mouseup', onDish3DUp);
+window.addEventListener('touchmove', onDish3DMove, { passive: false });
+window.addEventListener('touchend', onDish3DUp);
 
-  if (currentImageURL) {
-    viewImage.src = currentImageURL;
-    viewImage.alt = currentPalabra ? `Imagen de ${currentPalabra}` : `Imagen del número ${n}`;
-    viewImage.style.display = '';
-  } else {
-    viewImage.removeAttribute('src');
-    viewImage.alt = '';
-    viewImage.style.display = 'none';
+// ── Dish visual ──────────────────────────────────────────────────────
+function buildDishWellContent(imageURL) {
+  if (imageURL) {
+    return `<img src="${imageURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="" loading="lazy" />`;
+  }
+  const h = 28;
+  const h2 = (h + 8) % 360, h3 = (h - 10 + 360) % 360, h4 = (h + 12) % 360, h5 = (h + 60) % 360;
+  return `
+    <div class="dish-content">
+      <div class="d-blob d-blob-base" style="background:radial-gradient(circle at 50% 45%,oklch(0.72 0.14 ${h}) 0%,oklch(0.52 0.16 ${h2}) 70%,transparent 78%)"></div>
+      <div class="d-blob d-piece" style="top:22%;left:28%;background:radial-gradient(circle at 40% 35%,oklch(0.86 0.08 ${h3}),oklch(0.72 0.14 ${h}) 65%,transparent 80%)"></div>
+      <div class="d-blob d-piece" style="top:52%;left:58%;background:radial-gradient(circle at 35% 30%,oklch(0.86 0.08 ${h3}),oklch(0.72 0.14 ${h}) 60%,transparent 80%)"></div>
+      <div class="d-blob d-sauce" style="background:radial-gradient(ellipse 60% 38% at 50% 60%,oklch(0.42 0.18 ${h4}) 0%,transparent 70%)"></div>
+      <div class="d-blob d-accent" style="top:30%;left:46%;background:oklch(0.78 0.18 ${h5})"></div>
+      <div class="d-gloss"></div>
+    </div>`;
+}
+
+function buildAndMountDish3D(imageURL) {
+  const stage = document.getElementById('viewDish3DStage');
+  if (!stage) return;
+
+  dish3dRotY = 0;
+  dish3dRotX = 56;
+
+  stage.innerHTML = `
+    <div class="dish3d dish3d--atelier" id="dish3dEl">
+      <div class="dish3d-tableshadow"></div>
+      <div class="dish3d-inner" id="dish3dInner"
+           style="transform:rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY - 180}deg) scale(0.6);opacity:0;">
+        <div class="dish3d-plate">
+          <div class="dish3d-plate-rim"></div>
+          <div class="dish3d-plate-well">${buildDishWellContent(imageURL)}</div>
+        </div>
+        <div class="dish3d-spotglow"></div>
+      </div>
+      <div class="dish3d-hint">↺ arrastra para girar</div>
+    </div>`;
+
+  const el = document.getElementById('dish3dEl');
+  if (el) {
+    el.addEventListener('mousedown', onDish3DDown);
+    el.addEventListener('touchstart', onDish3DDown, { passive: false });
   }
 
-  renderAlergenosSection(currentAlergenos);
+  requestAnimationFrame(() => {
+    const inner = document.getElementById('dish3dInner');
+    if (!inner) return;
+    inner.style.transition = 'transform 0.9s cubic-bezier(.18,.9,.2,1), opacity 0.6s';
+    inner.style.transform = `rotateX(${dish3dRotX}deg) rotateY(${dish3dRotY}deg)`;
+    inner.style.opacity = '1';
+  });
 }
 
+// ── Allergens ────────────────────────────────────────────────────────
 function renderAlergenosSection(alergenos) {
   if (!viewAlergenosSection) return;
-  const chips = viewAlergenosSection.querySelector('.alergenos-chips');
+  const chips = viewAlergenosSection.querySelector('.alg-atelier-chips');
   if (!chips) return;
   chips.innerHTML = '';
   const entries = Object.entries(alergenos || {});
@@ -79,21 +117,58 @@ function renderAlergenosSection(alergenos) {
   viewAlergenosSection.classList.remove('hidden');
   for (const [name, val] of entries) {
     const chip = document.createElement('span');
-    chip.className = `alergeno-chip ${val === 'T' ? 'traza' : 'presente'}`;
-    chip.textContent = val === 'T' ? `${name} (T)` : name;
-    chip.title = val === 'T' ? `${name}: trazas` : `${name}: presente`;
+    const isTrace = val === 'T';
+    chip.className = `alg-atelier-chip${isTrace ? ' is-trace' : ''}`;
+    chip.title = isTrace ? `${name}: trazas` : `${name}: presente`;
+    if (isTrace) {
+      chip.innerHTML = `${name}<em> · trazas</em>`;
+    } else {
+      chip.textContent = name;
+    }
     chips.appendChild(chip);
   }
 }
 
-function getCurrentNumber() {
-  return currentNumber;
+// ── Public API ───────────────────────────────────────────────────────
+function renderView({ n, palabra, descripcion, imageURL, alergenos }) {
+  currentNumber = n;
+  currentPalabra = palabra || '';
+  currentDescripcion = descripcion || '';
+  currentImageURL = imageURL || '';
+  currentAlergenos = alergenos || {};
+
+  const numEl = document.getElementById('viewNumber');
+  const titleEl = document.getElementById('viewTitle');
+  const descEl = document.getElementById('viewDesc');
+
+  if (numEl) numEl.textContent = String(n).padStart(2, '0');
+  if (titleEl) titleEl.textContent = currentPalabra || '—';
+  if (descEl) descEl.textContent = currentDescripcion || '—';
+
+  buildAndMountDish3D(imageURL);
+  renderAlergenosSection(currentAlergenos);
 }
 
-function isViewOpen() {
-  return viewBackdrop.classList.contains('is-open');
+function openView() {
+  viewBackdrop.classList.add('is-open');
+  viewBackdrop.removeAttribute('aria-hidden');
+  requestAnimationFrame(() => {
+    viewShell?.classList.add('is-mounted');
+  });
+  viewCloseBtn?.focus();
 }
 
+function closeView() {
+  viewShell?.classList.remove('is-mounted');
+  setTimeout(() => {
+    viewBackdrop.classList.remove('is-open');
+  }, 320);
+  viewBackdrop.setAttribute('aria-hidden', 'true');
+  currentNumber = null;
+}
+
+function getCurrentNumber() { return currentNumber; }
+function isViewOpen() { return viewBackdrop.classList.contains('is-open'); }
 function getCurrentData() {
   return {
     n: currentNumber,
@@ -104,28 +179,24 @@ function getCurrentData() {
   };
 }
 
-function speakDesc() {
+// ── Event listeners ──────────────────────────────────────────────────
+viewBackdrop?.addEventListener('click', (e) => {
+  if (e.target === viewBackdrop) closeView();
+});
+viewCloseBtn?.addEventListener('click', closeView);
+viewSpeakBtn?.addEventListener('click', () => {
   if (!currentDescripcion) return;
   try {
     const synth = window.speechSynthesis;
     if (!synth) return;
     synth.cancel();
     const u = new SpeechSynthesisUtterance(currentDescripcion);
-    u.lang = 'es-ES';
-    u.rate = 1;
-    u.pitch = 1;
+    u.lang = 'es-ES'; u.rate = 1; u.pitch = 1;
     synth.speak(u);
   } catch {}
-}
-
-// Eventos internos de cierre
-viewBackdrop?.addEventListener('click', (e) => {
-  if (e.target === viewBackdrop) closeView();
 });
-viewCloseBtn?.addEventListener('click', closeView);
-viewSpeakBtn?.addEventListener('click', speakDesc);
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeView();
+  if (e.key === 'Escape' && viewBackdrop?.classList.contains('is-open')) closeView();
 });
 
 export { renderView, openView, closeView, getCurrentNumber, isViewOpen, getCurrentData };

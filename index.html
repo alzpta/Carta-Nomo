@@ -29,6 +29,18 @@
       </div>
     </header>
 
+    <!-- Barra búsqueda + filtro -->
+    <div class="carta-tools">
+      <label class="carta-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-3.6-3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar plato…" aria-label="Buscar plato" />
+        <button class="carta-search-clear hidden" id="searchClear" aria-label="Borrar búsqueda">×</button>
+      </label>
+      <button class="carta-filter" id="filterBtn" aria-label="Filtrar por alérgenos">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
     <section class="glass card" aria-labelledby="gridLabel">
       <h2 id="gridLabel" class="subtitle" style="position:absolute;left:-9999px">Selección de números</h2>
       <div id="grid" class="grid" role="grid" aria-describedby="gridHelp"></div>
@@ -60,31 +72,61 @@
     </div>
   </div>
 
-  <!-- Popup de vista (detalle número) -->
-  <div id="viewBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="viewTitle" aria-describedby="viewDesc">
-    <div class="glass sheet" role="document">
-      <header>
-        <h2 id="viewTitle">—</h2>
-      </header>
+  <!-- Popup de vista — Atelier -->
+  <div id="viewBackdrop" class="popup-host" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="viewTitle">
+    <div class="popup-shell" id="viewShell" role="document">
+      <div class="popup popup--atelier">
+        <div class="atl-bg"><div class="atl-paper"></div></div>
+        <header class="atl-header">
+          <button id="viewCloseBtn" class="atl-close" aria-label="Cerrar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="atl-no">
+            <span class="atl-no-pre">N<sup>o</sup></span>
+            <span id="viewNumber" class="atl-no-val">—</span>
+          </div>
+          <div style="width:32px"></div>
+        </header>
 
-      <div class="body">
-        <img id="viewImage" class="preview" alt="" />
-        <p id="viewDesc" class="subtitle popup-desc"></p>
-        <div id="viewAlergenos" class="alergenos-section hidden">
-          <p class="alergenos-label">Alérgenos</p>
-          <div class="alergenos-chips"></div>
+        <div id="viewDish3DStage" class="atl-stage"></div>
+
+        <div class="atl-body">
+          <h2 id="viewTitle" class="atl-name">—</h2>
+          <p id="viewDesc" class="atl-desc">—</p>
+          <div id="viewAlergenos" class="alg-atelier hidden">
+            <div class="alg-atelier-label">alérgenos</div>
+            <div class="alg-atelier-chips"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="actions popup-actions">
-        <button id="viewSpeakBtn" class="btn">Escuchar descripción</button>
-        <button id="viewCloseBtn" class="btn">Cerrar</button>
+        <div class="atl-footer">
+          <button id="viewSpeakBtn" class="atl-listen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 10v4a1 1 0 001 1h3l4 3V6L7 9H4a1 1 0 00-1 1z" fill="currentColor"/><path d="M15 9a4 4 0 010 6M18 6a8 8 0 010 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            Escuchar
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Filter sheet -->
+  <div id="filterBackdrop" class="filter-host" role="dialog" aria-modal="true" aria-label="Filtrar alérgenos">
+    <div class="filter-sheet">
+      <div class="filter-handle"></div>
+      <div class="filter-head">
+        <h2>Ocultar platos con…</h2>
+        <button id="filterClear" class="filter-clear">Borrar todo</button>
+      </div>
+      <div id="filterList" class="filter-list"></div>
+      <div class="filter-foot">
+        <button id="filterDone" class="filter-done">Hecho</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>
-
-

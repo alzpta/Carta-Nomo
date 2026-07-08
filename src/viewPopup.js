@@ -1,4 +1,5 @@
 // Popup de vista — Atelier design con plato 3D girable
+import { t, allergenLabel } from "./i18n.js";
 
 let currentNumber = null;
 let currentPalabra = '';
@@ -119,7 +120,7 @@ function buildAndMountDish3D(imageURL) {
         </div>
         <div class="dish3d-spotglow"></div>
       </div>
-      <div class="dish3d-hint">↺ arrastra para girar</div>
+      <div class="dish3d-hint">${t('dishRotateHint')}</div>
     </div>`;
 
   dish3dInnerEl = document.getElementById('dish3dInner');
@@ -173,14 +174,15 @@ function renderAlergenosSection(alergenos) {
   }
   viewAlergenosSection.classList.remove('hidden');
   for (const [name, val] of entries) {
+    const label = allergenLabel(name);
     const chip = document.createElement('span');
     const isTrace = val === 'T';
     chip.className = `alg-atelier-chip${isTrace ? ' is-trace' : ''}`;
-    chip.title = isTrace ? `${name}: trazas` : `${name}: presente`;
-    chip.textContent = name;
+    chip.title = isTrace ? `${label}: ${t('trace')}` : label;
+    chip.textContent = label;
     if (isTrace) {
       const em = document.createElement('em');
-      em.textContent = ' · trazas';
+      em.textContent = ` · ${t('trace')}`;
       chip.appendChild(em);
     }
     chips.appendChild(chip);

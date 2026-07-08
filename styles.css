@@ -109,7 +109,11 @@ header.appbar{
 .cell:hover{ transform: translateY(-2px); box-shadow: 0 8px 22px rgba(42,31,23,.13), 0 2px 6px rgba(42,31,23,.09); }
 .cell:active{ transform: translateY(0) scale(.97) }
 .cell:focus-visible{ outline: 3px solid color-mix(in oklab, var(--tint) 55%, transparent); outline-offset: 2px }
-.cell.empty{ color: rgba(42,31,23,.28); background: linear-gradient(175deg, rgba(245,239,228,.55), rgba(235,226,211,.38)); box-shadow: 0 2px 8px rgba(42,31,23,.05); border-color: rgba(139,100,60,.10); }
+.cell.empty, .cell.is-hidden{
+  color: transparent; cursor:not-allowed; pointer-events:none;
+  background: linear-gradient(175deg, rgba(245,239,228,.55), rgba(235,226,211,.38));
+  box-shadow: 0 2px 8px rgba(42,31,23,.05); border-color: rgba(139,100,60,.10);
+}
 
 #output{ padding: 8px clamp(6px, 1.6vw, 10px) 12px; font-size: clamp(1rem, 2.8vw, 1.15rem) }
 
@@ -256,8 +260,6 @@ header.appbar{
   background:var(--danger); color:#fff; font-size:10px; font-weight:700;
   display:grid; place-items:center; border:1.5px solid var(--bg);
 }
-.cell.is-hidden{ opacity:.18; cursor:not-allowed; pointer-events:none }
-
 /* ====================================================================
    Popup nuevo — host / shell (Atelier)
    ==================================================================== */

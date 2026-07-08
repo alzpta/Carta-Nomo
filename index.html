@@ -20,7 +20,7 @@
         </svg>
         <div>
           <h1>Carta Nomo · Sarria</h1>
-          <p class="subtitle">Toca un número para ver y escuchar. Azul = libre/no existe en menú.</p>
+          <p class="subtitle" id="headerSubtitle">Toca un número para ver y escuchar. Azul = libre/no existe en menú.</p>
         </div>
       </div>
       <div class="toolbar" role="toolbar" aria-label="Acciones">
@@ -52,15 +52,15 @@
   <!-- Modal inicio de sesión -->
   <div id="loginBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="glass sheet" role="document">
-      <header><h2>Iniciar sesión</h2></header>
+      <header><h2 id="loginTitle">Iniciar sesión</h2></header>
       <div class="body">
         <div class="row">
-          <label for="loginEmail">Correo</label>
+          <label for="loginEmail" id="loginEmailLabel">Correo</label>
           <input type="email" id="loginEmail" required aria-invalid="false" />
           <div id="loginEmailError" class="error" aria-live="polite"></div>
         </div>
         <div class="row">
-          <label for="loginPass">Contraseña</label>
+          <label for="loginPass" id="loginPassLabel">Contraseña</label>
           <input type="password" id="loginPass" required aria-invalid="false" />
           <div id="loginPassError" class="error" aria-live="polite"></div>
         </div>
@@ -94,11 +94,11 @@
           <h2 id="viewTitle" class="atl-name">—</h2>
           <p id="viewDesc" class="atl-desc">—</p>
           <div id="viewIngredientes" class="ing-atelier hidden">
-            <div class="ing-atelier-label">ingredientes</div>
+            <div class="ing-atelier-label" id="viewIngredientesLabel">ingredientes</div>
             <ul class="ing-list"></ul>
           </div>
           <div id="viewAlergenos" class="alg-atelier hidden">
-            <div class="alg-atelier-label">alérgenos</div>
+            <div class="alg-atelier-label" id="viewAlergenosLabel">alérgenos</div>
             <div class="alg-atelier-chips"></div>
           </div>
         </div>
@@ -106,7 +106,7 @@
         <div class="atl-footer">
           <button id="viewSpeakBtn" class="atl-listen">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 10v4a1 1 0 001 1h3l4 3V6L7 9H4a1 1 0 00-1 1z" fill="currentColor"/><path d="M15 9a4 4 0 010 6M18 6a8 8 0 010 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-            Escuchar
+            <span id="viewSpeakLabel">Escuchar</span>
           </button>
         </div>
       </div>
@@ -118,7 +118,7 @@
     <div class="filter-sheet">
       <div class="filter-handle"></div>
       <div class="filter-head">
-        <h2>Ocultar platos con…</h2>
+        <h2 id="filterSheetTitle">Ocultar platos con…</h2>
         <button id="filterClear" class="filter-clear">Borrar todo</button>
       </div>
       <div id="filterList" class="filter-list"></div>

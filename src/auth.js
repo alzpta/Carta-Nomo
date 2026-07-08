@@ -1,4 +1,5 @@
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { t } from "./i18n.js";
 
 export function initAuth(auth, elements) {
   const {
@@ -29,7 +30,7 @@ export function initAuth(auth, elements) {
     const on = !!user;
     logoutBtn?.classList.toggle('hidden', !on);
     loginBtn?.classList.toggle('hidden', on);
-    if (userInfo) userInfo.textContent = on ? `Sesión: ${user.email}` : 'Sesión: invitado';
+    if (userInfo) userInfo.textContent = on ? `${t('sessionPrefix')}${user.email}` : t('sessionGuest');
   };
   onAuthStateChanged(auth, renderAuthUI);
 
@@ -62,15 +63,15 @@ export function initAuth(auth, elements) {
     let hasError = false;
 
     if (!email) {
-      setError(loginEmail, loginEmailError, 'El correo es obligatorio.');
+      setError(loginEmail, loginEmailError, t('emailRequired'));
       hasError = true;
     } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setError(loginEmail, loginEmailError, 'Correo no válido.');
+      setError(loginEmail, loginEmailError, t('emailInvalid'));
       hasError = true;
     }
 
     if (!pass) {
-      setError(loginPass, loginPassError, 'La contraseña es obligatoria.');
+      setError(loginPass, loginPassError, t('passRequired'));
       hasError = true;
     }
 
@@ -83,11 +84,11 @@ export function initAuth(auth, elements) {
     } catch (e) {
       const code = e?.code || '';
       if (code === 'auth/invalid-email' || code === 'auth/user-not-found' || code === 'auth/user-disabled') {
-        setError(loginEmail, loginEmailError, 'Correo no válido o usuario inexistente.');
+        setError(loginEmail, loginEmailError, t('userNotFound'));
       } else if (code === 'auth/wrong-password') {
-        setError(loginPass, loginPassError, 'Contraseña incorrecta.');
+        setError(loginPass, loginPassError, t('wrongPassword'));
       } else {
-        setError(loginPass, loginPassError, e?.message || 'Error al iniciar sesión.');
+        setError(loginPass, loginPassError, t('loginError'));
       }
     } finally {
       loginSubmit.disabled = false;

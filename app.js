@@ -6,6 +6,31 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-s
 import { initAuth } from "./src/auth.js";
 import { renderView, openView } from "./src/viewPopup.js";
 import { subscribeNumeros } from "./src/db.js";
+import { t, allergenLabel } from "./src/i18n.js";
+
+// Traducción de textos estáticos de la interfaz según el idioma del dispositivo
+const setText = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = t(key); };
+setText('headerSubtitle', 'subtitle');
+setText('gridLabel', 'gridLabel');
+setText('gridHelp', 'gridHelp');
+setText('loginTitle', 'loginTitle');
+setText('loginEmailLabel', 'emailLabel');
+setText('loginPassLabel', 'passLabel');
+setText('loginCancel', 'cancel');
+setText('loginSubmit', 'enter');
+setText('viewIngredientesLabel', 'ingredients');
+setText('viewAlergenosLabel', 'allergens');
+setText('viewSpeakLabel', 'listen');
+setText('filterSheetTitle', 'filterSheetTitle');
+setText('filterClear', 'filterClearAll');
+setText('filterDone', 'filterDone');
+if (document.getElementById('loginBtn')) document.getElementById('loginBtn').textContent = t('login');
+document.getElementById('searchInput')?.setAttribute('placeholder', t('searchPlaceholder'));
+document.getElementById('searchInput')?.setAttribute('aria-label', t('searchLabel'));
+document.getElementById('searchClear')?.setAttribute('aria-label', t('searchClear'));
+document.getElementById('filterBtn')?.setAttribute('aria-label', t('filterLabel'));
+document.getElementById('filterBackdrop')?.setAttribute('aria-label', t('filterLabel'));
+document.getElementById('viewCloseBtn')?.setAttribute('aria-label', t('close'));
 
 // Helpers para manifest/iconos según BASE_PATH
 const addLink = (rel, href) => {
@@ -122,7 +147,7 @@ function buildFilterList() {
     const row = document.createElement('button');
     const on = hiddenAllergens.has(name);
     row.className = `filter-row${on ? ' is-on' : ''}`;
-    row.innerHTML = `<span>${name}</span><span class="filter-toggle"><span class="filter-toggle-knob"></span></span>`;
+    row.innerHTML = `<span>${allergenLabel(name)}</span><span class="filter-toggle"><span class="filter-toggle-knob"></span></span>`;
     row.addEventListener('click', () => {
       if (hiddenAllergens.has(name)) hiddenAllergens.delete(name);
       else hiddenAllergens.add(name);
